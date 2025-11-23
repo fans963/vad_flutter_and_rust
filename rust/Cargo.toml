@@ -1,0 +1,15 @@
+[package]
+name = "rust_lib_vad"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+flutter_rust_bridge = "=2.11.1"
+rustfft = "6.4.1"
+symphonia = { version = "0.5.5", features = ["all"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
