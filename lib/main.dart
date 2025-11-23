@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
   Float64List? _audioData;
   double _zoomLevel = 1.0; // 1.0 表示显示所有数据
   double _panPosition = 0.0; // 0.0 到 1.0，表示起始位置的比例
-  static const int maxPoints = 1000; // 最大显示点数
+  static const int maxPoints = 10000; // 最大显示点数
 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
