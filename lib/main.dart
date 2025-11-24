@@ -3,12 +3,15 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/rust/api/audio_processor.dart';
 import 'package:vad/src/rust/api/simple.dart';
 import 'package:vad/src/rust/frb_generated.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
+  await trayManager.setIcon('assets/icon/icon.svg');
   runApp(const MyApp());
 }
 
@@ -97,6 +100,7 @@ class _MyAppState extends State<MyApp> {
                   const Text('Pan: '),
                   Expanded(
                     child: Slider(
+                      year2023: false,
                       value: _panPosition,
                       min: 0.0,
                       max: 1.0,

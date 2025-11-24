@@ -38,10 +38,17 @@ dependencies:
     path: rust_builder
   flutter_rust_bridge: 2.11.1
   file_picker: ^10.3.7
-  riverpod: ^3.0.3
   fl_chart: ^1.1.1
+  flutter_mobx: ^2.3.0
+  get_it: ^9.1.0
+  flex_color_scheme: ^8.3.1
+  tray_manager: ^0.5.2
 
 dev_dependencies:
+  flutter_launcher_icons:
+    git:
+      url: https://github.com/devmil/flutter_launcher_icons.git
+      ref: add_linux_support
   flutter_test:
     sdk: flutter
 
@@ -64,6 +71,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/icon/icon.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

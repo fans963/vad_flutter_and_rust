@@ -2,15 +2,18 @@
 
 A new Flutter project.
 
-## Getting Started
+## Linux 编译 tray_manager 报错解决方案
 
-This project is a starting point for a Flutter application.
+如果在 Linux 下编译 Flutter 项目并使用 tray_manager 插件时遇到如下错误：
 
-A few resources to get you started if this is your first Flutter project:
+```
+error: 'app_indicator_new' is deprecated [-Werror,-Wdeprecated-declarations]
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+请在 `linux/flutter/ephemeral/.plugin_symlinks/tray_manager/linux/CMakeLists.txt` 添加如下编译参数：
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+target_compile_options(${PLUGIN_NAME} PRIVATE -Wno-error=deprecated-declarations)
+```
+
+这样可关闭废弃 API 报错，正常编译运行。
