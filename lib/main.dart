@@ -7,11 +7,28 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/rust/api/audio_processor.dart';
 import 'package:vad/src/rust/api/simple.dart';
 import 'package:vad/src/rust/frb_generated.dart';
+import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
   await trayManager.setIcon('assets/icon/icon.svg');
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(800, 600),
+    center: true,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
+    windowButtonVisibility: false,
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    // await windowManager.setResizable(true);
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
   runApp(const MyApp());
 }
 
@@ -67,10 +84,45 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('flutter_rust_bridge quickstart')),
+        appBar: null,
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            // 自定义标题栏
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onPanStart: (_) async {
+                await windowManager.startDragging();
+              },
+              child: Container(
+                height: 36,
+                color: Colors.grey[900],
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    const Text(
+                      'flutter_rust_bridge quickstart',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    const Spacer(),
+                    // 可选：窗口控制按钮
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      padding: EdgeInsets.zero,
+                      onPressed: () async {
+                        await windowManager.close();
+                      },
+                      tooltip: '关闭',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // 原内容
             Text(
               'Action: Call Rust `greet("$_selectedFileName")`\nResult: `${greet(name: _selectedFileName)}`\nFile size: $_fileBytesLength bytes\nAudioProcessor: ${_audioProcessor != null ? 'Created' : 'Not created'}',
             ),
