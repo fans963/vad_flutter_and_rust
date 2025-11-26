@@ -3,3 +3,4 @@ rust_root: rust/
 dart_output: lib/src/rust
 enable_lifetime: true
 default_dart_async: false
+web: true

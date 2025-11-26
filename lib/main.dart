@@ -1,33 +1,38 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/rust/api/audio_processor.dart';
 import 'package:vad/src/rust/api/simple.dart';
+import 'package:vad/src/rust/api/util.dart';
 import 'package:vad/src/rust/frb_generated.dart';
+import 'package:vad/src/util.dart';
 import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
-  await trayManager.setIcon('assets/icon/icon.svg');
-  await windowManager.ensureInitialized();
+  if (isDesktop) {
+    await trayManager.setIcon('assets/icon/icon.svg');
+    await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(800, 600),
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden,
-    windowButtonVisibility: false,
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    // await windowManager.setResizable(true);
-    await windowManager.show();
-    await windowManager.focus();
-  });
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(800, 600),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+      windowButtonVisibility: false,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      // await windowManager.setResizable(true);
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   runApp(const MyApp());
 }
@@ -92,6 +97,7 @@ class _MyAppState extends State<MyApp> {
             GestureDetector(
               behavior: HitTestBehavior.translucent,
               onPanStart: (_) async {
+                if (!isDesktop) return;
                 await windowManager.startDragging();
               },
               child: Container(
@@ -114,6 +120,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                       padding: EdgeInsets.zero,
                       onPressed: () async {
+                        if (!isDesktop) return;
                         await windowManager.close();
                       },
                       tooltip: '关闭',

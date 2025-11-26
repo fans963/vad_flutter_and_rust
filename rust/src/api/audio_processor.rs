@@ -1,17 +1,13 @@
-use flutter_rust_bridge::handler::TaskInfo;
 use std::io::Cursor;
-use symphonia::core::audio::{AudioBufferRef, Signal, SignalSpec};
-use symphonia::core::codecs::DecoderOptions;
-use symphonia::core::formats::FormatOptions;
-use symphonia::core::formats::FormatReader;
-use symphonia::core::io::MediaSourceStream;
-use symphonia::core::meta::MetadataOptions;
+use rayon::option;
+use symphonia::core::audio::Signal;
 use symphonia::core::probe::Hint;
 
 #[frb(opaque)]
 pub struct AudioProcessor {
     file_path: String,
     audio_data: Vec<f64>,
+    cached_fft_data: Option<(usize, Vec<f64>)>,
     sample_rate: u32,
     frame_size: usize,
 }
@@ -109,6 +105,7 @@ impl AudioProcessor {
         AudioProcessor {
             file_path,
             audio_data: samples_f64,
+            cached_fft_data: None,
             frame_size: 512,
             sample_rate,
         }
@@ -134,8 +131,14 @@ impl AudioProcessor {
         }
     }
 
-    pub async fn fft() -> Vec<f64> {
-        // Placeholder for FFT processing logic
+    pub async fn fft(&self) -> Vec<f64> {
+        if let Some(cached_data)=&self.cached_fft_data {
+            if cached_data.0==self.frame_size {
+                return cached_data.1.clone();
+            }else {
+                
+            }
+        }
 
         vec![]
     }

@@ -8,8 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessor>>
 abstract class AudioProcessor implements RustOpaqueInterface {
-  static Future<Float64List> fft() =>
-      RustLib.instance.api.crateApiAudioProcessorAudioProcessorFft();
+  Future<Float64List> fft();
 
   Future<Float64List> getAudioData();
 

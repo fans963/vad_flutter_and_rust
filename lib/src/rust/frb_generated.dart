@@ -68,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 870302840;
+  int get rustContentHash => 960825477;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,7 +79,9 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<Float64List> crateApiAudioProcessorAudioProcessorFft();
+  Future<Float64List> crateApiAudioProcessorAudioProcessorFft({
+    required AudioProcessor that,
+  });
 
   Future<Float64List> crateApiAudioProcessorAudioProcessorGetAudioData({
     required AudioProcessor that,
@@ -100,6 +102,11 @@ abstract class RustLibApi extends BaseApi {
 
   void crateApiAudioProcessorAudioProcessorSetFrameSize({
     required AudioProcessor that,
+    required BigInt frameSize,
+  });
+
+  Future<Float64List> crateApiUtilCaculateFftParallel({
+    required List<double> inputData,
     required BigInt frameSize,
   });
 
@@ -130,11 +137,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<Float64List> crateApiAudioProcessorAudioProcessorFft() {
+  Future<Float64List> crateApiAudioProcessorAudioProcessorFft({
+    required AudioProcessor that,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessor(
+            that,
+            serializer,
+          );
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -147,14 +160,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiAudioProcessorAudioProcessorFftConstMeta,
-        argValues: [],
+        argValues: [that],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta get kCrateApiAudioProcessorAudioProcessorFftConstMeta =>
-      const TaskConstMeta(debugName: "AudioProcessor_fft", argNames: []);
+      const TaskConstMeta(debugName: "AudioProcessor_fft", argNames: ["that"]);
 
   @override
   Future<Float64List> crateApiAudioProcessorAudioProcessorGetAudioData({
@@ -327,6 +340,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Float64List> crateApiUtilCaculateFftParallel({
+    required List<double> inputData,
+    required BigInt frameSize,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_f_64_loose(inputData, serializer);
+          sse_encode_usize(frameSize, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_f_64_strict,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiUtilCaculateFftParallelConstMeta,
+        argValues: [inputData, frameSize],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiUtilCaculateFftParallelConstMeta =>
+      const TaskConstMeta(
+        debugName: "caculate_fft_parallel",
+        argNames: ["inputData", "frameSize"],
+      );
+
+  @override
   Future<DownSampleChartData> crateApiUtilDownSampleData({
     required List<double> rawData,
   }) {
@@ -338,7 +386,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 8,
             port: port_,
           );
         },
@@ -363,7 +411,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -385,7 +433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -805,6 +853,9 @@ class AudioProcessorImpl extends RustOpaque implements AudioProcessor {
     rustArcDecrementStrongCountPtr:
         RustLib.instance.api.rust_arc_decrement_strong_count_AudioProcessorPtr,
   );
+
+  Future<Float64List> fft() =>
+      RustLib.instance.api.crateApiAudioProcessorAudioProcessorFft(that: this);
 
   Future<Float64List> getAudioData() => RustLib.instance.api
       .crateApiAudioProcessorAudioProcessorGetAudioData(that: this);

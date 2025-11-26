@@ -6,6 +6,14 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+Future<Float64List> caculateFftParallel({
+  required List<double> inputData,
+  required BigInt frameSize,
+}) => RustLib.instance.api.crateApiUtilCaculateFftParallel(
+  inputData: inputData,
+  frameSize: frameSize,
+);
+
 Future<DownSampleChartData> downSampleData({required List<double> rawData}) =>
     RustLib.instance.api.crateApiUtilDownSampleData(rawData: rawData);
 
