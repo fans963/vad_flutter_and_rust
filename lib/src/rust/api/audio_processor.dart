@@ -5,25 +5,43 @@
 
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'util.dart';
+
+// These functions are ignored because they are not marked as `pub`: `get_offset_visible_data`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `AudioInfo`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessor>>
 abstract class AudioProcessor implements RustOpaqueInterface {
-  Future<Float64List> fft();
+  Future<void> add({required String filePath, required List<int> fileData});
 
-  Future<Float64List> getAudioData();
+  BigInt audioDataLen({required String filePath});
 
-  void getFilePath();
+  Future<ChartData> getAudioData({
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+  });
 
-  BigInt getFrameSize();
+  Future<ChartData> getDownSampledData({
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+    required double downSampleFactor,
+  });
+
+  Future<ChartData> getFftData({
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+  });
+
+  BigInt getFrameSize({required String filePath});
+
+  int getSampleRate({required String filePath});
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
-  static Future<AudioProcessor> newInstance({
-    required String filePath,
-    required List<int> fileData,
-  }) => RustLib.instance.api.crateApiAudioProcessorAudioProcessorNew(
-    filePath: filePath,
-    fileData: fileData,
-  );
+  static Future<AudioProcessor> newInstance() =>
+      RustLib.instance.api.crateApiAudioProcessorAudioProcessorNew();
 
   void setFrameSize({required BigInt frameSize});
 }

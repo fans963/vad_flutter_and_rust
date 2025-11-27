@@ -1,29 +1,40 @@
+use rayon::prelude::*;
+use symphonia::core::formats::util;
 use std::io::Cursor;
-use rayon::option;
-use symphonia::core::audio::Signal;
+use std::ops::Index;
+use symphonia::core::audio::{self, Signal};
 use symphonia::core::probe::Hint;
+
+use crate::api::util::{ChartData, calculate_fft_parallel};
+
+pub struct AudioInfo {
+    audio_data: Vec<f64>,
+    cached_fft_data: std::sync::RwLock<Option<(usize, Vec<f64>)>>, // 使用 RwLock 保证线程安全
+    sample_rate: u32,
+}
 
 #[frb(opaque)]
 pub struct AudioProcessor {
-    file_path: String,
-    audio_data: Vec<f64>,
-    cached_fft_data: Option<(usize, Vec<f64>)>,
-    sample_rate: u32,
+    audio_info_map: std::collections::HashMap<String, AudioInfo>,
     frame_size: usize,
 }
 
 impl AudioProcessor {
-    pub async fn new(file_path: String, file_data: Vec<u8>) -> Self {
-        // 1. 设置 Symohonia 读入源 (使用 Cursor 模拟文件读取)
+    pub async fn new() -> Self {
+        AudioProcessor {
+            audio_info_map: std::collections::HashMap::new(),
+            frame_size: 512,
+        }
+    }
+
+    pub async fn add(&mut self, file_path: String, file_data: Vec<u8>) {
         let source = Box::new(Cursor::new(file_data));
 
-        // 2. 尝试识别文件类型（Hint可以根据文件名/扩展名提供提示）
         let mut hint = Hint::new();
         if let Some(ext) = file_path.rfind('.').map(|i| &file_path[i + 1..]) {
             hint.with_extension(ext);
         }
 
-        // 3. 获取 FormatReader
         let mss = symphonia::core::io::MediaSourceStream::new(source, Default::default());
         let probed = symphonia::default::get_probe()
             .format(
@@ -35,7 +46,6 @@ impl AudioProcessor {
             .expect("UNSUPPORTED_AUDIO_FORMAT");
         let mut format_reader = probed.format;
 
-        // 4. 选择第一个音频轨道并获取其参数
         let track = format_reader
             .tracks()
             .iter()
@@ -46,7 +56,6 @@ impl AudioProcessor {
         let track_id = track.id;
 
         println!("Audio sample rate: {}", sample_rate);
-        // 5. 初始化解码器
         let mut decoder = symphonia::default::get_codecs()
             .make(
                 &track.codec_params,
@@ -56,17 +65,13 @@ impl AudioProcessor {
 
         let mut samples_f64: Vec<f64> = Vec::new();
 
-        // 6. 循环解码音频包
         loop {
-            // 获取下一个音频包
             let packet = match format_reader.next_packet() {
                 Ok(p) => p,
                 Err(symphonia::core::errors::Error::ResetRequired) => {
-                    // 解码器需要重置，通常是因为格式变化
                     continue;
                 }
                 Err(symphonia::core::errors::Error::IoError(_)) => {
-                    // 读到文件末尾或 I/O 错误
                     break;
                 }
                 Err(e) => panic!("PACKET_READ_ERROR: {:?}", e),
@@ -76,22 +81,17 @@ impl AudioProcessor {
                 continue;
             }
 
-            // 解码包
             match decoder.decode(&packet) {
                 Ok(decoded_buffer) => {
-                    // 7. 将解码后的样本转换为 f32 并添加到 Vec 中
                     let spec = decoded_buffer.spec();
                     let duration = decoded_buffer.capacity();
 
-                    // 创建一个 AudioBuffer，用于统一处理不同格式
                     let mut audio_buffer: symphonia::core::audio::AudioBuffer<f64> =
                         symphonia::core::audio::AudioBuffer::new(duration as u64, *spec);
                     decoded_buffer.convert(&mut audio_buffer);
 
-                    // 遍历所有通道，将样本转换为 f64
                     for channel in 0..spec.channels.count() {
                         for sample_i32 in audio_buffer.chan(channel) {
-                            // IntoSample trait 帮助将 i16, i32, f64 等转换为 f64
                             samples_f64.push(*sample_i32);
                         }
                     }
@@ -102,46 +102,158 @@ impl AudioProcessor {
             }
         }
 
-        AudioProcessor {
-            file_path,
-            audio_data: samples_f64,
-            cached_fft_data: None,
-            frame_size: 512,
-            sample_rate,
+        self.audio_info_map.insert(
+            file_path.clone(),
+            AudioInfo {
+                audio_data: samples_f64,
+                cached_fft_data: std::sync::RwLock::new(None),
+                sample_rate,
+            },
+        );
+    }
+
+    async fn get_offset_visible_data(
+        &self,
+        offset: (f64, f64),
+        index: (usize, usize),
+        data: &Vec<f64>,
+    ) -> ChartData {
+        let index_data = if index.0 >= index.1 {
+            println!("Invalid index range: start {} >= end {}", index.0, index.1);
+            Vec::new()
+        } else {
+            (index.0..index.1.min(data.len()))
+                .into_par_iter()
+                .map(|i| i as f64 + offset.0)
+                .collect()
+        };
+
+        let plot_data = if index.0 >= data.len() || index.0 >= index.1 {
+            println!("Index out of bounds or invalid range: start {}", index.0);
+            Vec::new()
+        } else {
+            let end = (index.1).min(data.len());
+            data[index.0..end].to_vec()
+        };
+
+        ChartData {
+            index: index_data,
+            data: plot_data,
         }
     }
 
-    pub fn get_file_path(&self) -> &str {
-        &self.file_path
+    pub async fn get_audio_data(
+        &self,
+        file_path: String,
+        offset: (f64, f64),
+        index: (usize, usize),
+    ) -> ChartData {
+        if self.audio_info_map.contains_key(&file_path) {
+            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
+                self.get_offset_visible_data(offset, index, &audio_info.audio_data)
+                    .await
+            } else {
+                println!("File not found: {}", file_path);
+                ChartData {
+                    index: vec![],
+                    data: vec![],
+                }
+            }
+        } else {
+            println!("No current file set");
+            ChartData {
+                index: vec![],
+                data: vec![],
+            }
+        }
     }
 
-    pub async fn get_audio_data(&self) -> Vec<f64> {
-        self.audio_data.clone()
+    pub async fn get_down_sampled_data(
+        &self,
+        file_path: String,
+        offset: (f64, f64),
+        index: (usize, usize),
+        down_sample_factor: f64,
+    ) -> ChartData {
+        crate::api::util::down_sample_data(
+            self.get_audio_data(file_path, offset, index).await,
+            down_sample_factor,
+        )
+        .await
     }
 
-    pub fn get_frame_size(&self) -> usize {
+    pub fn get_frame_size(&self, file_path: String) -> usize {
         self.frame_size
     }
 
     pub fn set_frame_size(&mut self, frame_size: usize) {
-        if frame_size.is_power_of_two() {
-            self.frame_size = frame_size;
-        } else {
-            println!("Frame size must be a power of two.");
-        }
+        self.frame_size = frame_size;
     }
 
-    pub async fn fft(&self) -> Vec<f64> {
-        if let Some(cached_data)=&self.cached_fft_data {
-            if cached_data.0==self.frame_size {
-                return cached_data.1.clone();
-            }else {
-                
+    pub async fn get_fft_data(
+        &self,
+        file_path: String,
+        offset: (f64, f64),
+        index: (usize, usize),
+    ) -> ChartData {
+        if self.audio_info_map.contains_key(&file_path) {
+            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
+                // 使用读锁检查缓存
+                let needs_update = {
+                    let cached_data_guard = audio_info.cached_fft_data.read().unwrap();
+                    match &*cached_data_guard {
+                        Some(cached_data) if cached_data.0 == self.frame_size => {
+                            return ChartData {
+                                index: vec![], // TODO: populate with proper frequency bins
+                                data: cached_data.1.clone(),
+                            };
+                        }
+                        _ => true, // 缓存不存在或帧大小不匹配
+                    }
+                };
+
+                // 如果需要更新缓存，先计算FFT，然后使用写锁更新缓存
+                if needs_update {
+                    let fft_data = calculate_fft_parallel(audio_info.audio_data.clone(), self.frame_size).await;
+                    {
+                        let mut cached_data_guard = audio_info.cached_fft_data.write().unwrap();
+                        *cached_data_guard = Some((self.frame_size, fft_data.clone()));
+                    }
+                    return ChartData {
+                        index: vec![], // TODO: populate with proper frequency bins
+                        data: fft_data,
+                    };
+                }
             }
         }
 
-        vec![]
+        ChartData {
+            index: vec![],
+            data: vec![],
+        }
     }
 
-    // pub
+    pub fn audio_data_len(&self, file_path: String) -> usize {
+        if self.audio_info_map.contains_key(&file_path) {
+            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
+                audio_info.audio_data.len()
+            } else {
+                0
+            }
+        } else {
+            0
+        }
+    }
+
+    pub fn get_sample_rate(&self, file_path: String) -> u32 {
+        if self.audio_info_map.contains_key(&file_path) {
+            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
+                audio_info.sample_rate
+            } else {
+                0
+            }
+        } else {
+            0
+        }
+    }
 }

@@ -6,22 +6,32 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<Float64List> caculateFftParallel({
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
+
+Future<Float64List> calculateFftParallel({
   required List<double> inputData,
   required BigInt frameSize,
-}) => RustLib.instance.api.crateApiUtilCaculateFftParallel(
+}) => RustLib.instance.api.crateApiUtilCalculateFftParallel(
   inputData: inputData,
   frameSize: frameSize,
 );
 
-Future<DownSampleChartData> downSampleData({required List<double> rawData}) =>
-    RustLib.instance.api.crateApiUtilDownSampleData(rawData: rawData);
+Future<Float64List> performLog10Parallel({required List<double> inputData}) =>
+    RustLib.instance.api.crateApiUtilPerformLog10Parallel(inputData: inputData);
 
-class DownSampleChartData {
+Future<ChartData> downSampleData({
+  required ChartData rawData,
+  required double downSampleFactor,
+}) => RustLib.instance.api.crateApiUtilDownSampleData(
+  rawData: rawData,
+  downSampleFactor: downSampleFactor,
+);
+
+class ChartData {
   final Float64List index;
   final Float64List data;
 
-  const DownSampleChartData({required this.index, required this.data});
+  const ChartData({required this.index, required this.data});
 
   @override
   int get hashCode => index.hashCode ^ data.hashCode;
@@ -29,7 +39,7 @@ class DownSampleChartData {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DownSampleChartData &&
+      other is ChartData &&
           runtimeType == other.runtimeType &&
           index == other.index &&
           data == other.data;

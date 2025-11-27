@@ -68,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 960825477;
+  int get rustContentHash => 680387333;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,44 +79,73 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<Float64List> crateApiAudioProcessorAudioProcessorFft({
+  Future<void> crateApiAudioProcessorAudioProcessorAdd({
     required AudioProcessor that,
+    required String filePath,
+    required List<int> fileData,
   });
 
-  Future<Float64List> crateApiAudioProcessorAudioProcessorGetAudioData({
+  BigInt crateApiAudioProcessorAudioProcessorAudioDataLen({
     required AudioProcessor that,
+    required String filePath,
   });
 
-  void crateApiAudioProcessorAudioProcessorGetFilePath({
+  Future<ChartData> crateApiAudioProcessorAudioProcessorGetAudioData({
     required AudioProcessor that,
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+  });
+
+  Future<ChartData> crateApiAudioProcessorAudioProcessorGetDownSampledData({
+    required AudioProcessor that,
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+    required double downSampleFactor,
+  });
+
+  Future<ChartData> crateApiAudioProcessorAudioProcessorGetFftData({
+    required AudioProcessor that,
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
   });
 
   BigInt crateApiAudioProcessorAudioProcessorGetFrameSize({
     required AudioProcessor that,
+    required String filePath,
   });
 
-  Future<AudioProcessor> crateApiAudioProcessorAudioProcessorNew({
+  int crateApiAudioProcessorAudioProcessorGetSampleRate({
+    required AudioProcessor that,
     required String filePath,
-    required List<int> fileData,
   });
+
+  Future<AudioProcessor> crateApiAudioProcessorAudioProcessorNew();
 
   void crateApiAudioProcessorAudioProcessorSetFrameSize({
     required AudioProcessor that,
     required BigInt frameSize,
   });
 
-  Future<Float64List> crateApiUtilCaculateFftParallel({
+  Future<Float64List> crateApiUtilCalculateFftParallel({
     required List<double> inputData,
     required BigInt frameSize,
   });
 
-  Future<DownSampleChartData> crateApiUtilDownSampleData({
-    required List<double> rawData,
+  Future<ChartData> crateApiUtilDownSampleData({
+    required ChartData rawData,
+    required double downSampleFactor,
   });
 
   String crateApiSimpleGreet({required String name});
 
   void crateApiSimpleInitApp();
+
+  Future<Float64List> crateApiUtilPerformLog10Parallel({
+    required List<double> inputData,
+  });
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_AudioProcessor;
@@ -137,17 +166,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<Float64List> crateApiAudioProcessorAudioProcessorFft({
+  Future<void> crateApiAudioProcessorAudioProcessorAdd({
     required AudioProcessor that,
+    required String filePath,
+    required List<int> fileData,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessor(
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessor(
             that,
             serializer,
           );
+          sse_encode_String(filePath, serializer);
+          sse_encode_list_prim_u_8_loose(fileData, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -156,22 +189,62 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_list_prim_f_64_strict,
+          decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiAudioProcessorAudioProcessorFftConstMeta,
-        argValues: [that],
+        constMeta: kCrateApiAudioProcessorAudioProcessorAddConstMeta,
+        argValues: [that, filePath, fileData],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiAudioProcessorAudioProcessorFftConstMeta =>
-      const TaskConstMeta(debugName: "AudioProcessor_fft", argNames: ["that"]);
+  TaskConstMeta get kCrateApiAudioProcessorAudioProcessorAddConstMeta =>
+      const TaskConstMeta(
+        debugName: "AudioProcessor_add",
+        argNames: ["that", "filePath", "fileData"],
+      );
 
   @override
-  Future<Float64List> crateApiAudioProcessorAudioProcessorGetAudioData({
+  BigInt crateApiAudioProcessorAudioProcessorAudioDataLen({
     required AudioProcessor that,
+    required String filePath,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessor(
+            that,
+            serializer,
+          );
+          sse_encode_String(filePath, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_usize,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiAudioProcessorAudioProcessorAudioDataLenConstMeta,
+        argValues: [that, filePath],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiAudioProcessorAudioProcessorAudioDataLenConstMeta =>
+      const TaskConstMeta(
+        debugName: "AudioProcessor_audio_data_len",
+        argNames: ["that", "filePath"],
+      );
+
+  @override
+  Future<ChartData> crateApiAudioProcessorAudioProcessorGetAudioData({
+    required AudioProcessor that,
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -181,19 +254,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
+          sse_encode_String(filePath, serializer);
+          sse_encode_box_autoadd_record_f_64_f_64(offset, serializer);
+          sse_encode_box_autoadd_record_usize_usize(index, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 3,
             port: port_,
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_list_prim_f_64_strict,
+          decodeSuccessData: sse_decode_chart_data,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiAudioProcessorAudioProcessorGetAudioDataConstMeta,
-        argValues: [that],
+        argValues: [that, filePath, offset, index],
         apiImpl: this,
       ),
     );
@@ -203,43 +279,101 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   get kCrateApiAudioProcessorAudioProcessorGetAudioDataConstMeta =>
       const TaskConstMeta(
         debugName: "AudioProcessor_get_audio_data",
-        argNames: ["that"],
+        argNames: ["that", "filePath", "offset", "index"],
       );
 
   @override
-  void crateApiAudioProcessorAudioProcessorGetFilePath({
+  Future<ChartData> crateApiAudioProcessorAudioProcessorGetDownSampledData({
     required AudioProcessor that,
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+    required double downSampleFactor,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessor(
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+          sse_encode_String(filePath, serializer);
+          sse_encode_box_autoadd_record_f_64_f_64(offset, serializer);
+          sse_encode_box_autoadd_record_usize_usize(index, serializer);
+          sse_encode_f_64(downSampleFactor, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
+          decodeSuccessData: sse_decode_chart_data,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiAudioProcessorAudioProcessorGetFilePathConstMeta,
-        argValues: [that],
+        constMeta:
+            kCrateApiAudioProcessorAudioProcessorGetDownSampledDataConstMeta,
+        argValues: [that, filePath, offset, index, downSampleFactor],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiAudioProcessorAudioProcessorGetFilePathConstMeta =>
+  TaskConstMeta
+  get kCrateApiAudioProcessorAudioProcessorGetDownSampledDataConstMeta =>
       const TaskConstMeta(
-        debugName: "AudioProcessor_get_file_path",
-        argNames: ["that"],
+        debugName: "AudioProcessor_get_down_sampled_data",
+        argNames: ["that", "filePath", "offset", "index", "downSampleFactor"],
+      );
+
+  @override
+  Future<ChartData> crateApiAudioProcessorAudioProcessorGetFftData({
+    required AudioProcessor that,
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessor(
+            that,
+            serializer,
+          );
+          sse_encode_String(filePath, serializer);
+          sse_encode_box_autoadd_record_f_64_f_64(offset, serializer);
+          sse_encode_box_autoadd_record_usize_usize(index, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_chart_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiAudioProcessorAudioProcessorGetFftDataConstMeta,
+        argValues: [that, filePath, offset, index],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAudioProcessorAudioProcessorGetFftDataConstMeta =>
+      const TaskConstMeta(
+        debugName: "AudioProcessor_get_fft_data",
+        argNames: ["that", "filePath", "offset", "index"],
       );
 
   @override
   BigInt crateApiAudioProcessorAudioProcessorGetFrameSize({
     required AudioProcessor that,
+    required String filePath,
   }) {
     return handler.executeSync(
       SyncTask(
@@ -249,14 +383,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          sse_encode_String(filePath, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_usize,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiAudioProcessorAudioProcessorGetFrameSizeConstMeta,
-        argValues: [that],
+        argValues: [that, filePath],
         apiImpl: this,
       ),
     );
@@ -266,24 +401,53 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   get kCrateApiAudioProcessorAudioProcessorGetFrameSizeConstMeta =>
       const TaskConstMeta(
         debugName: "AudioProcessor_get_frame_size",
-        argNames: ["that"],
+        argNames: ["that", "filePath"],
       );
 
   @override
-  Future<AudioProcessor> crateApiAudioProcessorAudioProcessorNew({
+  int crateApiAudioProcessorAudioProcessorGetSampleRate({
+    required AudioProcessor that,
     required String filePath,
-    required List<int> fileData,
   }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessor(
+            that,
+            serializer,
+          );
+          sse_encode_String(filePath, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_32,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiAudioProcessorAudioProcessorGetSampleRateConstMeta,
+        argValues: [that, filePath],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiAudioProcessorAudioProcessorGetSampleRateConstMeta =>
+      const TaskConstMeta(
+        debugName: "AudioProcessor_get_sample_rate",
+        argNames: ["that", "filePath"],
+      );
+
+  @override
+  Future<AudioProcessor> crateApiAudioProcessorAudioProcessorNew() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(filePath, serializer);
-          sse_encode_list_prim_u_8_loose(fileData, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 8,
             port: port_,
           );
         },
@@ -293,17 +457,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiAudioProcessorAudioProcessorNewConstMeta,
-        argValues: [filePath, fileData],
+        argValues: [],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta get kCrateApiAudioProcessorAudioProcessorNewConstMeta =>
-      const TaskConstMeta(
-        debugName: "AudioProcessor_new",
-        argNames: ["filePath", "fileData"],
-      );
+      const TaskConstMeta(debugName: "AudioProcessor_new", argNames: []);
 
   @override
   void crateApiAudioProcessorAudioProcessorSetFrameSize({
@@ -319,7 +480,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_usize(frameSize, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -340,7 +501,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Float64List> crateApiUtilCaculateFftParallel({
+  Future<Float64List> crateApiUtilCalculateFftParallel({
     required List<double> inputData,
     required BigInt frameSize,
   }) {
@@ -353,7 +514,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 10,
             port: port_,
           );
         },
@@ -361,48 +522,52 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_prim_f_64_strict,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiUtilCaculateFftParallelConstMeta,
+        constMeta: kCrateApiUtilCalculateFftParallelConstMeta,
         argValues: [inputData, frameSize],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiUtilCaculateFftParallelConstMeta =>
+  TaskConstMeta get kCrateApiUtilCalculateFftParallelConstMeta =>
       const TaskConstMeta(
-        debugName: "caculate_fft_parallel",
+        debugName: "calculate_fft_parallel",
         argNames: ["inputData", "frameSize"],
       );
 
   @override
-  Future<DownSampleChartData> crateApiUtilDownSampleData({
-    required List<double> rawData,
+  Future<ChartData> crateApiUtilDownSampleData({
+    required ChartData rawData,
+    required double downSampleFactor,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_f_64_loose(rawData, serializer);
+          sse_encode_box_autoadd_chart_data(rawData, serializer);
+          sse_encode_f_64(downSampleFactor, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 11,
             port: port_,
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_down_sample_chart_data,
+          decodeSuccessData: sse_decode_chart_data,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiUtilDownSampleDataConstMeta,
-        argValues: [rawData],
+        argValues: [rawData, downSampleFactor],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiUtilDownSampleDataConstMeta =>
-      const TaskConstMeta(debugName: "down_sample_data", argNames: ["rawData"]);
+  TaskConstMeta get kCrateApiUtilDownSampleDataConstMeta => const TaskConstMeta(
+    debugName: "down_sample_data",
+    argNames: ["rawData", "downSampleFactor"],
+  );
 
   @override
   String crateApiSimpleGreet({required String name}) {
@@ -411,7 +576,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -433,7 +598,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -448,6 +613,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiSimpleInitAppConstMeta =>
       const TaskConstMeta(debugName: "init_app", argNames: []);
+
+  @override
+  Future<Float64List> crateApiUtilPerformLog10Parallel({
+    required List<double> inputData,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_f_64_loose(inputData, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_f_64_strict,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiUtilPerformLog10ParallelConstMeta,
+        argValues: [inputData],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiUtilPerformLog10ParallelConstMeta =>
+      const TaskConstMeta(
+        debugName: "perform_log10_parallel",
+        argNames: ["inputData"],
+      );
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_AudioProcessor => wire
@@ -500,12 +698,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  DownSampleChartData dco_decode_down_sample_chart_data(dynamic raw) {
+  ChartData dco_decode_box_autoadd_chart_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_chart_data(raw);
+  }
+
+  @protected
+  (double, double) dco_decode_box_autoadd_record_f_64_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as (double, double);
+  }
+
+  @protected
+  (BigInt, BigInt) dco_decode_box_autoadd_record_usize_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as (BigInt, BigInt);
+  }
+
+  @protected
+  ChartData dco_decode_chart_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return DownSampleChartData(
+    return ChartData(
       index: dco_decode_list_prim_f_64_strict(arr[0]),
       data: dco_decode_list_prim_f_64_strict(arr[1]),
     );
@@ -539,6 +755,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
+  }
+
+  @protected
+  (double, double) dco_decode_record_f_64_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_f_64(arr[0]), dco_decode_f_64(arr[1]));
+  }
+
+  @protected
+  (BigInt, BigInt) dco_decode_record_usize_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_usize(arr[0]), dco_decode_usize(arr[1]));
+  }
+
+  @protected
+  int dco_decode_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
   }
 
   @protected
@@ -615,13 +857,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  DownSampleChartData sse_decode_down_sample_chart_data(
+  ChartData sse_decode_box_autoadd_chart_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_chart_data(deserializer));
+  }
+
+  @protected
+  (double, double) sse_decode_box_autoadd_record_f_64_f_64(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_record_f_64_f_64(deserializer));
+  }
+
+  @protected
+  (BigInt, BigInt) sse_decode_box_autoadd_record_usize_usize(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_record_usize_usize(deserializer));
+  }
+
+  @protected
+  ChartData sse_decode_chart_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
     var var_index = sse_decode_list_prim_f_64_strict(deserializer);
     var var_data = sse_decode_list_prim_f_64_strict(deserializer);
-    return DownSampleChartData(index: var_index, data: var_data);
+    return ChartData(index: var_index, data: var_data);
   }
 
   @protected
@@ -656,6 +918,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  (double, double) sse_decode_record_f_64_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_f_64(deserializer);
+    var var_field1 = sse_decode_f_64(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (BigInt, BigInt) sse_decode_record_usize_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_usize(deserializer);
+    var var_field1 = sse_decode_usize(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint32();
   }
 
   @protected
@@ -746,10 +1030,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_down_sample_chart_data(
-    DownSampleChartData self,
+  void sse_encode_box_autoadd_chart_data(
+    ChartData self,
     SseSerializer serializer,
   ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_chart_data(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_record_f_64_f_64(
+    (double, double) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_record_f_64_f_64(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_record_usize_usize(
+    (BigInt, BigInt) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_record_usize_usize(self, serializer);
+  }
+
+  @protected
+  void sse_encode_chart_data(ChartData self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_f_64_strict(self.index, serializer);
     sse_encode_list_prim_f_64_strict(self.data, serializer);
@@ -806,6 +1114,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_record_f_64_f_64(
+    (double, double) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self.$1, serializer);
+    sse_encode_f_64(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_usize_usize(
+    (BigInt, BigInt) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.$1, serializer);
+    sse_encode_usize(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint32(self);
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
@@ -854,17 +1188,66 @@ class AudioProcessorImpl extends RustOpaque implements AudioProcessor {
         RustLib.instance.api.rust_arc_decrement_strong_count_AudioProcessorPtr,
   );
 
-  Future<Float64List> fft() =>
-      RustLib.instance.api.crateApiAudioProcessorAudioProcessorFft(that: this);
+  Future<void> add({required String filePath, required List<int> fileData}) =>
+      RustLib.instance.api.crateApiAudioProcessorAudioProcessorAdd(
+        that: this,
+        filePath: filePath,
+        fileData: fileData,
+      );
 
-  Future<Float64List> getAudioData() => RustLib.instance.api
-      .crateApiAudioProcessorAudioProcessorGetAudioData(that: this);
+  BigInt audioDataLen({required String filePath}) =>
+      RustLib.instance.api.crateApiAudioProcessorAudioProcessorAudioDataLen(
+        that: this,
+        filePath: filePath,
+      );
 
-  void getFilePath() => RustLib.instance.api
-      .crateApiAudioProcessorAudioProcessorGetFilePath(that: this);
+  Future<ChartData> getAudioData({
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+  }) => RustLib.instance.api.crateApiAudioProcessorAudioProcessorGetAudioData(
+    that: this,
+    filePath: filePath,
+    offset: offset,
+    index: index,
+  );
 
-  BigInt getFrameSize() => RustLib.instance.api
-      .crateApiAudioProcessorAudioProcessorGetFrameSize(that: this);
+  Future<ChartData> getDownSampledData({
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+    required double downSampleFactor,
+  }) => RustLib.instance.api
+      .crateApiAudioProcessorAudioProcessorGetDownSampledData(
+        that: this,
+        filePath: filePath,
+        offset: offset,
+        index: index,
+        downSampleFactor: downSampleFactor,
+      );
+
+  Future<ChartData> getFftData({
+    required String filePath,
+    required (double, double) offset,
+    required (BigInt, BigInt) index,
+  }) => RustLib.instance.api.crateApiAudioProcessorAudioProcessorGetFftData(
+    that: this,
+    filePath: filePath,
+    offset: offset,
+    index: index,
+  );
+
+  BigInt getFrameSize({required String filePath}) =>
+      RustLib.instance.api.crateApiAudioProcessorAudioProcessorGetFrameSize(
+        that: this,
+        filePath: filePath,
+      );
+
+  int getSampleRate({required String filePath}) =>
+      RustLib.instance.api.crateApiAudioProcessorAudioProcessorGetSampleRate(
+        that: this,
+        filePath: filePath,
+      );
 
   void setFrameSize({required BigInt frameSize}) =>
       RustLib.instance.api.crateApiAudioProcessorAudioProcessorSetFrameSize(

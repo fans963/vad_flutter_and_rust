@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +9,13 @@ import 'package:vad/src/rust/api/util.dart';
 import 'package:vad/src/rust/frb_generated.dart';
 import 'package:vad/src/util.dart';
 import 'package:window_manager/window_manager.dart';
+
+// 数据类，包含音频和FFT数据
+class AudioChartData {
+  final ChartData? audioData;
+  final ChartData? fftData;
+  AudioChartData({this.audioData, this.fftData});
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +30,6 @@ Future<void> main() async {
       backgroundColor: Colors.transparent,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.hidden,
-      windowButtonVisibility: false,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       // await windowManager.setResizable(true);
@@ -48,10 +52,43 @@ class _MyAppState extends State<MyApp> {
   String _selectedFileName = 'Tom';
   int _fileBytesLength = 0;
   AudioProcessor? _audioProcessor;
-  Float64List? _audioData;
+  String? _currentFilePath;
   double _zoomLevel = 1.0; // 1.0 表示显示所有数据
   double _panPosition = 0.0; // 0.0 到 1.0，表示起始位置的比例
-  static const int maxPoints = 10000; // 最大显示点数
+  static const int maxPoints = 1000; // 最大显示点数
+
+  // 同时获取音频和FFT数据
+  Future<AudioChartData> _getChartData() async {
+    if (_audioProcessor == null || _currentFilePath == null) {
+      return AudioChartData();
+    }
+
+    final audioDataLen = _audioProcessor!.audioDataLen(
+      filePath: _currentFilePath!,
+    );
+
+    final audioData = await _audioProcessor!.getAudioData(
+      filePath: _currentFilePath!,
+      offset: (0.0, 0.0),
+      index: (BigInt.zero, audioDataLen),
+    );
+
+    ChartData fftData = await _audioProcessor!.getFftData(
+      filePath: _currentFilePath!,
+      offset: (0.0, 0.0),
+      index: (
+        BigInt.zero,
+        audioDataLen, // 使用音频数据长度作为FFT索引范围
+      ),
+    );
+
+    fftData = ChartData(
+      index: fftData.index,
+      data: await performLog10Parallel(inputData: fftData.data),
+    );
+
+    return AudioChartData(audioData: audioData, fftData: fftData);
+  }
 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -64,21 +101,15 @@ class _MyAppState extends State<MyApp> {
 
       if (file.bytes != null) {
         final Uint8List fileContentBytes = file.bytes!;
+        final filePath = file.path!;
 
-        // 创建 AudioProcessor
-        final audioProcessor = await AudioProcessor.newInstance(
-          filePath: file.path!,
-          fileData: fileContentBytes,
-        );
-
-        // 获取音频数据
-        final audioData = await audioProcessor.getAudioData();
+        _audioProcessor ??= await AudioProcessor.newInstance();
+        _audioProcessor?.add(filePath: filePath, fileData: fileContentBytes);
 
         setState(() {
           _selectedFileName = file.name;
           _fileBytesLength = fileContentBytes.length;
-          _audioProcessor = audioProcessor;
-          _audioData = audioData;
+          _currentFilePath = filePath;
         });
       }
     }
@@ -107,7 +138,7 @@ class _MyAppState extends State<MyApp> {
                 child: Row(
                   children: [
                     const Text(
-                      'flutter_rust_bridge quickstart',
+                      'vad',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     const Spacer(),
@@ -135,12 +166,13 @@ class _MyAppState extends State<MyApp> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(onPressed: _pickFile, child: const Text('选择文件')),
-            if (_audioData != null) ...[
+            if (_currentFilePath != null) ...[
               Row(
                 children: [
                   const Text('Zoom: '),
                   Expanded(
                     child: Slider(
+                      year2023: false,
                       value: _zoomLevel,
                       min: 0.01,
                       max: 1.0,
@@ -174,44 +206,98 @@ class _MyAppState extends State<MyApp> {
                 ],
               ),
               Expanded(
-                child: LineChart(
-                  LineChartData(
-                    minX:
-                        _panPosition *
-                        (_audioData!.length -
-                            (_audioData!.length * _zoomLevel).toInt()),
-                    maxX:
-                        (_panPosition *
-                            (_audioData!.length -
-                                (_audioData!.length * _zoomLevel).toInt())) +
-                        (_audioData!.length * _zoomLevel).toInt() -
-                        1,
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: () {
-                          int totalLength = _audioData!.length;
-                          int visibleLength = (totalLength * _zoomLevel)
-                              .toInt();
-                          int start =
-                              (_panPosition * (totalLength - visibleLength))
-                                  .toInt();
-                          int end = start + visibleLength;
-                          int step = (visibleLength / maxPoints).ceil();
-                          List<FlSpot> spots = [];
-                          for (int i = start; i < end; i += step) {
-                            if (i < totalLength) {
-                              spots.add(FlSpot(i.toDouble(), _audioData![i]));
-                            }
-                          }
-                          return spots;
-                        }(),
-                        isCurved: false,
-                        color: Colors.blue,
-                      ),
-                    ],
-                    titlesData: FlTitlesData(show: false),
-                    borderData: FlBorderData(show: true),
-                  ),
+                child: FutureBuilder<AudioChartData>(
+                  future: _getChartData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data != null) {
+                      final chartData = snapshot.data!;
+                      final audioData = chartData.audioData;
+                      final fftData = chartData.fftData;
+
+                      final lineBars = <LineChartBarData>[];
+
+                      // 添加音频数据线（蓝色）
+                      if (audioData != null && audioData.data.isNotEmpty) {
+                        lineBars.add(
+                          LineChartBarData(
+                            dotData: FlDotData(show: false),
+                            spots: List.generate(
+                              audioData.data.length,
+                              (i) =>
+                                  FlSpot(audioData.index[i], audioData.data[i]),
+                            ),
+                            isCurved: false,
+                            color: Colors.blue,
+                          ),
+                        );
+                      }
+
+                      // 添加FFT数据线（红色）
+                      if (fftData != null && fftData.data.isNotEmpty) {
+                        lineBars.add(
+                          LineChartBarData(
+                            dotData: FlDotData(show: false),
+                            spots: List.generate(
+                              fftData.data.length,
+                              (i) => FlSpot(
+                                fftData.index.isNotEmpty
+                                    ? fftData.index[i]
+                                    : i.toDouble(),
+                                fftData.data[i],
+                              ),
+                            ),
+                            isCurved: false,
+                            color: Colors.red,
+                          ),
+                        );
+                      }
+
+                      if (lineBars.isEmpty) {
+                        return const Center(child: Text('No data available'));
+                      }
+
+                      // 使用音频数据长度来计算缩放范围
+                      final dataLength =
+                          audioData?.data.length ?? fftData?.data.length ?? 0;
+
+                      return LineChart(
+                        LineChartData(
+                          minX:
+                              _panPosition *
+                              (dataLength - (dataLength * _zoomLevel).toInt()),
+                          maxX:
+                              (_panPosition *
+                                  (dataLength -
+                                      (dataLength * _zoomLevel).toInt())) +
+                              (dataLength * _zoomLevel).toInt() -
+                              1,
+                          lineBarsData: lineBars,
+                          titlesData: FlTitlesData(
+                            show: true,
+                            leftTitles: AxisTitles(
+                              // Y 轴在左侧
+                              sideTitles: SideTitles(showTitles: true),
+                            ),
+                            bottomTitles: AxisTitles(
+                              // X 轴在底部
+                              sideTitles: SideTitles(showTitles: true),
+                            ),
+                            topTitles: AxisTitles(
+                              // 隐藏顶部轴标题
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            rightTitles: AxisTitles(
+                              // 隐藏右侧轴标题
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                          ),
+                          borderData: FlBorderData(show: true),
+                        ),
+                      );
+                    }
+                    // 异步没有完成时显示空内容
+                    return const SizedBox.shrink();
+                  },
                 ),
               ),
             ],

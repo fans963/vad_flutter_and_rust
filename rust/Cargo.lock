@@ -690,6 +690,7 @@ name = "rust_lib_vad"
 version = "0.1.0"
 dependencies = [
  "flutter_rust_bridge",
+ "num-complex",
  "rayon",
  "rustfft",
  "symphonia",
