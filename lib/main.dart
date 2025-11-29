@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/rust/api/audio_processor.dart';
-import 'package:vad/src/rust/api/simple.dart';
 import 'package:vad/src/rust/api/util.dart';
 import 'package:vad/src/rust/frb_generated.dart';
 import 'package:vad/src/util.dart';
@@ -32,7 +31,6 @@ Future<void> main() async {
       titleBarStyle: TitleBarStyle.hidden,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
-      // await windowManager.setResizable(true);
       await windowManager.show();
       await windowManager.focus();
     });
@@ -70,7 +68,7 @@ class _MyAppState extends State<MyApp> {
     final audioData = await _audioProcessor!.getAudioData(
       filePath: _currentFilePath!,
       offset: (0.0, 0.0),
-      index: (BigInt.zero, audioDataLen),
+      index: (BigInt.zero, BigInt.from(128)),
     );
 
     ChartData fftData = await _audioProcessor!.getFftData(
@@ -78,7 +76,7 @@ class _MyAppState extends State<MyApp> {
       offset: (0.0, 0.0),
       index: (
         BigInt.zero,
-        audioDataLen, // 使用音频数据长度作为FFT索引范围
+        BigInt.from(128), // 使用固定长度作为FFT索引范围
       ),
     );
 
@@ -159,10 +157,6 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               ),
-            ),
-            // 原内容
-            Text(
-              'Action: Call Rust `greet("$_selectedFileName")`\nResult: `${greet(name: _selectedFileName)}`\nFile size: $_fileBytesLength bytes\nAudioProcessor: ${_audioProcessor != null ? 'Created' : 'Not created'}',
             ),
             const SizedBox(height: 20),
             ElevatedButton(onPressed: _pickFile, child: const Text('选择文件')),
@@ -275,19 +269,15 @@ class _MyAppState extends State<MyApp> {
                           titlesData: FlTitlesData(
                             show: true,
                             leftTitles: AxisTitles(
-                              // Y 轴在左侧
                               sideTitles: SideTitles(showTitles: true),
                             ),
                             bottomTitles: AxisTitles(
-                              // X 轴在底部
                               sideTitles: SideTitles(showTitles: true),
                             ),
                             topTitles: AxisTitles(
-                              // 隐藏顶部轴标题
                               sideTitles: SideTitles(showTitles: false),
                             ),
                             rightTitles: AxisTitles(
-                              // 隐藏右侧轴标题
                               sideTitles: SideTitles(showTitles: false),
                             ),
                           ),

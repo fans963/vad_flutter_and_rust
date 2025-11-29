@@ -1,28 +1,29 @@
 use rayon::prelude::*;
-use symphonia::core::formats::util;
 use std::io::Cursor;
 use std::ops::Index;
+use std::sync::RwLock;
 use symphonia::core::audio::{self, Signal};
+use symphonia::core::formats::util;
 use symphonia::core::probe::Hint;
 
-use crate::api::util::{ChartData, calculate_fft_parallel};
+use crate::api::util::{calculate_fft_parallel, ChartData};
 
 pub struct AudioInfo {
     audio_data: Vec<f64>,
-    cached_fft_data: std::sync::RwLock<Option<(usize, Vec<f64>)>>, // 使用 RwLock 保证线程安全
+    cached_fft_data: Option<(usize, Vec<f64>)>,
     sample_rate: u32,
 }
 
 #[frb(opaque)]
 pub struct AudioProcessor {
-    audio_info_map: std::collections::HashMap<String, AudioInfo>,
+    audio_info_map: RwLock<std::collections::HashMap<String, AudioInfo>>,
     frame_size: usize,
 }
 
 impl AudioProcessor {
     pub async fn new() -> Self {
         AudioProcessor {
-            audio_info_map: std::collections::HashMap::new(),
+            audio_info_map: RwLock::new(std::collections::HashMap::new()),
             frame_size: 512,
         }
     }
@@ -39,7 +40,7 @@ impl AudioProcessor {
         let probed = symphonia::default::get_probe()
             .format(
                 &hint,
-                mss,
+                mss, 
                 &symphonia::core::formats::FormatOptions::default(),
                 &symphonia::core::meta::MetadataOptions::default(),
             )
@@ -102,14 +103,17 @@ impl AudioProcessor {
             }
         }
 
-        self.audio_info_map.insert(
-            file_path.clone(),
-            AudioInfo {
-                audio_data: samples_f64,
-                cached_fft_data: std::sync::RwLock::new(None),
-                sample_rate,
-            },
-        );
+        {
+            let mut map = self.audio_info_map.write().unwrap();
+            map.insert(
+                file_path.clone(),
+                AudioInfo {
+                    audio_data: samples_f64,
+                    cached_fft_data: None,
+                    sample_rate,
+                },
+            );
+        }
     }
 
     async fn get_offset_visible_data(
@@ -148,24 +152,20 @@ impl AudioProcessor {
         offset: (f64, f64),
         index: (usize, usize),
     ) -> ChartData {
-        if self.audio_info_map.contains_key(&file_path) {
-            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
-                self.get_offset_visible_data(offset, index, &audio_info.audio_data)
-                    .await
+        let audio_data = {
+            let map = self.audio_info_map.read().unwrap();
+            if let Some(audio_info) = map.get(&file_path) {
+                audio_info.audio_data.clone()
             } else {
                 println!("File not found: {}", file_path);
-                ChartData {
+                return ChartData {
                     index: vec![],
                     data: vec![],
-                }
+                };
             }
-        } else {
-            println!("No current file set");
-            ChartData {
-                index: vec![],
-                data: vec![],
-            }
-        }
+        };
+        self.get_offset_visible_data(offset, index, &audio_data)
+            .await
     }
 
     pub async fn get_down_sampled_data(
@@ -196,62 +196,64 @@ impl AudioProcessor {
         offset: (f64, f64),
         index: (usize, usize),
     ) -> ChartData {
-        if self.audio_info_map.contains_key(&file_path) {
-            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
-                // 使用读锁检查缓存
-                let needs_update = {
-                    let cached_data_guard = audio_info.cached_fft_data.read().unwrap();
-                    match &*cached_data_guard {
-                        Some(cached_data) if cached_data.0 == self.frame_size => {
-                            return ChartData {
-                                index: vec![], // TODO: populate with proper frequency bins
-                                data: cached_data.1.clone(),
-                            };
-                        }
-                        _ => true, // 缓存不存在或帧大小不匹配
-                    }
+        // 首先检查缓存
+        let (audio_data, needs_update) = {
+            let map = self.audio_info_map.read().unwrap();
+            if let Some(audio_info) = map.get(&file_path) {
+                let needs_update = match &audio_info.cached_fft_data {
+                    Some((cached_frame_size, _)) if *cached_frame_size == self.frame_size => false,
+                    _ => true,
                 };
 
-                // 如果需要更新缓存，先计算FFT，然后使用写锁更新缓存
-                if needs_update {
-                    let fft_data = calculate_fft_parallel(audio_info.audio_data.clone(), self.frame_size).await;
-                    {
-                        let mut cached_data_guard = audio_info.cached_fft_data.write().unwrap();
-                        *cached_data_guard = Some((self.frame_size, fft_data.clone()));
+                if !needs_update {
+                    // 返回缓存的数据
+                    if let Some((_, cached_data)) = &audio_info.cached_fft_data {
+                        return ChartData {
+                            index: vec![], // TODO: populate with proper frequency bins
+                            data: cached_data.clone(),
+                        };
                     }
-                    return ChartData {
-                        index: vec![], // TODO: populate with proper frequency bins
-                        data: fft_data,
-                    };
                 }
+
+                (audio_info.audio_data.clone(), needs_update)
+            } else {
+                return ChartData {
+                    index: vec![],
+                    data: vec![],
+                };
+            }
+        };
+
+        // 如果需要更新缓存，先计算FFT
+        let fft_data = calculate_fft_parallel(audio_data, self.frame_size).await;
+
+        // 更新缓存
+        {
+            let mut map = self.audio_info_map.write().unwrap();
+            if let Some(audio_info) = map.get_mut(&file_path) {
+                audio_info.cached_fft_data = Some((self.frame_size, fft_data.clone()));
             }
         }
 
         ChartData {
-            index: vec![],
-            data: vec![],
+            index: vec![], // TODO: populate with proper frequency bins
+            data: fft_data,
         }
     }
 
     pub fn audio_data_len(&self, file_path: String) -> usize {
-        if self.audio_info_map.contains_key(&file_path) {
-            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
-                audio_info.audio_data.len()
-            } else {
-                0
-            }
+        let map = self.audio_info_map.read().unwrap();
+        if let Some(audio_info) = map.get(&file_path) {
+            audio_info.audio_data.len()
         } else {
             0
         }
     }
 
     pub fn get_sample_rate(&self, file_path: String) -> u32 {
-        if self.audio_info_map.contains_key(&file_path) {
-            if let Some(audio_info) = self.audio_info_map.get(&file_path) {
-                audio_info.sample_rate
-            } else {
-                0
-            }
+        let map = self.audio_info_map.read().unwrap();
+        if let Some(audio_info) = map.get(&file_path) {
+            audio_info.sample_rate
         } else {
             0
         }
