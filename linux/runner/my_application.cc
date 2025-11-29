@@ -53,7 +53,7 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "vad");
   }
 
-  gtk_window_set_icon_from_file(window, "assets/icon/icon.svg", NULL);
+  gtk_window_set_icon_from_file(window, "assets/image/icon.png", NULL);
   gtk_window_set_default_size(window, 1280, 720);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();

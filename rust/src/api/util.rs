@@ -48,11 +48,23 @@ pub async fn perform_log10_parallel(input_data: Vec<f64>) -> Vec<f64> {
 pub async fn down_sample_data(raw_data: ChartData, down_sample_factor: f64) -> ChartData {
     if down_sample_factor <= 1.0 {
         return raw_data;
-    }else {
-        
     }
+
+    let original_len = raw_data.data.len();
+    if original_len == 0 {
+        return raw_data;
+    }
+
+    let step = down_sample_factor as usize;
+    if step == 0 || step >= original_len {
+        return raw_data;
+    }
+
+    let new_data: Vec<f64> = raw_data.data.par_iter().step_by(step).cloned().collect();
+    let new_index: Vec<f64> = raw_data.index.par_iter().step_by(step).cloned().collect();
+
     ChartData {
-        index: vec![],
-        data: vec![],
+        index: new_index,
+        data: new_data,
     }
 }
