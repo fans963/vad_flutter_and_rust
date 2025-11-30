@@ -22,7 +22,8 @@ class AudioChartData {
   final ChartData? fftData;
   AudioChartData({this.audioData, this.fftData});
 }
-
+ 
+ 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
