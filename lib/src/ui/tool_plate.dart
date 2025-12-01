@@ -1,36 +1,63 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/legacy.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vad/src/provider/navigator_index_provider.dart';
+import 'package:vad/src/util/drag_handler.dart';
 
 class ToolPlate extends ConsumerWidget {
   const ToolPlate({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeWidgetIndex = ref.watch(navigatorIndexProvider);
-    final widgets = [const HomePanel(),const InfoPanel(), const ControlPanel()];
+    final currentHeight = ref.watch(toolPlateHeightProvider);
+
+    final widgets = [
+      const HomePanel(),
+      const InfoPanel(),
+      const ControlPanel(),
+    ];
     final colorScheme = Theme.of(context).colorScheme;
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: Container(
-        height: 300,
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16.0),
-            topRight: Radius.circular(16.0),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100),
+      height: currentHeight,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16.0),
+          topRight: Radius.circular(16.0),
         ),
-        child: widgets[activeWidgetIndex],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          GenericDragHandle(
+            onDragUpdate: (double newHeight) {
+              final screenHeight = MediaQuery.of(context).size.height;
+              ref
+                  .read(toolPlateHeightProvider.notifier)
+                  .updateHeight(newHeight.clamp(50.0, screenHeight * 0.6));
+            },
+            onDragStart: () {
+              return ref.read(toolPlateHeightProvider);
+            },
+          ),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: widgets[activeWidgetIndex],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -38,34 +65,41 @@ class ToolPlate extends ConsumerWidget {
 
 class HomePanel extends ConsumerWidget {
   const HomePanel({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     return ListView(
       children: [
         Column(
           children: [
-            SizedBox(height: 8),
+            SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage('assets/image/fan_avatar.png'),
+                  backgroundImage: const AssetImage(
+                    'assets/image/fan_avatar.png',
+                  ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 20),
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage('assets/image/liu_avatar.jpg'),
+                  backgroundImage: const AssetImage(
+                    'assets/image/liu_avatar.jpg',
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 40),
             AutoSizeText(
               'Developer: fans963 & 🐂津哥',
               style: Theme.of(context).textTheme.headlineSmall,
+              maxLines: 1,
+              minFontSize: 14,
             ),
             SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -74,6 +108,7 @@ class HomePanel extends ConsumerWidget {
                       'Project Repository: ',
                       style: Theme.of(context).textTheme.headlineSmall,
                       maxLines: 1,
+                      minFontSize: 12,
                     ),
                   ),
                   Flexible(
@@ -82,9 +117,7 @@ class HomePanel extends ConsumerWidget {
                         final url = Uri.parse(
                           'https://github.com/fans963/vad_flutter_and_rust',
                         );
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(url);
-                        }
+                        await launchUrl(url);
                       },
                       child: AutoSizeText(
                         'https://github.com/fans963/vad_flutter_and_rust',
@@ -94,6 +127,7 @@ class HomePanel extends ConsumerWidget {
                               decoration: TextDecoration.underline,
                             ),
                         maxLines: 1,
+                        minFontSize: 12,
                       ),
                     ),
                   ),
@@ -109,6 +143,7 @@ class HomePanel extends ConsumerWidget {
 
 class InfoPanel extends ConsumerWidget {
   const InfoPanel({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
@@ -119,6 +154,7 @@ class InfoPanel extends ConsumerWidget {
 
 class ControlPanel extends ConsumerWidget {
   const ControlPanel({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(

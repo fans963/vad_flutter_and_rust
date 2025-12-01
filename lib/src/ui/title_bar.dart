@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vad/src/util.dart';
+import 'package:vad/src/util/util.dart';
 import 'package:window_manager/window_manager.dart';
 
 class TitleBar extends StatelessWidget {

@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "/home/fan/workspace/flutter/vad/build/web",
+    "public": "./build/web",
     "ignore": [
       "firebase.json",
       "**/.*",

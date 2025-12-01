@@ -14,7 +14,7 @@ import 'package:vad/src/ui/chart_widget.dart';
 import 'package:vad/src/ui/pick_file_button.dart';
 import 'package:vad/src/ui/title_bar.dart';
 import 'package:vad/src/ui/tool_plate.dart';
-import 'package:vad/src/util.dart';
+import 'package:vad/src/util/util.dart';
 import 'package:window_manager/window_manager.dart';
 
 class AudioChartData {
@@ -62,7 +62,6 @@ class MyApp extends ConsumerWidget {
       appBarStyle: FlexAppBarStyle.surface,
       subThemesData: const FlexSubThemesData(
         defaultRadius: 12.0,
-        useTextTheme: true,
       ),
     );
   }
@@ -77,7 +76,6 @@ class MyApp extends ConsumerWidget {
       appBarStyle: FlexAppBarStyle.surface,
       subThemesData: const FlexSubThemesData(
         defaultRadius: 12.0,
-        useTextTheme: true,
       ),
       darkIsTrueBlack: true, 
     );
@@ -124,7 +122,7 @@ class MyApp extends ConsumerWidget {
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
                 BottomNavigationBarItem(icon: Icon(Icons.info), label: '信息'),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
+                  icon: Icon(Icons.edit),
                   label: '控制',
                 ),
               ],
