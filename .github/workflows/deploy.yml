@@ -29,10 +29,11 @@ jobs:
       - name: Run Codegen
         run: flutter_rust_bridge_codegen generate
 
-      - name: Build Flutter Web
-        run: |
-          flutter_rust_bridge_codegen build-web --release
-          flutter build web --release 
+      - name: Build Flutter Web(Rust WASM)
+        run: flutter_rust_bridge_codegen build-web --release
+
+      - name: Build Flutter Web(Flutter Build)
+        run: flutter build web --release 
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
