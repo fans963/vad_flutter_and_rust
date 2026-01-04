@@ -17,7 +17,10 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           targets: wasm32-unknown-unknown
-          components: rust-src
+          components: rust-src, rustfmt
+
+      - name: Install Cargo Expand
+        run: cargo install cargo-expand --locked
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
