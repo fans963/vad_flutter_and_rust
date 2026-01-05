@@ -53,7 +53,7 @@ VAD 是一个现代化的音频分析工具，结合了 Flutter 的跨平台 UI 
 
 #### Frontend (Flutter)
 - **框架**: Flutter 3.9.4+
-- **状态管理**: Riverpod 3.1.0
+- **状态管理**: Riverpod ^3.1.0
 - **UI 组件**:
   - `fl_chart`: 图表可视化
   - `flex_color_scheme`: 主题管理
@@ -338,7 +338,7 @@ VAD is a modern audio analysis tool that combines Flutter's cross-platform UI ca
 
 #### Frontend (Flutter)
 - **Framework**: Flutter 3.9.4+
-- **State Management**: Riverpod 3.1.0
+- **State Management**: Riverpod ^3.1.0
 - **UI Components**:
   - `fl_chart`: Chart visualization
   - `flex_color_scheme`: Theme management
