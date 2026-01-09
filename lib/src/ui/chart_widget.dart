@@ -1,10 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vad/src/provider/audio_process_providr.dart';
 import 'package:vad/src/provider/chart_control_provider.dart';
 import 'package:vad/src/provider/chart_paramater_provider.dart';
-import 'package:vad/src/rust/api/audio_processor.dart';
 
 class ChartWidget extends ConsumerWidget {
   const ChartWidget({super.key});

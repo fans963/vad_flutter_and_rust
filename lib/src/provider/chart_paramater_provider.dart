@@ -48,7 +48,7 @@ final chartDataProvider = FutureProvider<List<LineChartBarData>>((ref) async {
 
   if (activeCharts.isEmpty) return [];
 
-  final processor = await audioProcessorAsync.maybeWhen(
+  final processor = audioProcessorAsync.maybeWhen(
     data: (p) => p,
     orElse: () => throw Exception('Audio processor not ready'),
   );

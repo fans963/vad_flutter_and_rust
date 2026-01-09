@@ -22,7 +22,6 @@ class AudioChartData {
   AudioChartData({this.audioData, this.fftData});
 }
  
- 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
@@ -55,7 +54,7 @@ class MyApp extends ConsumerWidget {
     return FlexThemeData.light(
       colorScheme: colorScheme,
       useMaterial3: true,
-      splashFactory: NoSplash.splashFactory,
+      splashFactory: InkSplash.splashFactory,
       surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
       blendLevel: 20,
       appBarStyle: FlexAppBarStyle.surface,
@@ -69,7 +68,7 @@ class MyApp extends ConsumerWidget {
     return FlexThemeData.dark(
       colorScheme: colorScheme,
       useMaterial3: true,
-      splashFactory: NoSplash.splashFactory,
+      splashFactory: InkSplash.splashFactory,
       surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
       blendLevel: 20,
       appBarStyle: FlexAppBarStyle.surface,
@@ -105,8 +104,8 @@ class MyApp extends ConsumerWidget {
           themeMode: ThemeMode.system,
           home: Scaffold(
             backgroundColor: Theme.of(context).brightness == Brightness.dark
-                ? darkColorScheme.background
-                : lightColorScheme.background,
+                ? darkColorScheme.surface
+                : lightColorScheme.surface,
             body: Column(
               children: [
                 if (isDesktop) const TitleBar(),

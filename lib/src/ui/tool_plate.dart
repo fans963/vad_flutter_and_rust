@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod/legacy.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vad/src/provider/navigator_index_provider.dart';
 import 'package:vad/src/util/drag_handler.dart';

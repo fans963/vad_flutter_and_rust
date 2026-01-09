@@ -11,7 +11,7 @@ class AudioProcessorNotifier extends AsyncNotifier<AudioProcessor> {
 
   Future<void> addFile(String filePath,Uint8List fileData) async {
     state = await AsyncValue.guard(() async {
-      final processor = await state.value!;
+      final processor = state.value!;
       await processor.add(filePath: filePath, fileData: fileData);
       return processor;
     });
