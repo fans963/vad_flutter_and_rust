@@ -36,7 +36,7 @@ class PickFileButton extends ConsumerWidget {
                 visible: true,
                 offset: (0.0, 0.0),
                 index: (BigInt.zero, BigInt.from(10000)),
-                dataType: ChartDataType.Waveform,
+                dataType: ChartDataType.waveform,
                 downSampleFactor: 10.0,
                 color: Theme.of(context).colorScheme.primary,
               ),

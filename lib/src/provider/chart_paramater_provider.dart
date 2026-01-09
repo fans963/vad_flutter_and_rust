@@ -1,11 +1,10 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/legacy.dart';
 import 'package:vad/src/provider/audio_process_providr.dart';
-import 'package:vad/src/rust/api/audio_processor.dart';
+import 'package:vad/src/rust/api/util.dart';
 
-enum ChartDataType { Waveform, AmplitudeSpectrum }
+enum ChartDataType { waveform, amplitudeSpectrum }
 
 typedef ChartDataParameter = ({
   String filePath,
@@ -14,7 +13,12 @@ typedef ChartDataParameter = ({
   (BigInt, BigInt) index,
   ChartDataType dataType,
   double downSampleFactor,
-  Color ?color,
+  Color? color,
+});
+
+typedef ChartSeriesData = ({
+  ChartData chartData,
+  Color color,
 });
 
 class ChartDataNotifier extends StateNotifier<List<ChartDataParameter>> {
@@ -38,11 +42,11 @@ class ChartDataNotifier extends StateNotifier<List<ChartDataParameter>> {
 
 final chartParameterProvider =
     StateNotifierProvider<ChartDataNotifier, List<ChartDataParameter>>(
-      (ref) => ChartDataNotifier(),
-    );
+  (ref) => ChartDataNotifier(),
+);
 
 // New provider for chart data
-final chartDataProvider = FutureProvider<List<LineChartBarData>>((ref) async {
+final chartDataProvider = FutureProvider<List<ChartSeriesData>>((ref) async {
   final activeCharts = ref.watch(chartParameterProvider);
   final audioProcessorAsync = ref.watch(audioProcessorProvider);
 
@@ -53,7 +57,7 @@ final chartDataProvider = FutureProvider<List<LineChartBarData>>((ref) async {
     orElse: () => throw Exception('Audio processor not ready'),
   );
 
-  final lineBars = <LineChartBarData>[];
+  final seriesData = <ChartSeriesData>[];
 
   for (final chart in activeCharts) {
     debugPrint('Rendering chart for file: ${chart.filePath}');
@@ -64,18 +68,11 @@ final chartDataProvider = FutureProvider<List<LineChartBarData>>((ref) async {
       downSampleFactor: chart.downSampleFactor,
     );
 
-    lineBars.add(
-      LineChartBarData(
-        dotData: const FlDotData(show: false),
-        spots: List.generate(
-          chartData.index.length,
-          (i) => FlSpot(chartData.index[i], chartData.data[i]),
-        ),
-        isCurved: false,
-        color: chart.color ?? Colors.blue,
-      ),
-    );
+    seriesData.add((
+      chartData: chartData,
+      color: chart.color ?? Colors.blue,
+    ));
   }
 
-  return lineBars;
+  return seriesData;
 });

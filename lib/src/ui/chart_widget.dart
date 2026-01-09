@@ -1,6 +1,6 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:vad/src/provider/chart_control_provider.dart';
 import 'package:vad/src/provider/chart_paramater_provider.dart';
 
@@ -10,39 +10,40 @@ class ChartWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chartDataAsync = ref.watch(chartDataProvider);
+    final control = ref.watch(chartControlProvider);
 
     return Container(
       height: 500,
       padding: const EdgeInsets.all(16.0),
       child: chartDataAsync.when(
-        data: (lineBars) => LineChart(
-          LineChartData(
-            lineTouchData: LineTouchData(
-              enabled: true,
-              touchTooltipData: LineTouchTooltipData(
-                getTooltipColor: (LineBarSpot touchedSpot) {
-                  return Colors.white.withOpacity(0.8);
-                },
-              ),
-            ),
-            minX: ref.watch(chartControlProvider).minX,
-            maxX: ref.watch(chartControlProvider).maxX,
-            minY: ref.watch(chartControlProvider).minY,
-            maxY: ref.watch(chartControlProvider).maxY,
-            lineBarsData: lineBars,
-            titlesData: const FlTitlesData(
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: true, reservedSize: 35.0),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: true, reservedSize: 35.0),
-              ),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-            ),
+        data: (seriesData) => SfCartesianChart(
+          primaryXAxis: NumericAxis(
+            minimum: control.minX,
+            maximum: control.maxX,
+            majorGridLines: const MajorGridLines(width: 0.5),
+            title: const AxisTitle(text: 'Index'),
           ),
+          primaryYAxis: NumericAxis(
+            minimum: control.minY,
+            maximum: control.maxY,
+            majorGridLines: const MajorGridLines(width: 0.5),
+            title: const AxisTitle(text: 'Amplitude'),
+          ),
+          tooltipBehavior: TooltipBehavior(
+            enable: true,
+            header: '',
+            canShowMarker: false,
+          ),
+          series: seriesData.map((data) {
+            return FastLineSeries<double, double>(
+              dataSource: data.chartData.data,
+              xValueMapper: (double val, int i) => data.chartData.index[i],
+              yValueMapper: (double val, int i) => val,
+              color: data.color,
+              animationDuration: 0,
+              name: 'Audio Signal',
+            );
+          }).toList(),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) =>

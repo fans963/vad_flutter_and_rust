@@ -1,12 +1,9 @@
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/provider/navigator_index_provider.dart';
-import 'package:vad/src/rust/api/audio_processor.dart';
 import 'package:vad/src/rust/api/util.dart';
 import 'package:vad/src/rust/frb_generated.dart';
 import 'package:vad/src/ui/chart_widget.dart';
