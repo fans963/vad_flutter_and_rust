@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/provider/navigator_index_provider.dart';
 import 'package:vad/src/rust/api/util.dart';
@@ -72,7 +73,6 @@ class MyApp extends ConsumerWidget {
       subThemesData: const FlexSubThemesData(
         defaultRadius: 12.0,
       ),
-      darkIsTrueBlack: true, 
     );
   }
 
@@ -98,33 +98,65 @@ class MyApp extends ConsumerWidget {
           title: 'vad',
           theme: _buildTheme(lightColorScheme),
           darkTheme: _buildDarkTheme(darkColorScheme),
-          themeMode: ThemeMode.system,
+          themeMode: ThemeMode.system, // Default to dark for OLED aesthetic
           home: Scaffold(
-            backgroundColor: Theme.of(context).brightness == Brightness.dark
-                ? darkColorScheme.surface
-                : lightColorScheme.surface,
             body: Column(
               children: [
                 if (isDesktop) const TitleBar(),
-                Expanded(child: ListView(children: const [ChartWidget()])),
+                Expanded(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                          Theme.of(context).colorScheme.surface,
+                        ],
+                      ),
+                    ),
+                    child: const ChartWidget(),
+                  ),
+                ),
                 const ToolPlate(),
               ],
             ),
             floatingActionButton: const PickFileButton(),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            bottomNavigationBar: BottomNavigationBar(
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
-                BottomNavigationBarItem(icon: Icon(Icons.info), label: '信息'),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.edit),
-                  label: '控制',
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    width: 0.5,
+                  ),
                 ),
-              ],
-              currentIndex: ref.watch(navigatorIndexProvider),
-              onTap: (index) {
-                ref.read(navigatorIndexProvider.notifier).setIndex(index);
-              },
+              ),
+              child: BottomNavigationBar(
+                elevation: 0,
+                unselectedItemColor: Colors.white.withValues(alpha: 0.5),
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.analytics_outlined),
+                    activeIcon: Icon(Icons.analytics),
+                    label: 'ANALYZE',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.info_outline),
+                    activeIcon: Icon(Icons.info),
+                    label: 'METRICS',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.tune_outlined),
+                    activeIcon: Icon(Icons.tune),
+                    label: 'CONFIG',
+                  ),
+                ],
+                currentIndex: ref.watch(navigatorIndexProvider),
+                onTap: (index) {
+                  ref.read(navigatorIndexProvider.notifier).setIndex(index);
+                },
+              ),
             ),
           ),
         );

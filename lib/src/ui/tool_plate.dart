@@ -21,18 +21,26 @@ class ToolPlate extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutQuart,
       height: currentHeight,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16.0),
-          topRight: Radius.circular(16.0),
+          topLeft: Radius.circular(24.0),
+          topRight: Radius.circular(24.0),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 20,
+            spreadRadius: 5,
             offset: const Offset(0, -5),
           ),
         ],
@@ -44,7 +52,7 @@ class ToolPlate extends ConsumerWidget {
               final screenHeight = MediaQuery.of(context).size.height;
               ref
                   .read(toolPlateHeightProvider.notifier)
-                  .updateHeight(newHeight.clamp(50.0, screenHeight * 0.6));
+                  .updateHeight(newHeight.clamp(30.0, screenHeight * 0.8));
             },
             onDragStart: () {
               return ref.read(toolPlateHeightProvider);
@@ -52,7 +60,21 @@ class ToolPlate extends ConsumerWidget {
           ),
           Expanded(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 400),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.05),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  ),
+                );
+              },
               child: widgets[activeWidgetIndex],
             ),
           ),
@@ -67,75 +89,143 @@ class HomePanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return ListView(
-      children: [
-        Column(
-          children: [
-            SizedBox(height: 40),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _Avatar(image: 'assets/image/fan_avatar.png', label: 'fans963'),
+              const SizedBox(width: 48),
+              _Avatar(image: 'assets/image/liu_avatar.jpg', label: '🐂津哥'),
+            ],
+          ),
+          const SizedBox(height: 32),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.onSurface.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.1)),
+            ),
+            child: Column(
               children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: const AssetImage(
-                    'assets/image/fan_avatar.png',
+                Text(
+                  'CORE DEVELOPERS',
+                  style: TextStyle(
+                    fontFamily: 'JetBrains Mono',
+                    fontSize: 10,
+                    letterSpacing: 2,
+                    color: colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ),
-                SizedBox(width: 20),
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: const AssetImage(
-                    'assets/image/liu_avatar.jpg',
+                const SizedBox(height: 8),
+                AutoSizeText(
+                  'ENGINEERED BY FANS & LIU',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
                   ),
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
-            SizedBox(height: 40),
-            AutoSizeText(
-              'Developer: fans963 & 🐂津哥',
-              style: Theme.of(context).textTheme.headlineSmall,
-              maxLines: 1,
-              minFontSize: 14,
-            ),
-            SizedBox(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: AutoSizeText(
-                      'Project Repository: ',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                      maxLines: 1,
-                      minFontSize: 12,
-                    ),
-                  ),
-                  Flexible(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final url = Uri.parse(
-                          'https://github.com/fans963/vad_flutter_and_rust',
-                        );
-                        await launchUrl(url);
-                      },
-                      child: AutoSizeText(
-                        'https://github.com/fans963/vad_flutter_and_rust',
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              decoration: TextDecoration.underline,
-                            ),
-                        maxLines: 1,
-                        minFontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
+          const SizedBox(height: 24),
+          _LinkButton(
+            label: 'SOURCE REPOSITORY',
+            url: 'https://github.com/fans963/vad_flutter_and_rust',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  final String image;
+  final String label;
+
+  const _Avatar({required this.image, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+          ),
+          child: CircleAvatar(
+            radius: 36,
+            backgroundImage: AssetImage(image),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'JetBrains Mono',
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _LinkButton extends StatelessWidget {
+  final String label;
+  final String url;
+
+  const _LinkButton({required this.label, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async {
+          final uri = Uri.parse(url);
+          await launchUrl(uri);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.code, size: 16, color: colorScheme.primary),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -145,8 +235,39 @@ class InfoPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Text('信息', style: Theme.of(context).textTheme.headlineMedium),
+    final colorScheme = Theme.of(context).colorScheme;
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.info_outline, size: 48, color: colorScheme.secondary),
+            const SizedBox(height: 16),
+            Text(
+              'SIGNAL METRICS',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+                color: colorScheme.secondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'REAL-TIME ANALYSIS ACTIVE',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -156,8 +277,39 @@ class ControlPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Text('控制', style: Theme.of(context).textTheme.headlineMedium),
+    final colorScheme = Theme.of(context).colorScheme;
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.tune, size: 48, color: colorScheme.primary),
+            const SizedBox(height: 16),
+            Text(
+              'ENGINE CONFIG',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'ADJUST PARAMETERS BELOW',
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 12,
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

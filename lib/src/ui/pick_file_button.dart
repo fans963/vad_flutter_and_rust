@@ -9,41 +9,52 @@ class PickFileButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context,WidgetRef ref)  {
-    return FloatingActionButton(
-      tooltip: '添加音频文件',
-      child: const Icon(Icons.add),
-      onPressed: () async {
-        const XTypeGroup typeGroup = XTypeGroup(
-          label: 'Audio',
-          extensions: <String>['wav', 'mp3', 'flac'],
-        );
-        final List<XFile> files = await openFiles(
-          acceptedTypeGroups: <XTypeGroup>[typeGroup],
-        );
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: FloatingActionButton(
+        tooltip: 'ADD SIGNAL SOURCE',
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.black,
+        elevation: 4,
+        highlightElevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: const Icon(Icons.add_chart_rounded),
+        onPressed: () async {
+          const XTypeGroup typeGroup = XTypeGroup(
+            label: 'Audio',
+            extensions: <String>['wav', 'mp3', 'flac'],
+          );
+          final List<XFile> files = await openFiles(
+            acceptedTypeGroups: <XTypeGroup>[typeGroup],
+          );
 
-        if (files.isNotEmpty) {
-          for (var file in files) {
-            final bytes = await file.readAsBytes();
-            debugPrint(
-              'Picked file: ${file.name}, size: ${await file.length()} bytes',
-            );
-            await ref
-                .read(audioProcessorProvider.notifier)
-                .addFile(file.path, bytes);
-            ref.read(chartParameterProvider.notifier).add(
-              (
-              filePath: file.path,
-                visible: true,
-                offset: (0.0, 0.0),
-                index: (BigInt.zero, BigInt.from(10000)),
-                dataType: ChartDataType.waveform,
-                downSampleFactor: 10.0,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            );
-          }
-        } 
-      },
+          if (files.isNotEmpty) {
+            for (var file in files) {
+              final bytes = await file.readAsBytes();
+              debugPrint(
+                'Picked file: ${file.name}, size: ${await file.length()} bytes',
+              );
+              await ref
+                  .read(audioProcessorProvider.notifier)
+                  .addFile(file.path, bytes);
+              
+              if (!context.mounted) continue;
+              
+              ref.read(chartParameterProvider.notifier).add(
+                (
+                filePath: file.path,
+                  visible: true,
+                  offset: (0.0, 0.0),
+                  index: (BigInt.zero, BigInt.from(10000)),
+                  dataType: ChartDataType.waveform,
+                  downSampleFactor: 10.0,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              );
+            }
+          } 
+        },
+      ),
     );
   }
 }

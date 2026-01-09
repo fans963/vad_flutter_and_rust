@@ -15,22 +15,46 @@ class TitleBar extends StatelessWidget {
         await windowManager.startDragging();
       },
       child: Container(
-        height: 40,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        color: colorScheme.surface,
+        height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.white.withValues(alpha: 0.05),
+              width: 1,
+            ),
+          ),
+        ),
         child: Row(
           children: [
-            const Text('vad'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                border: Border.all(color: colorScheme.primary.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                'VAD // ENGINE',
+                style: TextStyle(
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ),
             const Spacer(),
-            IconButton(
+            _TitleBarButton(
+              icon: Icons.remove,
               onPressed: () async {
                 if (!isDesktop) return;
                 await windowManager.minimize();
               },
-              icon: const Icon(Icons.minimize),
-              tooltip: '最小化',
             ),
-            IconButton(
+            _TitleBarButton(
+              icon: Icons.crop_square,
               onPressed: () async {
                 if (!isDesktop) return;
                 if (await windowManager.isMaximized()) {
@@ -39,18 +63,48 @@ class TitleBar extends StatelessWidget {
                   await windowManager.maximize();
                 }
               },
-              icon: Icon(Icons.fullscreen),
-              tooltip: '最大化',
             ),
-            IconButton(
-              icon: const Icon(Icons.close),
+            _TitleBarButton(
+              icon: Icons.close,
+              isClose: true,
               onPressed: () async {
                 if (!isDesktop) return;
                 await windowManager.close();
               },
-              tooltip: '关闭',
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TitleBarButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final bool isClose;
+
+  const _TitleBarButton({
+    required this.icon,
+    required this.onPressed,
+    this.isClose = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: InkWell(
+        onTap: onPressed,
+        child: Container(
+          width: 48,
+          height: 48,
+          alignment: Alignment.center,
+          child: Icon(
+            icon,
+            size: 18,
+            color: isClose ? Colors.redAccent.withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.6),
+          ),
         ),
       ),
     );
