@@ -2,12 +2,12 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/provider/navigator_index_provider.dart';
 import 'package:vad/src/rust/api/util.dart';
 import 'package:vad/src/rust/frb_generated.dart';
 import 'package:vad/src/ui/chart_widget.dart';
+import 'package:vad/src/ui/test_chart_widget.dart' hide ChartData;
 import 'package:vad/src/ui/pick_file_button.dart';
 import 'package:vad/src/ui/title_bar.dart';
 import 'package:vad/src/ui/tool_plate.dart';
@@ -19,7 +19,7 @@ class AudioChartData {
   final ChartData? fftData;
   AudioChartData({this.audioData, this.fftData});
 }
- 
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
@@ -56,9 +56,7 @@ class MyApp extends ConsumerWidget {
       surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
       blendLevel: 20,
       appBarStyle: FlexAppBarStyle.surface,
-      subThemesData: const FlexSubThemesData(
-        defaultRadius: 12.0,
-      ),
+      subThemesData: const FlexSubThemesData(defaultRadius: 12.0),
     );
   }
 
@@ -70,9 +68,8 @@ class MyApp extends ConsumerWidget {
       surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
       blendLevel: 20,
       appBarStyle: FlexAppBarStyle.surface,
-      subThemesData: const FlexSubThemesData(
-        defaultRadius: 12.0,
-      ),
+      subThemesData: const FlexSubThemesData(defaultRadius: 12.0),
+      darkIsTrueBlack: true,
     );
   }
 
@@ -93,29 +90,24 @@ class MyApp extends ConsumerWidget {
             brightness: Brightness.dark,
           );
         }
-        
+
         return MaterialApp(
           title: 'vad',
           theme: _buildTheme(lightColorScheme),
           darkTheme: _buildDarkTheme(darkColorScheme),
-          themeMode: ThemeMode.system, // Default to dark for OLED aesthetic
+          themeMode: ThemeMode.system,
           home: Scaffold(
+            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                ? darkColorScheme.surface
+                : lightColorScheme.surface,
             body: Column(
               children: [
                 if (isDesktop) const TitleBar(),
                 Expanded(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                          Theme.of(context).colorScheme.surface,
-                        ],
-                      ),
                     ),
-                    child: const ChartWidget(),
+                      child: const TestChartWidget(),
                   ),
                 ),
                 const ToolPlate(),
@@ -123,40 +115,16 @@ class MyApp extends ConsumerWidget {
             ),
             floatingActionButton: const PickFileButton(),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            bottomNavigationBar: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    width: 0.5,
-                  ),
-                ),
-              ),
-              child: BottomNavigationBar(
-                elevation: 0,
-                unselectedItemColor: Colors.white.withValues(alpha: 0.5),
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.analytics_outlined),
-                    activeIcon: Icon(Icons.analytics),
-                    label: 'ANALYZE',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.info_outline),
-                    activeIcon: Icon(Icons.info),
-                    label: 'METRICS',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.tune_outlined),
-                    activeIcon: Icon(Icons.tune),
-                    label: 'CONFIG',
-                  ),
-                ],
-                currentIndex: ref.watch(navigatorIndexProvider),
-                onTap: (index) {
-                  ref.read(navigatorIndexProvider.notifier).setIndex(index);
-                },
-              ),
+            bottomNavigationBar: BottomNavigationBar(
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
+                BottomNavigationBarItem(icon: Icon(Icons.info), label: '信息'),
+                BottomNavigationBarItem(icon: Icon(Icons.edit), label: '控制'),
+              ],
+              currentIndex: ref.watch(navigatorIndexProvider),
+              onTap: (index) {
+                ref.read(navigatorIndexProvider.notifier).setIndex(index);
+              },
             ),
           ),
         );

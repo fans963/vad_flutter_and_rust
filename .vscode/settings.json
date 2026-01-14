@@ -1,3 +1,7 @@
 {
-  "dart.flutterSdkPath": ".fvm/versions/beta"
+  "dart.flutterSdkPath": ".fvm/versions/beta",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
+  "editor.formatOnType": true
 }

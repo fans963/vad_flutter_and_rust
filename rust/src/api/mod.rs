@@ -1,8 +1,10 @@
-pub mod audio_processor;
+pub mod types;
+pub mod traits;
+pub mod decoder;
+pub mod storage;
 pub mod util;
-
-#[flutter_rust_bridge::frb(init)]
-pub fn init_app() {
-    // Default utilities - feel free to customize
-    flutter_rust_bridge::setup_default_user_utils(); 
-}
+pub mod cache;
+pub mod core;
+pub mod sampling;
+pub mod events;
+pub mod transform;

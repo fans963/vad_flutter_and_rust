@@ -2,24 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/legacy.dart';
 import 'package:vad/src/provider/audio_process_providr.dart';
+import 'package:vad/src/rust/api/audio_processor.dart';
 import 'package:vad/src/rust/api/util.dart';
-
-enum ChartDataType { waveform, amplitudeSpectrum }
 
 typedef ChartDataParameter = ({
   String filePath,
   bool visible,
   (double, double) offset,
   (BigInt, BigInt) index,
-  ChartDataType dataType,
-  double downSampleFactor,
+  DataType dataType,
+  int targetWidth,
   Color? color,
 });
 
-typedef ChartSeriesData = ({
-  ChartData chartData,
-  Color color,
-});
+typedef ChartSeriesData = ({ChartData chartData, Color color});
 
 class ChartDataNotifier extends StateNotifier<List<ChartDataParameter>> {
   ChartDataNotifier() : super([]);
@@ -42,10 +38,9 @@ class ChartDataNotifier extends StateNotifier<List<ChartDataParameter>> {
 
 final chartParameterProvider =
     StateNotifierProvider<ChartDataNotifier, List<ChartDataParameter>>(
-  (ref) => ChartDataNotifier(),
-);
+      (ref) => ChartDataNotifier(),
+    );
 
-// New provider for chart data
 final chartDataProvider = FutureProvider<List<ChartSeriesData>>((ref) async {
   final activeCharts = ref.watch(chartParameterProvider);
   final audioProcessorAsync = ref.watch(audioProcessorProvider);
@@ -63,15 +58,13 @@ final chartDataProvider = FutureProvider<List<ChartSeriesData>>((ref) async {
     debugPrint('Rendering chart for file: ${chart.filePath}');
     final chartData = await processor.getDownSampledData(
       filePath: chart.filePath,
+      dataType: DataType.audio,
       offset: chart.offset,
       index: chart.index,
-      downSampleFactor: chart.downSampleFactor,
+      targetWidth: BigInt.from(chart.targetWidth),
     );
 
-    seriesData.add((
-      chartData: chartData,
-      color: chart.color ?? Colors.blue,
-    ));
+    seriesData.add((chartData: chartData, color: chart.color ?? Colors.blue));
   }
 
   return seriesData;

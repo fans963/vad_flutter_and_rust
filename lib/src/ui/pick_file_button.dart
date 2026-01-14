@@ -3,58 +3,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vad/src/provider/audio_process_providr.dart';
 import 'package:vad/src/provider/chart_paramater_provider.dart';
+import 'package:vad/src/rust/api/audio_processor.dart';
 
 class PickFileButton extends ConsumerWidget {
   const PickFileButton({super.key});
 
   @override
-  Widget build(BuildContext context,WidgetRef ref)  {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: FloatingActionButton(
-        tooltip: 'ADD SIGNAL SOURCE',
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.black,
-        elevation: 4,
-        highlightElevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: const Icon(Icons.add_chart_rounded),
-        onPressed: () async {
-          const XTypeGroup typeGroup = XTypeGroup(
-            label: 'Audio',
-            extensions: <String>['wav', 'mp3', 'flac'],
-          );
-          final List<XFile> files = await openFiles(
-            acceptedTypeGroups: <XTypeGroup>[typeGroup],
-          );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return FloatingActionButton(
+      tooltip: '添加音频文件',
+      child: const Icon(Icons.add),
+      onPressed: () async {
+        const XTypeGroup typeGroup = XTypeGroup(
+          label: 'Audio',
+          extensions: <String>['wav', 'mp3', 'flac'],
+        );
+        final List<XFile> files = await openFiles(
+          acceptedTypeGroups: <XTypeGroup>[typeGroup],
+        );
 
-          if (files.isNotEmpty) {
-            for (var file in files) {
-              final bytes = await file.readAsBytes();
-              debugPrint(
-                'Picked file: ${file.name}, size: ${await file.length()} bytes',
-              );
-              await ref
-                  .read(audioProcessorProvider.notifier)
-                  .addFile(file.path, bytes);
-              
-              if (!context.mounted) continue;
-              
-              ref.read(chartParameterProvider.notifier).add(
-                (
-                filePath: file.path,
-                  visible: true,
-                  offset: (0.0, 0.0),
-                  index: (BigInt.zero, BigInt.from(10000)),
-                  dataType: ChartDataType.waveform,
-                  downSampleFactor: 10.0,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              );
-            }
-          } 
-        },
-      ),
+        if (files.isNotEmpty) {
+          for (var file in files) {
+            final bytes = await file.readAsBytes();
+            debugPrint(
+              'Picked file: ${file.name}, size: ${await file.length()} bytes',
+            );
+            await ref
+                .read(audioProcessorProvider.notifier)
+                .addFile(file.path, bytes);
+            ref.read(chartParameterProvider.notifier).add((
+              filePath: file.path,
+              visible: true,
+              offset: (0.0, 0.0),
+              index: (BigInt.zero, BigInt.from(100000)),
+              dataType: DataType.audio,
+              targetWidth: 1000,
+              color: Colors.black,
+            ));
+          }
+        }
+      },
     );
   }
 }
