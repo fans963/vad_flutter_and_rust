@@ -35,7 +35,6 @@ use crate::api::traits::communicator::Communicator;
 use crate::api::traits::down_sample::DownSample;
 use crate::api::types::audio::*;
 use crate::api::types::chart::*;
-use crate::api::types::events::*;
 use crate::api::types::file::*;
 use crate::api::util::format_getter::FormatGetter;
 use crate::*;
@@ -219,16 +218,15 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_add_impl(
     )
 }
 fn wire__crate__api__core__engine__AudioProcessorEngine_new_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
             debug_name: "AudioProcessorEngine_new",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
         },
         move || {
             let message = unsafe {
@@ -250,25 +248,18 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_new_impl(
             let api_communicator =
                 <Box<dyn Communicator + Send + Sync>>::sse_decode(&mut deserializer);
             deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, ()>(
-                    (move || async move {
-                        let output_ok = Result::<_, ()>::Ok(
-                            crate::api::core::engine::AudioProcessorEngine::new(
-                                api_config,
-                                api_decoder,
-                                api_storage,
-                                api_cache,
-                                api_down_sampler,
-                                api_communicator,
-                            )
-                            .await,
-                        )?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
+            transform_result_sse::<_, ()>((move || {
+                let output_ok =
+                    Result::<_, ()>::Ok(crate::api::core::engine::AudioProcessorEngine::new(
+                        api_config,
+                        api_decoder,
+                        api_storage,
+                        api_cache,
+                        api_down_sampler,
+                        api_communicator,
+                    ))?;
+                Ok(output_ok)
+            })())
         },
     )
 }
@@ -1637,10 +1628,10 @@ fn wire__crate__api__events__communicator_events__create_chart_event_stream_impl
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_sink =
-                <StreamSink<ChartEvent, flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(
-                    &mut deserializer,
-                );
+            let api_sink = <StreamSink<
+                crate::api::types::events::ChartEvent,
+                flutter_rust_bridge::for_generated::SseCodec,
+            >>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok({
@@ -1652,16 +1643,15 @@ fn wire__crate__api__events__communicator_events__create_chart_event_stream_impl
     )
 }
 fn wire__crate__api__core__engine__create_default_engine_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
             debug_name: "create_default_engine",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
         },
         move || {
             let message = unsafe {
@@ -1675,17 +1665,12 @@ fn wire__crate__api__core__engine__create_default_engine_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_config = <crate::api::types::config::Config>::sse_decode(&mut deserializer);
             deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, ()>(
-                    (move || async move {
-                        let output_ok = Result::<_, ()>::Ok(
-                            crate::api::core::engine::create_default_engine(api_config).await,
-                        )?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
+            transform_result_sse::<_, ()>((move || {
+                let output_ok = Result::<_, ()>::Ok(
+                    crate::api::core::engine::create_default_engine(api_config),
+                )?;
+                Ok(output_ok)
+            })())
         },
     )
 }
@@ -1710,7 +1695,7 @@ fn wire__crate__api__events__communicator_events__emit_chart_event_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_event = <ChartEvent>::sse_decode(&mut deserializer);
+            let api_event = <crate::api::types::events::ChartEvent>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok({
@@ -2048,9 +2033,6 @@ flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
     flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Chart>
 );
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
     flutter_rust_bridge::for_generated::RustAutoOpaqueInner<File>
 );
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
@@ -2195,16 +2177,6 @@ impl SseDecode for Chart {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <RustOpaqueMoi<
             flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Chart>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode for ChartEvent {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>,
         >>::sse_decode(deserializer);
         return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
     }
@@ -2374,16 +2346,6 @@ impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpa
     }
 }
 
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
 impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<File>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2412,7 +2374,12 @@ impl SseDecode
     }
 }
 
-impl SseDecode for StreamSink<ChartEvent, flutter_rust_bridge::for_generated::SseCodec> {
+impl SseDecode
+    for StreamSink<
+        crate::api::types::events::ChartEvent,
+        flutter_rust_bridge::for_generated::SseCodec,
+    >
+{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <String>::sse_decode(deserializer);
@@ -2478,6 +2445,53 @@ impl SseDecode for crate::api::types::audio::AudioInfo {
     }
 }
 
+impl SseDecode for crate::api::types::events::ChartEvent {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_key = <String>::sse_decode(deserializer);
+                let mut var_chart =
+                    <crate::api::types::chart::CommunicatorChart>::sse_decode(deserializer);
+                return crate::api::types::events::ChartEvent::AddChart {
+                    key: var_key,
+                    chart: var_chart,
+                };
+            }
+            1 => {
+                let mut var_key = <String>::sse_decode(deserializer);
+                let mut var_dataType =
+                    <crate::api::types::chart::DataType>::sse_decode(deserializer);
+                return crate::api::types::events::ChartEvent::RemoveChart {
+                    key: var_key,
+                    data_type: var_dataType,
+                };
+            }
+            2 => {
+                return crate::api::types::events::ChartEvent::RemoveAllCharts;
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseDecode for crate::api::types::chart::CommunicatorChart {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_key = <String>::sse_decode(deserializer);
+        let mut var_dataType = <crate::api::types::chart::DataType>::sse_decode(deserializer);
+        let mut var_chart = <Vec<crate::api::types::chart::Point>>::sse_decode(deserializer);
+        return crate::api::types::chart::CommunicatorChart {
+            key: var_key,
+            data_type: var_dataType,
+            chart: var_chart,
+        };
+    }
+}
+
 impl SseDecode for crate::api::types::config::Config {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2516,6 +2530,18 @@ impl SseDecode for i32 {
     }
 }
 
+impl SseDecode for Vec<crate::api::types::chart::Point> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::types::chart::Point>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2532,6 +2558,15 @@ impl SseDecode for crate::api::sampling::minmax::Minmax {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         return crate::api::sampling::minmax::Minmax {};
+    }
+}
+
+impl SseDecode for crate::api::types::chart::Point {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_x = <f32>::sse_decode(deserializer);
+        let mut var_y = <f32>::sse_decode(deserializer);
+        return crate::api::types::chart::Point { x: var_x, y: var_y };
     }
 }
 
@@ -2604,12 +2639,6 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        4 => wire__crate__api__core__engine__AudioProcessorEngine_new_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
         5 => wire__crate__api__core__engine__AudioProcessorEngine_remove_audio_impl(
             port,
             ptr,
@@ -2634,12 +2663,6 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        47 => wire__crate__api__core__engine__create_default_engine_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
         _ => unreachable!(),
     }
 }
@@ -2654,6 +2677,7 @@ fn pde_ffi_dispatcher_sync_impl(
     match func_id {
                         1 => wire__crate__api__types__audio__AudioData_auto_accessor_get_samples_impl(ptr, rust_vec_len, data_len),
 2 => wire__crate__api__types__audio__AudioData_auto_accessor_set_samples_impl(ptr, rust_vec_len, data_len),
+4 => wire__crate__api__core__engine__AudioProcessorEngine_new_impl(ptr, rust_vec_len, data_len),
 9 => wire__crate__api__types__audio__Audio_auto_accessor_get_data_impl(ptr, rust_vec_len, data_len),
 10 => wire__crate__api__types__audio__Audio_auto_accessor_get_info_impl(ptr, rust_vec_len, data_len),
 11 => wire__crate__api__types__audio__Audio_auto_accessor_set_data_impl(ptr, rust_vec_len, data_len),
@@ -2679,6 +2703,7 @@ fn pde_ffi_dispatcher_sync_impl(
 31 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_remove_impl(ptr, rust_vec_len, data_len),
 45 => wire__crate__api__types__config__config_default_impl(ptr, rust_vec_len, data_len),
 46 => wire__crate__api__events__communicator_events__create_chart_event_stream_impl(ptr, rust_vec_len, data_len),
+47 => wire__crate__api__core__engine__create_default_engine_impl(ptr, rust_vec_len, data_len),
 48 => wire__crate__api__events__communicator_events__emit_chart_event_impl(ptr, rust_vec_len, data_len),
 49 => wire__crate__api__sampling__minmax__minmax_down_sample_impl(ptr, rust_vec_len, data_len),
 50 => wire__crate__api__util__format_getter__simple_format_getter_get_format_impl(ptr, rust_vec_len, data_len),
@@ -2903,21 +2928,6 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Chart>> for Chart {
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<ChartEvent> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<ChartEvent> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<ChartEvent>> for ChartEvent {
-    fn into_into_dart(self) -> FrbWrapper<ChartEvent> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<File> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
@@ -3025,6 +3035,62 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::types::audio::AudioInfo>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::types::events::ChartEvent {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::api::types::events::ChartEvent::AddChart { key, chart } => [
+                0.into_dart(),
+                key.into_into_dart().into_dart(),
+                chart.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::types::events::ChartEvent::RemoveChart { key, data_type } => [
+                1.into_dart(),
+                key.into_into_dart().into_dart(),
+                data_type.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::types::events::ChartEvent::RemoveAllCharts => [2.into_dart()].into_dart(),
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::types::events::ChartEvent
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::types::events::ChartEvent>
+    for crate::api::types::events::ChartEvent
+{
+    fn into_into_dart(self) -> crate::api::types::events::ChartEvent {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::types::chart::CommunicatorChart {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.key.into_into_dart().into_dart(),
+            self.data_type.into_into_dart().into_dart(),
+            self.chart.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::types::chart::CommunicatorChart
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::types::chart::CommunicatorChart>
+    for crate::api::types::chart::CommunicatorChart
+{
+    fn into_into_dart(self) -> crate::api::types::chart::CommunicatorChart {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::types::config::Config {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [self.frame_size.into_into_dart().into_dart()].into_dart()
@@ -3078,6 +3144,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::sampling::minmax::Minmax>
     for crate::api::sampling::minmax::Minmax
 {
     fn into_into_dart(self) -> crate::api::sampling::minmax::Minmax {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::types::chart::Point {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.x.into_into_dart().into_dart(),
+            self.y.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::types::chart::Point
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::types::chart::Point>
+    for crate::api::types::chart::Point
+{
+    fn into_into_dart(self) -> crate::api::types::chart::Point {
         self
     }
 }
@@ -3270,13 +3357,6 @@ impl SseEncode for Chart {
     }
 }
 
-impl SseEncode for ChartEvent {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
 impl SseEncode for File {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3452,17 +3532,6 @@ impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpa
     }
 }
 
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
 impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<File>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3494,7 +3563,12 @@ impl SseEncode
     }
 }
 
-impl SseEncode for StreamSink<ChartEvent, flutter_rust_bridge::for_generated::SseCodec> {
+impl SseEncode
+    for StreamSink<
+        crate::api::types::events::ChartEvent,
+        flutter_rust_bridge::for_generated::SseCodec,
+    >
+{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         unimplemented!("")
@@ -3554,6 +3628,39 @@ impl SseEncode for crate::api::types::audio::AudioInfo {
     }
 }
 
+impl SseEncode for crate::api::types::events::ChartEvent {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::api::types::events::ChartEvent::AddChart { key, chart } => {
+                <i32>::sse_encode(0, serializer);
+                <String>::sse_encode(key, serializer);
+                <crate::api::types::chart::CommunicatorChart>::sse_encode(chart, serializer);
+            }
+            crate::api::types::events::ChartEvent::RemoveChart { key, data_type } => {
+                <i32>::sse_encode(1, serializer);
+                <String>::sse_encode(key, serializer);
+                <crate::api::types::chart::DataType>::sse_encode(data_type, serializer);
+            }
+            crate::api::types::events::ChartEvent::RemoveAllCharts => {
+                <i32>::sse_encode(2, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseEncode for crate::api::types::chart::CommunicatorChart {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.key, serializer);
+        <crate::api::types::chart::DataType>::sse_encode(self.data_type, serializer);
+        <Vec<crate::api::types::chart::Point>>::sse_encode(self.chart, serializer);
+    }
+}
+
 impl SseEncode for crate::api::types::config::Config {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3593,6 +3700,16 @@ impl SseEncode for i32 {
     }
 }
 
+impl SseEncode for Vec<crate::api::types::chart::Point> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::types::chart::Point>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3606,6 +3723,14 @@ impl SseEncode for Vec<u8> {
 impl SseEncode for crate::api::sampling::minmax::Minmax {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+}
+
+impl SseEncode for crate::api::types::chart::Point {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <f32>::sse_encode(self.x, serializer);
+        <f32>::sse_encode(self.y, serializer);
+    }
 }
 
 impl SseEncode for crate::api::util::format_getter::SimpleFormatGetter {
@@ -3677,7 +3802,6 @@ mod io {
     use crate::api::traits::down_sample::DownSample;
     use crate::api::types::audio::*;
     use crate::api::types::chart::*;
-    use crate::api::types::events::*;
     use crate::api::types::file::*;
     use crate::api::util::format_getter::FormatGetter;
     use crate::*;
@@ -3900,20 +4024,6 @@ mod io {
     }
 
     #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_vad_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_vad_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>::decrement_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_vad_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
         ptr: *const std::ffi::c_void,
     ) {
@@ -3977,7 +4087,6 @@ mod web {
     use crate::api::traits::down_sample::DownSample;
     use crate::api::types::audio::*;
     use crate::api::types::chart::*;
-    use crate::api::types::events::*;
     use crate::api::types::file::*;
     use crate::api::util::format_getter::FormatGetter;
     use crate::*;
@@ -4199,20 +4308,6 @@ mod web {
         ptr: *const std::ffi::c_void,
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Chart>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>::decrement_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]

@@ -1,85 +1,208 @@
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:vad/src/provider/chart_control_provider.dart';
-// import 'package:vad/src/provider/chart_paramater_provider.dart';
+import 'dart:async';
+import 'dart:collection';
 
-// class ChartWidget extends ConsumerWidget {
-//   const ChartWidget({super.key});
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:vad/src/provider/audio_process_providr.dart';
+import 'package:vad/src/provider/chart_control_provider.dart';
+import 'package:vad/src/provider/chart_paramater_provider.dart';
+import 'package:vad/src/rust/api/events/communicator_events.dart';
+import 'package:vad/src/rust/api/types/chart.dart';
+import 'package:vad/src/rust/api/types/events.dart';
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final chartDataAsync = ref.watch(chartDataProvider);
-//     final control = ref.watch(chartControlProvider);
+class ChartWidget extends ConsumerStatefulWidget {
+  const ChartWidget({super.key});
 
-//     return Container(
-//       height: 500,
-//       padding: const EdgeInsets.all(16.0),
-//       child: chartDataAsync.when(
-//         data: (seriesList) {
-//           if (seriesList.isEmpty) {
-//             return const Center(child: Text('No data to display'));
-//           }
+  @override
+  ConsumerState<ChartWidget> createState() => _ChartWidgetState();
+}
 
-//           final lineBarsData = seriesList.asMap().entries.map((entry) {
-//             final i = entry.key;
-//             final series = entry.value;
-//             final chartParam = ref.read(chartParameterProvider)[i];
-            
-//             final double xStart = chartParam.index.$1.toDouble();
-//             final double xEnd = chartParam.index.$2.toDouble();
-//             final double originalRange = xEnd - xStart;
-//             final int sampledCount = series.chartData.data.length;
-            
-//             // 计算步长：如果采样后只有1个点或没有点，步长默认为1
-//             final double step = sampledCount > 1 ? originalRange / (sampledCount - 1) : 1.0;
+class _ChartDataContainer {
+  final LinkedHashMap<String, List<CommunicatorChart>> seriesData =
+      LinkedHashMap();
 
-//             final spots = series.chartData.data.asMap().entries.map((e) {
-//               final double x = xStart + (e.key * step);
-//               return FlSpot(x, e.value.toDouble());
-//             }).toList();
+  void addSeries(String key, CommunicatorChart chartData) {
+    seriesData.putIfAbsent(key, () => []).add(chartData);
+  }
 
-//             return LineChartBarData(
-//               spots: spots,
-//               isCurved: false,
-//               color: series.color,
-//               barWidth: 1,
-//               isStrokeCapRound: true,
-//               dotData: const FlDotData(show: false),
-//               belowBarData: BarAreaData(show: false),
-//             );
-//           }).toList();
+  void removeSeries(String key) {
+    seriesData.remove(key);
+  }
 
-//           return LineChart(
-//             LineChartData(
-//               lineBarsData: lineBarsData,
-//               minX: control.minX,
-//               maxX: control.maxX,
-//               minY: control.minY,
-//               maxY: control.maxY,
-//               titlesData: const FlTitlesData(
-//                 show: true,
-//                 bottomTitles: AxisTitles(
-//                   axisNameWidget: Text('数据点序号'),
-//                   sideTitles: SideTitles(showTitles: true, reservedSize: 30),
-//                 ),
-//                 leftTitles: AxisTitles(
-//                   axisNameWidget: Text('数值'),
-//                   sideTitles: SideTitles(showTitles: true, reservedSize: 40),
-//                 ),
-//                 topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-//                 rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-//               ),
-//               gridData: const FlGridData(show: true),
-//               borderData: FlBorderData(show: true),
-//               lineTouchData: const LineTouchData(enabled: false), // Disable touch for performance
-//             ),
-//           );
-//         },
-//         loading: () => const Center(child: CircularProgressIndicator()),
-//         error: (error, stack) =>
-//             Center(child: Text('Error loading chart: $error')),
-//       ),
-//     );
-//   }
-// }
+  void clearAll() {
+    seriesData.clear();
+  }
+
+  List<String> getKeys() => seriesData.keys.toList();
+
+  List<CommunicatorChart>? getCharts(String key) => seriesData[key];
+}
+
+class _ChartWidgetState extends ConsumerState<ChartWidget> {
+  StreamSubscription<ChartEvent>? _chartEventSubscription;
+  final _containerKey = GlobalKey();
+  double? _lastWidth;
+
+  late final _ChartDataContainer _chartDataContainer = _ChartDataContainer();
+
+  @override
+  void initState() {
+    super.initState();
+    _chartEventSubscription = createChartEventStream().listen(
+      (event) {
+        switch (event) {
+          case ChartEvent_AddChart():
+            {
+              _chartDataContainer.addSeries(event.key, event.chart);
+              debugPrint(
+                "Received ChartEvent_AddChart: ${event.key}, points: ${event.chart.chart.length}",
+              );
+              setState(() {});
+            }
+          case ChartEvent_RemoveChart():
+            {
+              _chartDataContainer.removeSeries(event.key);
+              debugPrint("Removed chart: ${event.key}");
+              setState(() {});
+            }
+          case ChartEvent_RemoveAllCharts():
+            {
+              _chartDataContainer.clearAll();
+              debugPrint("Removed all charts");
+              setState(() {});
+            }
+        }
+      },
+      onError: (error) => debugPrint('Chart event stream error: $error'),
+      cancelOnError: false,
+    );
+    _listenToSizeChanges();
+  }
+
+  void _listenToSizeChanges() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateDownsamplePointsNum();
+      _listenToSizeChanges();
+    });
+  }
+
+  void _updateDownsamplePointsNum() {
+    final size = _containerKey.currentContext?.size;
+    if (size != null && size.width != _lastWidth) {
+      _lastWidth = size.width;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(audioProcessorProvider)
+            .value
+            ?.setDownSamplePointsNum(pointsNum: BigInt.from(size.width * 2));
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final chartControl = ref.watch(chartControlProvider);
+    final chartParameters = ref.watch(chartParameterProvider);
+
+    chartControl.whenData((control) {
+      ref
+          .read(audioProcessorProvider)
+          .value
+          ?.setIndexRange(start: control.minX, end: control.maxX);
+    });
+
+    final seriesList = _buildChartSeries();
+
+    return Container(
+      key: _containerKey,
+      height: 500,
+      padding: const EdgeInsets.all(10.0),
+      child: RepaintBoundary(
+        child: SfCartesianChart(
+          zoomPanBehavior: ZoomPanBehavior(
+            enablePinching: true,
+            enablePanning: true,
+            enableMouseWheelZooming: true,
+            enableSelectionZooming: true,
+            zoomMode: ZoomMode.xy,
+          ),
+          primaryXAxis: NumericAxis(
+            name: 'primaryXAxis',
+            minimum: 0,
+            maximum: 1000000,
+          ),
+          primaryYAxis: const NumericAxis(
+            name: 'primaryYAxis',
+            minimum: -0.5,
+            maximum: 0.5,
+          ),
+          onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
+            if (rangeChangedArgs.axisName == 'primaryXAxis') {
+              final minX = (rangeChangedArgs.visibleMin as num).toDouble();
+              final maxX = (rangeChangedArgs.visibleMax as num).toDouble();
+              
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ref.read(chartControlProvider.notifier).setControlParameter((
+                  minX: minX,
+                  maxX: maxX,
+                  minY: 0.0,
+                  maxY: 0.0,
+                ));
+              });
+            }
+          },
+          series: seriesList,
+        ),
+      ),
+    );
+  }
+
+  List<CartesianSeries> _buildChartSeries() {
+    final keys = _chartDataContainer.getKeys();
+    final colors = _getChartColors();
+    
+    final seriesList = <CartesianSeries>[];
+    int seriesIndex = 0;
+    
+    for (final key in keys) {
+      final charts = _chartDataContainer.getCharts(key)!;
+      
+      for (final communicatorChart in charts) {
+        final color = colors[seriesIndex % colors.length];
+        
+        seriesList.add(
+          FastLineSeries<Point, double>(
+            name: key,
+            dataSource: communicatorChart.chart,
+            xValueMapper: (Point point, _) => point.x,
+            yValueMapper: (Point point, _) => point.y,
+            color: color,
+            width: 0.4,
+            animationDuration: 0,
+            sortingOrder: SortingOrder.ascending,
+            sortFieldValueMapper: (Point point, _) => point.x,
+          ),
+        );
+        
+        seriesIndex++;
+      }
+    }
+    
+    return seriesList;
+  }
+
+  List<Color> _getChartColors() {
+    return [
+      Colors.blue,
+      Colors.red,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.cyan,
+      Colors.pink,
+      Colors.amber,
+    ];
+  }
+}

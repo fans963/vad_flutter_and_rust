@@ -7,7 +7,7 @@ import '../../frb_generated.dart';
 import '../../lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Chart>>
 abstract class Chart implements RustOpaqueInterface {
@@ -22,4 +22,46 @@ abstract class Chart implements RustOpaqueInterface {
   Chart getRange({required double startX, required double endX});
 }
 
+class CommunicatorChart {
+  final String key;
+  final DataType dataType;
+  final List<Point> chart;
+
+  const CommunicatorChart({
+    required this.key,
+    required this.dataType,
+    required this.chart,
+  });
+
+  @override
+  int get hashCode => key.hashCode ^ dataType.hashCode ^ chart.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CommunicatorChart &&
+          runtimeType == other.runtimeType &&
+          key == other.key &&
+          dataType == other.dataType &&
+          chart == other.chart;
+}
+
 enum DataType { audio, spectrum, energy, zeroCrossingRate }
+
+class Point {
+  final double x;
+  final double y;
+
+  const Point({required this.x, required this.y});
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Point &&
+          runtimeType == other.runtimeType &&
+          x == other.x &&
+          y == other.y;
+}

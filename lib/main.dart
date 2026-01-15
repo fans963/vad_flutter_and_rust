@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/provider/navigator_index_provider.dart';
 import 'package:vad/src/rust/frb_generated.dart';
+import 'package:vad/src/ui/chart_widget.dart';
 import 'package:vad/src/ui/fps_counter.dart';
 import 'package:vad/src/ui/test_chart_widget.dart';
 import 'package:vad/src/ui/pick_file_button.dart';
@@ -107,7 +108,7 @@ class MyApp extends ConsumerWidget {
                     Expanded(
                       child: DecoratedBox(
                         decoration: BoxDecoration(),
-                        // child: const TestChartWidget(),
+                        child: const ChartWidget(),
                       ),
                     ),
                     const ToolPlate(),

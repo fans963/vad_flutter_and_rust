@@ -1,7 +1,7 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use log::{debug, error};
+use log::{debug, error, info};
 use symphonia::core::probe::Hint;
 
 use crate::api::traits::audio_decoder::AudioDecoder;
@@ -20,7 +20,6 @@ impl SymphoniaDecoder {
 impl AudioDecoder for SymphoniaDecoder {
     fn decode(&self, format: String, data: Vec<u8>) -> Result<Audio, AppError> {
         let source = Box::new(Cursor::new(data));
-
         let mut hint = Hint::new();
         hint.with_extension(&format);
 

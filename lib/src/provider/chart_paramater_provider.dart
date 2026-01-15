@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:riverpod/legacy.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:vad/src/rust/api/types/chart.dart';
 
 typedef ChartDataParameter = ({
@@ -10,23 +11,41 @@ typedef ChartDataParameter = ({
   Color? color,
 });
 
-class ChartDataNotifier extends StateNotifier<HashMap<String,ChartDataParameter>> {
-  ChartDataNotifier() : super(HashMap());
+class ChartDataNotifier
+    extends AsyncNotifier<HashMap<String, ChartDataParameter>> {
+  @override
+  Future<HashMap<String, ChartDataParameter>> build() async {
+    return HashMap<String, ChartDataParameter>();
+  }
 
   List<ChartDataParameter> getChartParameters() {
-    return state.values.toList();
+    final currentState = state.value;
+    if (currentState == null) return [];
+    return currentState.values.toList();
   }
 
   void add(String key, ChartDataParameter parameter) {
-    state[key] = parameter;
+    final currentState = state.value;
+    if (currentState != null) {
+      final newState = HashMap<String, ChartDataParameter>.from(currentState);
+      newState[key] = parameter;
+      state = AsyncValue.data(newState);
+    }
   }
 
   void delete(String key) {
-    state.remove(key);
+    final currentState = state.value;
+    if (currentState != null) {
+      final newState = HashMap<String, ChartDataParameter>.from(currentState);
+      newState.remove(key);
+      state = AsyncValue.data(newState);
+    }
   }
 }
 
 final chartParameterProvider =
-    StateNotifierProvider<ChartDataNotifier, HashMap<String,ChartDataParameter>>(
-      (ref) => ChartDataNotifier(),
+    AsyncNotifierProvider<
+      ChartDataNotifier,
+      HashMap<String, ChartDataParameter>
+    >(() => ChartDataNotifier(),
     );

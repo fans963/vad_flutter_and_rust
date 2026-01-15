@@ -9,15 +9,14 @@ import '../types/config.dart';
 import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<AudioProcessorEngine> createDefaultEngine({required Config config}) =>
+AudioProcessorEngine createDefaultEngine({required Config config}) =>
     RustLib.instance.api.crateApiCoreEngineCreateDefaultEngine(config: config);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>>
 abstract class AudioProcessorEngine implements RustOpaqueInterface {
   Future<void> add({required String filePath, required List<int> audioData});
 
-  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
-  static Future<AudioProcessorEngine> newInstance({
+  factory AudioProcessorEngine({
     required Config config,
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,

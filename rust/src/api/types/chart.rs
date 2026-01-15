@@ -20,6 +20,13 @@ pub struct Chart {
     pub points: Arc<Vec<Point>>,
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct CommunicatorChart{
+    pub key: String,
+    pub data_type: DataType,
+    pub chart: Vec<Point>,
+}
+
 impl Chart {
     pub fn get_range(&self, start_x: f32, end_x: f32) -> Self {
         use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};

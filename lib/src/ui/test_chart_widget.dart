@@ -14,7 +14,7 @@ class _TestChartWidgetState extends State<TestChartWidget> {
   late Float64List _xValues;
   late Float64List _yValues;
   late List<int> _indices;
-  final int _totalPoints = 50000;
+  final int _totalPoints = 100000;
 
   @override
   void initState() {
@@ -52,7 +52,7 @@ class _TestChartWidgetState extends State<TestChartWidget> {
             // 2. 启用二分查找裁剪，这是缩放时不卡顿的关键
             // 虽然一次性显示10万点，但在缩放进去后，图表会自动只渲染可见点
             initialVisibleMinimum: 0,
-            initialVisibleMaximum: 50000,
+            initialVisibleMaximum: 100000,
             edgeLabelPlacement: EdgeLabelPlacement.shift,
           ),
 

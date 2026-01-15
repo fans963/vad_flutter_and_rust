@@ -1,21 +1,26 @@
 import 'package:riverpod/legacy.dart';
+import 'package:riverpod/riverpod.dart';
 
 typedef ChartControlParameter = ({
-  double maxIndex,
   double minX,
   double maxX,
   double minY,
   double maxY,
 });
 
-class ChartControlProvider extends StateNotifier<ChartControlParameter> {
-  ChartControlProvider() : super((maxIndex: 0, minX: 0, maxX: 100000, minY: -0.5, maxY: 0.5));
+class ChartControlProvider extends AsyncNotifier<ChartControlParameter> {
+  @override
+  Future<ChartControlParameter> build() async {
+    // 返回初始值
+    return (minX: 0.0, maxX: 1.0, minY: -1.0, maxY: 1.0);
+  }
+
   void setControlParameter(ChartControlParameter parameter) {
-    state = parameter;
+    state = AsyncValue.data(parameter);
   }
 }
 
 final chartControlProvider =
-    StateNotifierProvider<ChartControlProvider, ChartControlParameter>(
-      (ref) => ChartControlProvider(),
+    AsyncNotifierProvider<ChartControlProvider, ChartControlParameter>(
+      () => ChartControlProvider(),
     );

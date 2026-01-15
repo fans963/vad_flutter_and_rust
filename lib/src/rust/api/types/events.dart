@@ -4,9 +4,24 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'chart.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'events.freezed.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>
-abstract class ChartEvent implements RustOpaqueInterface {}
+@freezed
+sealed class ChartEvent with _$ChartEvent {
+  const ChartEvent._();
+
+  const factory ChartEvent.addChart({
+    required String key,
+    required CommunicatorChart chart,
+  }) = ChartEvent_AddChart;
+  const factory ChartEvent.removeChart({
+    required String key,
+    required DataType dataType,
+  }) = ChartEvent_RemoveChart;
+  const factory ChartEvent.removeAllCharts() = ChartEvent_RemoveAllCharts;
+}

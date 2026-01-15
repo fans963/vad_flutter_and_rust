@@ -51,6 +51,8 @@ dependencies:
   google_fonts: ^7.0.2
   syncfusion_flutter_charts: ^32.1.23
   freezed_annotation: ^3.1.0
+  graphic: ^2.6.0
+  flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
   flutter_launcher_icons:

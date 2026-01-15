@@ -1,5 +1,6 @@
 use std::{ops::Index, sync::Arc};
 
+use log::info;
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 use crate::api::{
@@ -36,7 +37,7 @@ pub struct AudioProcessorEngine {
 }
 
 impl AudioProcessorEngine {
-    pub async fn new(
+    pub fn new(
         config: Config,
         decoder: Box<dyn AudioDecoder + Send + Sync>,
         storage: Box<dyn AudioStorage + Send + Sync>,
@@ -111,7 +112,7 @@ impl AudioProcessorEngine {
     }
 }
 
-pub async fn create_default_engine(config: Config) -> AudioProcessorEngine {
+pub fn create_default_engine(config: Config) -> AudioProcessorEngine {
     AudioProcessorEngine::new(
         config,
         Box::new(SymphoniaDecoder::new()),
@@ -120,5 +121,4 @@ pub async fn create_default_engine(config: Config) -> AudioProcessorEngine {
         Box::new(Minmax {}),
         Box::new(communicator::communicator::StreamCommunicator::new()),
     )
-    .await
 }
