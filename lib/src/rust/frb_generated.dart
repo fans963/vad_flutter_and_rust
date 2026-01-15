@@ -3,15 +3,17 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/communicator/communicator.dart';
 import 'api/core/engine.dart';
 import 'api/decoder/symphonia_decoder.dart';
-import 'api/events/cache_events.dart';
+import 'api/events/communicator_events.dart';
 import 'api/sampling/minmax.dart';
 import 'api/storage/kv_audio_storage.dart';
 import 'api/storage/kv_cached_chart_storage.dart';
 import 'api/traits/audio_decoder.dart';
 import 'api/traits/audio_storage.dart';
 import 'api/traits/cached_chart_storage.dart';
+import 'api/traits/communicator.dart';
 import 'api/traits/down_sample.dart';
 import 'api/traits/transform.dart';
 import 'api/types/audio.dart';
@@ -82,7 +84,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 626122215;
+  int get rustContentHash => 499233646;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -102,36 +104,38 @@ abstract class RustLibApi extends BaseApi {
     required ArcVecF32 samples,
   });
 
-  void crateApiCoreEngineAudioProcessorEngineAdd({
+  Future<void> crateApiCoreEngineAudioProcessorEngineAdd({
     required AudioProcessorEngine that,
     required String filePath,
     required List<int> audioData,
   });
 
-  AudioProcessorEngine crateApiCoreEngineAudioProcessorEngineNew({
+  Future<AudioProcessorEngine> crateApiCoreEngineAudioProcessorEngineNew({
     required Config config,
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
     required BoxCachedChartStorage cache,
+    required BoxDownSample downSampler,
+    required BoxCommunicator communicator,
   });
 
-  void crateApiCoreEngineAudioProcessorEngineRemoveAudio({
+  Future<void> crateApiCoreEngineAudioProcessorEngineRemoveAudio({
     required AudioProcessorEngine that,
     required String filePath,
   });
 
-  void crateApiCoreEngineAudioProcessorEngineRemoveChart({
+  Future<void> crateApiCoreEngineAudioProcessorEngineRemoveChart({
     required AudioProcessorEngine that,
     required String filePath,
     required DataType dataType,
   });
 
-  void crateApiCoreEngineAudioProcessorEngineSetDownSamplePointsNum({
+  Future<void> crateApiCoreEngineAudioProcessorEngineSetDownSamplePointsNum({
     required AudioProcessorEngine that,
     required BigInt pointsNum,
   });
 
-  void crateApiCoreEngineAudioProcessorEngineSetIndexRange({
+  Future<void> crateApiCoreEngineAudioProcessorEngineSetIndexRange({
     required AudioProcessorEngine that,
     required double start,
     required double end,
@@ -167,6 +171,12 @@ abstract class RustLibApi extends BaseApi {
   void crateApiTypesChartChartAutoAccessorSetPoints({
     required Chart that,
     required ArcVecPoint points,
+  });
+
+  Chart crateApiTypesChartChartGetRange({
+    required Chart that,
+    required double startX,
+    required double endX,
   });
 
   ArcVecU8 crateApiTypesFileFileAutoAccessorGetBytes({required File that});
@@ -234,13 +244,15 @@ abstract class RustLibApi extends BaseApi {
 
   Config crateApiTypesConfigConfigDefault();
 
-  Stream<CacheEvent> crateApiEventsCacheEventsCreateCacheEventStream();
+  Stream<ChartEvent> crateApiEventsCommunicatorEventsCreateChartEventStream();
 
-  AudioProcessorEngine crateApiCoreEngineCreateDefaultEngine({
+  Future<AudioProcessorEngine> crateApiCoreEngineCreateDefaultEngine({
     required Config config,
   });
 
-  void crateApiEventsCacheEventsEmitCacheEvent({required CacheEvent event});
+  void crateApiEventsCommunicatorEventsEmitChartEvent({
+    required ChartEvent event,
+  });
 
   Chart crateApiSamplingMinmaxMinmaxDownSample({
     required Minmax that,
@@ -251,6 +263,24 @@ abstract class RustLibApi extends BaseApi {
   String crateApiUtilFormatGetterSimpleFormatGetterGetFormat({
     required SimpleFormatGetter that,
     required String filePath,
+  });
+
+  void crateApiCommunicatorCommunicatorStreamCommunicatorAddChart({
+    required StreamCommunicator that,
+    required String key,
+    required Chart chart,
+  });
+
+  StreamCommunicator crateApiCommunicatorCommunicatorStreamCommunicatorNew();
+
+  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllCharts({
+    required StreamCommunicator that,
+  });
+
+  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveChart({
+    required StreamCommunicator that,
+    required String key,
+    required DataType dataType,
   });
 
   Audio crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode({
@@ -336,18 +366,36 @@ abstract class RustLibApi extends BaseApi {
   get rust_arc_decrement_strong_count_BoxCachedChartStoragePtr;
 
   RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_CacheEvent;
+  get rust_arc_increment_strong_count_BoxCommunicator;
 
   RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_CacheEvent;
+  get rust_arc_decrement_strong_count_BoxCommunicator;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_CacheEventPtr;
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_BoxCommunicatorPtr;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_BoxDownSample;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_BoxDownSample;
+
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_BoxDownSamplePtr;
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Chart;
 
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Chart;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ChartPtr;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_ChartEvent;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_ChartEvent;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ChartEventPtr;
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_File;
 
@@ -453,14 +501,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiCoreEngineAudioProcessorEngineAdd({
+  Future<void> crateApiCoreEngineAudioProcessorEngineAdd({
     required AudioProcessorEngine that,
     required String filePath,
     required List<int> audioData,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessorEngine(
             that,
@@ -468,7 +516,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(filePath, serializer);
           sse_encode_list_prim_u_8_loose(audioData, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -488,15 +541,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  AudioProcessorEngine crateApiCoreEngineAudioProcessorEngineNew({
+  Future<AudioProcessorEngine> crateApiCoreEngineAudioProcessorEngineNew({
     required Config config,
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
     required BoxCachedChartStorage cache,
+    required BoxDownSample downSampler,
+    required BoxCommunicator communicator,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_config(config, serializer);
           sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynAudioDecoderSendSync(
@@ -511,7 +566,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             cache,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
+            downSampler,
+            serializer,
+          );
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
+            communicator,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -519,7 +587,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiCoreEngineAudioProcessorEngineNewConstMeta,
-        argValues: [config, decoder, storage, cache],
+        argValues: [config, decoder, storage, cache, downSampler, communicator],
         apiImpl: this,
       ),
     );
@@ -528,24 +596,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiCoreEngineAudioProcessorEngineNewConstMeta =>
       const TaskConstMeta(
         debugName: "AudioProcessorEngine_new",
-        argNames: ["config", "decoder", "storage", "cache"],
+        argNames: [
+          "config",
+          "decoder",
+          "storage",
+          "cache",
+          "downSampler",
+          "communicator",
+        ],
       );
 
   @override
-  void crateApiCoreEngineAudioProcessorEngineRemoveAudio({
+  Future<void> crateApiCoreEngineAudioProcessorEngineRemoveAudio({
     required AudioProcessorEngine that,
     required String filePath,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessorEngine(
             that,
             serializer,
           );
           sse_encode_String(filePath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -566,14 +646,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiCoreEngineAudioProcessorEngineRemoveChart({
+  Future<void> crateApiCoreEngineAudioProcessorEngineRemoveChart({
     required AudioProcessorEngine that,
     required String filePath,
     required DataType dataType,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessorEngine(
             that,
@@ -581,7 +661,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(filePath, serializer);
           sse_encode_data_type(dataType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -602,20 +687,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiCoreEngineAudioProcessorEngineSetDownSamplePointsNum({
+  Future<void> crateApiCoreEngineAudioProcessorEngineSetDownSamplePointsNum({
     required AudioProcessorEngine that,
     required BigInt pointsNum,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessorEngine(
             that,
             serializer,
           );
           sse_encode_usize(pointsNum, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -637,14 +727,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiCoreEngineAudioProcessorEngineSetIndexRange({
+  Future<void> crateApiCoreEngineAudioProcessorEngineSetIndexRange({
     required AudioProcessorEngine that,
     required double start,
     required double end,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessorEngine(
             that,
@@ -652,7 +742,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_f_32(start, serializer);
           sse_encode_f_32(end, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -934,6 +1029,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Chart crateApiTypesChartChartGetRange({
+    required Chart that,
+    required double startX,
+    required double endX,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            that,
+            serializer,
+          );
+          sse_encode_f_32(startX, serializer);
+          sse_encode_f_32(endX, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTypesChartChartGetRangeConstMeta,
+        argValues: [that, startX, endX],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTypesChartChartGetRangeConstMeta =>
+      const TaskConstMeta(
+        debugName: "Chart_get_range",
+        argNames: ["that", "startX", "endX"],
+      );
+
+  @override
   ArcVecU8 crateApiTypesFileFileAutoAccessorGetBytes({required File that}) {
     return handler.executeSync(
       SyncTask(
@@ -943,7 +1074,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -973,7 +1104,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1009,7 +1140,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             bytes,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1042,7 +1173,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(filePath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1075,7 +1206,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1101,7 +1232,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1132,7 +1263,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1171,7 +1302,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             storageUnit,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1209,7 +1340,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             chart,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1243,7 +1374,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_config,
@@ -1279,7 +1410,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1314,7 +1445,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1343,7 +1474,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1378,7 +1509,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(key, serializer);
           sse_encode_data_type(dataType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1405,7 +1536,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_config,
@@ -1422,23 +1553,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "config_default", argNames: []);
 
   @override
-  Stream<CacheEvent> crateApiEventsCacheEventsCreateCacheEventStream() {
-    final sink = RustStreamSink<CacheEvent>();
+  Stream<ChartEvent> crateApiEventsCommunicatorEventsCreateChartEventStream() {
+    final sink = RustStreamSink<ChartEvent>();
     handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent_Sse(
+          sse_encode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent_Sse(
             sink,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiEventsCacheEventsCreateCacheEventStreamConstMeta,
+        constMeta:
+            kCrateApiEventsCommunicatorEventsCreateChartEventStreamConstMeta,
         argValues: [sink],
         apiImpl: this,
       ),
@@ -1446,22 +1578,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return sink.stream;
   }
 
-  TaskConstMeta get kCrateApiEventsCacheEventsCreateCacheEventStreamConstMeta =>
+  TaskConstMeta
+  get kCrateApiEventsCommunicatorEventsCreateChartEventStreamConstMeta =>
       const TaskConstMeta(
-        debugName: "create_cache_event_stream",
+        debugName: "create_chart_event_stream",
         argNames: ["sink"],
       );
 
   @override
-  AudioProcessorEngine crateApiCoreEngineCreateDefaultEngine({
+  Future<AudioProcessorEngine> crateApiCoreEngineCreateDefaultEngine({
     required Config config,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 47,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1482,30 +1620,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiEventsCacheEventsEmitCacheEvent({required CacheEvent event}) {
+  void crateApiEventsCommunicatorEventsEmitChartEvent({
+    required ChartEvent event,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent(
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
             event,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiEventsCacheEventsEmitCacheEventConstMeta,
+        constMeta: kCrateApiEventsCommunicatorEventsEmitChartEventConstMeta,
         argValues: [event],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiEventsCacheEventsEmitCacheEventConstMeta =>
-      const TaskConstMeta(debugName: "emit_cache_event", argNames: ["event"]);
+  TaskConstMeta get kCrateApiEventsCommunicatorEventsEmitChartEventConstMeta =>
+      const TaskConstMeta(debugName: "emit_chart_event", argNames: ["event"]);
 
   @override
   Chart crateApiSamplingMinmaxMinmaxDownSample({
@@ -1523,7 +1663,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_usize(targetPointsNum, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1554,7 +1694,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_simple_format_getter(that, serializer);
           sse_encode_String(filePath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1576,6 +1716,131 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  void crateApiCommunicatorCommunicatorStreamCommunicatorAddChart({
+    required StreamCommunicator that,
+    required String key,
+    required Chart chart,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_stream_communicator(that, serializer);
+          sse_encode_String(key, serializer);
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            chart,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiCommunicatorCommunicatorStreamCommunicatorAddChartConstMeta,
+        argValues: [that, key, chart],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiCommunicatorCommunicatorStreamCommunicatorAddChartConstMeta =>
+      const TaskConstMeta(
+        debugName: "stream_communicator_add_chart",
+        argNames: ["that", "key", "chart"],
+      );
+
+  @override
+  StreamCommunicator crateApiCommunicatorCommunicatorStreamCommunicatorNew() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_stream_communicator,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiCommunicatorCommunicatorStreamCommunicatorNewConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiCommunicatorCommunicatorStreamCommunicatorNewConstMeta =>
+      const TaskConstMeta(debugName: "stream_communicator_new", argNames: []);
+
+  @override
+  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllCharts({
+    required StreamCommunicator that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_stream_communicator(that, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllChartsConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllChartsConstMeta =>
+      const TaskConstMeta(
+        debugName: "stream_communicator_remove_all_charts",
+        argNames: ["that"],
+      );
+
+  @override
+  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveChart({
+    required StreamCommunicator that,
+    required String key,
+    required DataType dataType,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_stream_communicator(that, serializer);
+          sse_encode_String(key, serializer);
+          sse_encode_data_type(dataType, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveChartConstMeta,
+        argValues: [that, key, dataType],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveChartConstMeta =>
+      const TaskConstMeta(
+        debugName: "stream_communicator_remove_chart",
+        argNames: ["that", "key", "dataType"],
+      );
+
+  @override
   Audio crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode({
     required SymphoniaDecoder that,
     required String format,
@@ -1588,7 +1853,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_symphonia_decoder(that, serializer);
           sse_encode_String(format, serializer);
           sse_encode_list_prim_u_8_loose(data, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1616,7 +1881,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_symphonia_decoder,
@@ -1706,12 +1971,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCachedChartStorageSendSync;
 
   RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_CacheEvent => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent;
+  get rust_arc_increment_strong_count_BoxCommunicator => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync;
 
   RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_CacheEvent => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent;
+  get rust_arc_decrement_strong_count_BoxCommunicator => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_BoxDownSample => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_BoxDownSample => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync;
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_Chart => wire
@@ -1720,6 +1993,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   RustArcDecrementStrongCountFnType
   get rust_arc_decrement_strong_count_Chart => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_ChartEvent => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_ChartEvent => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent;
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_File => wire
@@ -1833,12 +2114,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  CacheEvent
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent(
+  BoxCommunicator
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return CacheEventImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return BoxCommunicatorImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  BoxDownSample
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return BoxDownSampleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1848,6 +2138,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ChartImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  ChartEvent
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ChartEventImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2076,12 +2375,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  CacheEvent
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent(
+  BoxCommunicator
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return CacheEventImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return BoxCommunicatorImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  BoxDownSample
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return BoxDownSampleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2091,6 +2399,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ChartImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  ChartEvent
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ChartEventImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2121,8 +2438,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RustStreamSink<CacheEvent>
-  dco_decode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent_Sse(
+  RustStreamSink<ChartEvent>
+  dco_decode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent_Sse(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -2149,6 +2466,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   CachedChartStorage dco_decode_TraitDef_CachedChartStorage(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  Communicator dco_decode_TraitDef_Communicator(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
@@ -2222,6 +2545,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  StreamCommunicator dco_decode_box_autoadd_stream_communicator(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_stream_communicator(raw);
+  }
+
+  @protected
   SymphoniaDecoder dco_decode_box_autoadd_symphonia_decoder(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_symphonia_decoder(raw);
@@ -2282,6 +2611,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.isNotEmpty)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
     return SimpleFormatGetter();
+  }
+
+  @protected
+  StreamCommunicator dco_decode_stream_communicator(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.isNotEmpty)
+      throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
+    return StreamCommunicator.raw();
   }
 
   @protected
@@ -2433,12 +2771,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  CacheEvent
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent(
+  BoxCommunicator
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return CacheEventImpl.frbInternalSseDecode(
+    return BoxCommunicatorImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  BoxDownSample
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return BoxDownSampleImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -2451,6 +2801,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ChartImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  ChartEvent
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ChartEventImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -2757,12 +3119,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  CacheEvent
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent(
+  BoxCommunicator
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return CacheEventImpl.frbInternalSseDecode(
+    return BoxCommunicatorImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  BoxDownSample
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return BoxDownSampleImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -2775,6 +3149,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ChartImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  ChartEvent
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ChartEventImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -2817,8 +3203,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RustStreamSink<CacheEvent>
-  sse_decode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent_Sse(
+  RustStreamSink<ChartEvent>
+  sse_decode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent_Sse(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2892,6 +3278,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  StreamCommunicator sse_decode_box_autoadd_stream_communicator(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_stream_communicator(deserializer));
+  }
+
+  @protected
   SymphoniaDecoder sse_decode_box_autoadd_symphonia_decoder(
     SseDeserializer deserializer,
   ) {
@@ -2951,6 +3345,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return SimpleFormatGetter();
+  }
+
+  @protected
+  StreamCommunicator sse_decode_stream_communicator(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return StreamCommunicator.raw();
   }
 
   @protected
@@ -3116,13 +3518,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent(
-    CacheEvent self,
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
+    BoxCommunicator self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-      (self as CacheEventImpl).frbInternalSseEncode(move: true),
+      (self as BoxCommunicatorImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
+    BoxDownSample self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as BoxDownSampleImpl).frbInternalSseEncode(move: true),
       serializer,
     );
   }
@@ -3136,6 +3551,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
       (self as ChartImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
+    ChartEvent self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ChartEventImpl).frbInternalSseEncode(move: true),
       serializer,
     );
   }
@@ -3467,13 +3895,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent(
-    CacheEvent self,
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
+    BoxCommunicator self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-      (self as CacheEventImpl).frbInternalSseEncode(move: null),
+      (self as BoxCommunicatorImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
+    BoxDownSample self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as BoxDownSampleImpl).frbInternalSseEncode(move: null),
       serializer,
     );
   }
@@ -3487,6 +3928,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
       (self as ChartImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent(
+    ChartEvent self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ChartEventImpl).frbInternalSseEncode(move: null),
       serializer,
     );
   }
@@ -3532,8 +3986,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-  sse_encode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent_Sse(
-    RustStreamSink<CacheEvent> self,
+  sse_encode_StreamSink_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent_Sse(
+    RustStreamSink<ChartEvent> self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3541,7 +3995,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       self.setupAndSerialize(
         codec: SseCodec(
           decodeSuccessData:
-              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCacheEvent,
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartEvent,
           decodeErrorData: sse_decode_AnyhowException,
         ),
       ),
@@ -3611,6 +4065,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_stream_communicator(
+    StreamCommunicator self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_stream_communicator(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_symphonia_decoder(
     SymphoniaDecoder self,
     SseSerializer serializer,
@@ -3673,6 +4136,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_simple_format_getter(
     SimpleFormatGetter self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_stream_communicator(
+    StreamCommunicator self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3865,27 +4336,29 @@ class AudioProcessorEngineImpl extends RustOpaque
         .rust_arc_decrement_strong_count_AudioProcessorEnginePtr,
   );
 
-  void add({required String filePath, required List<int> audioData}) =>
+  Future<void> add({required String filePath, required List<int> audioData}) =>
       RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineAdd(
         that: this,
         filePath: filePath,
         audioData: audioData,
       );
 
-  void removeAudio({required String filePath}) =>
+  Future<void> removeAudio({required String filePath}) =>
       RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineRemoveAudio(
         that: this,
         filePath: filePath,
       );
 
-  void removeChart({required String filePath, required DataType dataType}) =>
-      RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineRemoveChart(
-        that: this,
-        filePath: filePath,
-        dataType: dataType,
-      );
+  Future<void> removeChart({
+    required String filePath,
+    required DataType dataType,
+  }) => RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineRemoveChart(
+    that: this,
+    filePath: filePath,
+    dataType: dataType,
+  );
 
-  void setDownSamplePointsNum({required BigInt pointsNum}) => RustLib
+  Future<void> setDownSamplePointsNum({required BigInt pointsNum}) => RustLib
       .instance
       .api
       .crateApiCoreEngineAudioProcessorEngineSetDownSamplePointsNum(
@@ -3893,7 +4366,7 @@ class AudioProcessorEngineImpl extends RustOpaque
         pointsNum: pointsNum,
       );
 
-  void setIndexRange({required double start, required double end}) =>
+  Future<void> setIndexRange({required double start, required double end}) =>
       RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineSetIndexRange(
         that: this,
         start: start,
@@ -3971,22 +4444,62 @@ class BoxCachedChartStorageImpl extends RustOpaque
 }
 
 @sealed
-class CacheEventImpl extends RustOpaque implements CacheEvent {
+class BoxCommunicatorImpl extends RustOpaque implements BoxCommunicator {
   // Not to be used by end users
-  CacheEventImpl.frbInternalDcoDecode(List<dynamic> wire)
+  BoxCommunicatorImpl.frbInternalDcoDecode(List<dynamic> wire)
     : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
-  CacheEventImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+  BoxCommunicatorImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
     : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_CacheEvent,
+        RustLib.instance.api.rust_arc_increment_strong_count_BoxCommunicator,
     rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_CacheEvent,
+        RustLib.instance.api.rust_arc_decrement_strong_count_BoxCommunicator,
     rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_CacheEventPtr,
+        RustLib.instance.api.rust_arc_decrement_strong_count_BoxCommunicatorPtr,
+  );
+}
+
+@sealed
+class BoxDownSampleImpl extends RustOpaque implements BoxDownSample {
+  // Not to be used by end users
+  BoxDownSampleImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  BoxDownSampleImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_BoxDownSample,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_BoxDownSample,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_BoxDownSamplePtr,
+  );
+}
+
+@sealed
+class ChartEventImpl extends RustOpaque implements ChartEvent {
+  // Not to be used by end users
+  ChartEventImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  ChartEventImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_ChartEvent,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_ChartEvent,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_ChartEventPtr,
   );
 }
 
@@ -4023,6 +4536,11 @@ class ChartImpl extends RustOpaque implements Chart {
 
   set points(ArcVecPoint points) => RustLib.instance.api
       .crateApiTypesChartChartAutoAccessorSetPoints(that: this, points: points);
+
+  Chart getRange({required double startX, required double endX}) => RustLib
+      .instance
+      .api
+      .crateApiTypesChartChartGetRange(that: this, startX: startX, endX: endX);
 }
 
 @sealed

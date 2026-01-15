@@ -4,9 +4,13 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../types/chart.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
+abstract class Communicator {
+  void addChart({required String key, required Chart chart});
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartEvent>>
-abstract class ChartEvent implements RustOpaqueInterface {}
+  void removeAllCharts();
+
+  void removeChart({required String key, required DataType dataType});
+}

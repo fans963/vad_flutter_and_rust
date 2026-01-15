@@ -7,8 +7,8 @@ import '../../frb_generated.dart';
 import '../types/events.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Stream<CacheEvent> createCacheEventStream() =>
-    RustLib.instance.api.crateApiEventsCacheEventsCreateCacheEventStream();
+Stream<ChartEvent> createChartEventStream() => RustLib.instance.api
+    .crateApiEventsCommunicatorEventsCreateChartEventStream();
 
-void emitCacheEvent({required CacheEvent event}) =>
-    RustLib.instance.api.crateApiEventsCacheEventsEmitCacheEvent(event: event);
+void emitChartEvent({required ChartEvent event}) => RustLib.instance.api
+    .crateApiEventsCommunicatorEventsEmitChartEvent(event: event);

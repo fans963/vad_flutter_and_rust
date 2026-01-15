@@ -4,21 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/provider/navigator_index_provider.dart';
-import 'package:vad/src/rust/api/util.dart';
 import 'package:vad/src/rust/frb_generated.dart';
-import 'package:vad/src/ui/chart_widget.dart';
-import 'package:vad/src/ui/test_chart_widget.dart' hide ChartData;
+import 'package:vad/src/ui/fps_counter.dart';
+import 'package:vad/src/ui/test_chart_widget.dart';
 import 'package:vad/src/ui/pick_file_button.dart';
 import 'package:vad/src/ui/title_bar.dart';
 import 'package:vad/src/ui/tool_plate.dart';
 import 'package:vad/src/util/util.dart';
 import 'package:window_manager/window_manager.dart';
 
-class AudioChartData {
-  final ChartData? audioData;
-  final ChartData? fftData;
-  AudioChartData({this.audioData, this.fftData});
-}
+// class AudioChartData {
+//   final Audio? audioData;
+//   final ChartData? fftData;
+//   AudioChartData({this.audioData, this.fftData});
+// }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -100,17 +99,25 @@ class MyApp extends ConsumerWidget {
             backgroundColor: Theme.of(context).brightness == Brightness.dark
                 ? darkColorScheme.surface
                 : lightColorScheme.surface,
-            body: Column(
+            body: Stack(
               children: [
-                if (isDesktop) const TitleBar(),
-                Expanded(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
+                Column(
+                  children: [
+                    if (isDesktop) const TitleBar(),
+                    Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(),
+                        // child: const TestChartWidget(),
+                      ),
                     ),
-                      child: const TestChartWidget(),
-                  ),
+                    const ToolPlate(),
+                  ],
                 ),
-                const ToolPlate(),
+                Positioned(
+                  top: isDesktop ? 45 : 10,
+                  right: 10,
+                  child: const FpsCounter(),
+                ),
               ],
             ),
             floatingActionButton: const PickFileButton(),

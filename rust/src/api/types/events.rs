@@ -1,13 +1,8 @@
-use crate::api::types::chart::Chart;
+use crate::api::types::chart::{Chart, DataType};
 
 #[derive(Clone, Debug)]
-pub enum CacheEvent {
-    ChartUpdated {
-        key: String,
-        chart: Chart,
-    },
-    ChartRemoved {
-        key: String,
-        data_type: crate::api::types::chart::DataType,
-    },
+pub enum ChartEvent {
+    AddChart { key: String, chart: Chart },
+    RemoveChart { key: String, data_type: DataType },
+    RemoveAllCharts {},
 }

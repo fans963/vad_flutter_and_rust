@@ -18,6 +18,8 @@ abstract class Chart implements RustOpaqueInterface {
   set dataType(DataType dataType);
 
   set points(ArcVecPoint points);
+
+  Chart getRange({required double startX, required double endX});
 }
 
 enum DataType { audio, spectrum, energy, zeroCrossingRate }

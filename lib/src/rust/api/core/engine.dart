@@ -9,32 +9,40 @@ import '../types/config.dart';
 import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-AudioProcessorEngine createDefaultEngine({required Config config}) =>
+Future<AudioProcessorEngine> createDefaultEngine({required Config config}) =>
     RustLib.instance.api.crateApiCoreEngineCreateDefaultEngine(config: config);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>>
 abstract class AudioProcessorEngine implements RustOpaqueInterface {
-  void add({required String filePath, required List<int> audioData});
+  Future<void> add({required String filePath, required List<int> audioData});
 
-  factory AudioProcessorEngine({
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<AudioProcessorEngine> newInstance({
     required Config config,
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
     required BoxCachedChartStorage cache,
+    required BoxDownSample downSampler,
+    required BoxCommunicator communicator,
   }) => RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineNew(
     config: config,
     decoder: decoder,
     storage: storage,
     cache: cache,
+    downSampler: downSampler,
+    communicator: communicator,
   );
 
-  void removeAudio({required String filePath});
+  Future<void> removeAudio({required String filePath});
 
-  void removeChart({required String filePath, required DataType dataType});
+  Future<void> removeChart({
+    required String filePath,
+    required DataType dataType,
+  });
 
-  void setDownSamplePointsNum({required BigInt pointsNum});
+  Future<void> setDownSamplePointsNum({required BigInt pointsNum});
 
-  void setIndexRange({required double start, required double end});
+  Future<void> setIndexRange({required double start, required double end});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn AudioDecoder + Send + Sync >>>
@@ -45,3 +53,9 @@ abstract class BoxAudioStorage implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn CachedChartStorage + Send + Sync >>>
 abstract class BoxCachedChartStorage implements RustOpaqueInterface {}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn Communicator + Send + Sync >>>
+abstract class BoxCommunicator implements RustOpaqueInterface {}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn DownSample + Send + Sync >>>
+abstract class BoxDownSample implements RustOpaqueInterface {}

@@ -1,13 +1,11 @@
 use dashmap::DashMap;
 
 use crate::api::{
-    events::cache_events::emit_cache_event,
     traits::cached_chart_storage::CachedChartStorage,
     types::{
         chart::{Chart, DataType},
         config::Config,
         error::AppError,
-        events::CacheEvent,
     },
 };
 
@@ -27,9 +25,6 @@ impl KvCachedChartStorage {
 
 impl CachedChartStorage for KvCachedChartStorage {
     fn add(&self, key: String, chart: Chart) -> Result<(), AppError> {
-        let event_chart = chart.clone();
-        let event_key = key.clone();
-
         if let Some(mut cached_charts) = self.dashmap.get_mut(&key) {
             if let Some(existing) = cached_charts
                 .iter_mut()
@@ -43,10 +38,6 @@ impl CachedChartStorage for KvCachedChartStorage {
             self.dashmap.insert(key, vec![chart]);
         }
 
-        emit_cache_event(CacheEvent::ChartUpdated {
-            key: event_key,
-            chart: event_chart,
-        });
         Ok(())
     }
 
@@ -71,7 +62,6 @@ impl CachedChartStorage for KvCachedChartStorage {
     ) -> Result<(), AppError> {
         if let Some(mut cached_charts) = self.dashmap.get_mut(&key) {
             cached_charts.retain(|c| c.data_type != data_type);
-            emit_cache_event(CacheEvent::ChartRemoved { key, data_type });
             Ok(())
         } else {
             Err(AppError::NotFound(format!(

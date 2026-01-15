@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vad/src/provider/audio_process_providr.dart';
 import 'package:vad/src/provider/chart_paramater_provider.dart';
-import 'package:vad/src/rust/api/audio_processor.dart';
+import 'package:vad/src/rust/api/types/chart.dart';
 
 class PickFileButton extends ConsumerWidget {
   const PickFileButton({super.key});
@@ -31,15 +31,15 @@ class PickFileButton extends ConsumerWidget {
             await ref
                 .read(audioProcessorProvider.notifier)
                 .addFile(file.path, bytes);
-            ref.read(chartParameterProvider.notifier).add((
-              filePath: file.path,
-              visible: true,
-              offset: (0.0, 0.0),
-              index: (BigInt.zero, BigInt.from(100000)),
-              dataType: DataType.audio,
-              targetWidth: 1000,
-              color: Colors.black,
-            ));
+            // ref.read(chartParameterProvider.notifier).add((
+            //   filePath: file.path,
+            //   visible: true,
+            //   offset: (0.0, 0.0),
+            //   index: (BigInt.zero, BigInt.from(100000)),
+            //   dataType: DataType.audio,
+            //   targetWidth: 1000,
+            //   color: Colors.black,
+            // ));
           }
         }
       },

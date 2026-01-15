@@ -1,19 +1,25 @@
-use std::sync::Arc;
+use std::{ops::Index, sync::Arc};
 
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 use crate::api::{
+    communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
+    events::communicator_events::emit_chart_event,
     sampling::minmax::Minmax,
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
-        audio_decoder::AudioDecoder, audio_storage::AudioStorage,
-        cached_chart_storage::CachedChartStorage, down_sample::DownSample,
+        audio_decoder::AudioDecoder,
+        audio_storage::AudioStorage,
+        cached_chart_storage::CachedChartStorage,
+        communicator::Communicator,
+        down_sample::{self, DownSample},
     },
     types::{
         chart::{Chart, DataType, Point},
         config::Config,
         error::AppError,
+        events::ChartEvent,
     },
     util::format_getter::{FormatGetter, SimpleFormatGetter},
 };
@@ -23,36 +29,42 @@ pub struct AudioProcessorEngine {
     decoder: Box<dyn AudioDecoder + Send + Sync>,
     storage: Box<dyn AudioStorage + Send + Sync>,
     cache: Box<dyn CachedChartStorage + Send + Sync>,
+    down_sampler: Box<dyn DownSample + Send + Sync>,
+    communicator: Box<dyn Communicator + Send + Sync>,
     down_sample_points_num: usize,
     index_range: (f32, f32),
 }
 
 impl AudioProcessorEngine {
-    pub fn new(
+    pub async fn new(
         config: Config,
         decoder: Box<dyn AudioDecoder + Send + Sync>,
         storage: Box<dyn AudioStorage + Send + Sync>,
         cache: Box<dyn CachedChartStorage + Send + Sync>,
+        down_sampler: Box<dyn DownSample + Send + Sync>,
+        communicator: Box<dyn Communicator + Send + Sync>,
     ) -> Self {
         Self {
             config,
             decoder,
             storage,
             cache,
+            down_sampler,
+            communicator,
             down_sample_points_num: 500,
             index_range: (0.0, 0.0),
         }
     }
 
-    pub fn set_down_sample_points_num(&mut self, points_num: usize) {
+    pub async fn set_down_sample_points_num(&mut self, points_num: usize) {
         self.down_sample_points_num = points_num;
     }
 
-    pub fn set_index_range(&mut self, start: f32, end: f32) {
+    pub async fn set_index_range(&mut self, start: f32, end: f32) {
         self.index_range = (start, end);
     }
 
-    pub fn add(&self, file_path: String, audio_data: Vec<u8>) -> Result<(), AppError> {
+    pub async fn add(&self, file_path: String, audio_data: Vec<u8>) -> Result<(), AppError> {
         let format = (SimpleFormatGetter {}).get_format(file_path.clone())?;
         let decoded_audio = self.decoder.decode(format, audio_data)?;
 
@@ -75,28 +87,38 @@ impl AudioProcessorEngine {
             points: Arc::new(points),
         };
 
-        // Using Minmax downsampler to reduce points for UI performance
-        let minmax = Minmax {};
-        let downsampled_chart = minmax.down_sample(audio_chart, self.down_sample_points_num);
+        self.cache.add(file_path.clone(), audio_chart.clone())?;
 
-        self.cache.add(file_path, downsampled_chart)?;
+        let visable_chart = audio_chart.get_range(self.index_range.0, self.index_range.1);
+
+        let downsampled_chart = self
+            .down_sampler
+            .down_sample(visable_chart, self.down_sample_points_num);
+        self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
     }
 
-    pub fn remove_audio(&self, file_path: String) -> Result<(), AppError> {
+    pub async fn remove_audio(&self, file_path: String) -> Result<(), AppError> {
         self.storage.remove(file_path)
     }
 
-    pub fn remove_chart(&self, file_path: String, data_type: DataType) -> Result<(), AppError> {
+    pub async fn remove_chart(
+        &self,
+        file_path: String,
+        data_type: DataType,
+    ) -> Result<(), AppError> {
         self.cache.remove(file_path, data_type)
     }
 }
 
-pub fn create_default_engine(config: Config) -> AudioProcessorEngine {
+pub async fn create_default_engine(config: Config) -> AudioProcessorEngine {
     AudioProcessorEngine::new(
         config,
         Box::new(SymphoniaDecoder::new()),
         Box::new(KvAudioStorage::new()),
         Box::new(KvCachedChartStorage::new()),
+        Box::new(Minmax {}),
+        Box::new(communicator::communicator::StreamCommunicator::new()),
     )
+    .await
 }
