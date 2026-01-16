@@ -142,12 +142,12 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
             enablePanning: true,
             enableMouseWheelZooming: true,
             enableSelectionZooming: true,
-            zoomMode: ZoomMode.xy,
+            zoomMode: ZoomMode.x,
           ),
           primaryXAxis: NumericAxis(
             name: 'primaryXAxis',
             minimum: 0,
-            maximum: 1000000,
+            maximum: 100000,
           ),
           primaryYAxis: const NumericAxis(
             name: 'primaryYAxis',

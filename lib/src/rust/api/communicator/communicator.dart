@@ -7,8 +7,6 @@ import '../../frb_generated.dart';
 import '../types/chart.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `record_update_interval`
-
 class StreamCommunicator {
   const StreamCommunicator.raw();
 
