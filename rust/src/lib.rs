@@ -10,7 +10,15 @@ fn init_logger() {
     );
 }
 
-#[cfg(not(target_os = "android"))]
+// Use the browser console on WebAssembly to avoid std::time usage.
+#[cfg(all(target_arch = "wasm32", not(target_os = "android")))]
+fn init_logger() {
+    console_error_panic_hook::set_once();
+    let _ = console_log::init_with_level(log::Level::Debug);
+}
+
+// Native non-Android targets use env_logger
+#[cfg(all(not(target_os = "android"), not(target_arch = "wasm32")))]
 fn init_logger() {
     use std::sync::Once;
     static INIT: Once = Once::new();
