@@ -15,13 +15,14 @@ part 'events.freezed.dart';
 sealed class ChartEvent with _$ChartEvent {
   const ChartEvent._();
 
-  const factory ChartEvent.addChart({
-    required String key,
-    required CommunicatorChart chart,
-  }) = ChartEvent_AddChart;
+  const factory ChartEvent.addChart({required CommunicatorChart chart}) =
+      ChartEvent_AddChart;
   const factory ChartEvent.removeChart({
     required String key,
     required DataType dataType,
   }) = ChartEvent_RemoveChart;
+  const factory ChartEvent.updateAllCharts({
+    required List<CommunicatorChart> charts,
+  }) = ChartEvent_UpdateAllCharts;
   const factory ChartEvent.removeAllCharts() = ChartEvent_RemoveAllCharts;
 }

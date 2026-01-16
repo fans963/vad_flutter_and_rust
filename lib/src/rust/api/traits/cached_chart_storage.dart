@@ -13,5 +13,7 @@ abstract class CachedChartStorage {
 
   Chart get_({required String key});
 
+  List<ChartWIthKey> getAllCache();
+
   void remove({required String key, required DataType dataType});
 }

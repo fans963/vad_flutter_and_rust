@@ -9,6 +9,8 @@ import '../types/config.dart';
 import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `update_all`
+
 AudioProcessorEngine createDefaultEngine({required Config config}) =>
     RustLib.instance.api.crateApiCoreEngineCreateDefaultEngine(config: config);
 
@@ -38,6 +40,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
     required String filePath,
     required DataType dataType,
   });
+
+  Future<void> setConfig({required Config config});
 
   Future<void> setDownSamplePointsNum({required BigInt pointsNum});
 

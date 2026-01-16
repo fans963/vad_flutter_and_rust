@@ -23,6 +23,9 @@ abstract class KvCachedChartStorage
   @override
   Chart get_({required String key});
 
+  @override
+  List<ChartWIthKey> getAllCache();
+
   factory KvCachedChartStorage() => RustLib.instance.api
       .crateApiStorageKvCachedChartStorageKvCachedChartStorageNew();
 

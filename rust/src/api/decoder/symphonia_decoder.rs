@@ -1,7 +1,7 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use log::{debug, error, info};
+use log::error;
 use symphonia::core::probe::Hint;
 
 use crate::api::traits::audio_decoder::AudioDecoder;

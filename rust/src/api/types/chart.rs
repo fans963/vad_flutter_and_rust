@@ -29,7 +29,7 @@ pub struct CommunicatorChart{
 
 impl Chart {
     pub fn get_range(&self, start_x: f32, end_x: f32) -> Self {
-        use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
+        use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator};
 
         let start = self
             .points
@@ -51,4 +51,10 @@ impl Chart {
             points: Arc::new(self.points[start..end].to_vec()),
         }
     }
+}
+
+#[derive(Clone)]
+pub struct ChartWIthKey {
+    pub key: String,
+    pub chart: Chart,
 }

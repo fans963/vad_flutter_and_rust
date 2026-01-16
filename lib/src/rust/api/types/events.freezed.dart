@@ -55,12 +55,13 @@ extension ChartEventPatterns on ChartEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ChartEvent_AddChart value)?  addChart,TResult Function( ChartEvent_RemoveChart value)?  removeChart,TResult Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ChartEvent_AddChart value)?  addChart,TResult Function( ChartEvent_RemoveChart value)?  removeChart,TResult Function( ChartEvent_UpdateAllCharts value)?  updateAllCharts,TResult Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
 return addChart(_that);case ChartEvent_RemoveChart() when removeChart != null:
-return removeChart(_that);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
+return removeChart(_that);case ChartEvent_UpdateAllCharts() when updateAllCharts != null:
+return updateAllCharts(_that);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts(_that);case _:
   return orElse();
 
@@ -79,12 +80,13 @@ return removeAllCharts(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ChartEvent_AddChart value)  addChart,required TResult Function( ChartEvent_RemoveChart value)  removeChart,required TResult Function( ChartEvent_RemoveAllCharts value)  removeAllCharts,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ChartEvent_AddChart value)  addChart,required TResult Function( ChartEvent_RemoveChart value)  removeChart,required TResult Function( ChartEvent_UpdateAllCharts value)  updateAllCharts,required TResult Function( ChartEvent_RemoveAllCharts value)  removeAllCharts,}){
 final _that = this;
 switch (_that) {
 case ChartEvent_AddChart():
 return addChart(_that);case ChartEvent_RemoveChart():
-return removeChart(_that);case ChartEvent_RemoveAllCharts():
+return removeChart(_that);case ChartEvent_UpdateAllCharts():
+return updateAllCharts(_that);case ChartEvent_RemoveAllCharts():
 return removeAllCharts(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -99,12 +101,13 @@ return removeAllCharts(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ChartEvent_AddChart value)?  addChart,TResult? Function( ChartEvent_RemoveChart value)?  removeChart,TResult? Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ChartEvent_AddChart value)?  addChart,TResult? Function( ChartEvent_RemoveChart value)?  removeChart,TResult? Function( ChartEvent_UpdateAllCharts value)?  updateAllCharts,TResult? Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,}){
 final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
 return addChart(_that);case ChartEvent_RemoveChart() when removeChart != null:
-return removeChart(_that);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
+return removeChart(_that);case ChartEvent_UpdateAllCharts() when updateAllCharts != null:
+return updateAllCharts(_that);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts(_that);case _:
   return null;
 
@@ -122,11 +125,12 @@ return removeAllCharts(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String key,  CommunicatorChart chart)?  addChart,TResult Function( String key,  DataType dataType)?  removeChart,TResult Function()?  removeAllCharts,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( CommunicatorChart chart)?  addChart,TResult Function( String key,  DataType dataType)?  removeChart,TResult Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult Function()?  removeAllCharts,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
-return addChart(_that.key,_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
-return removeChart(_that.key,_that.dataType);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
+return addChart(_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
+return removeChart(_that.key,_that.dataType);case ChartEvent_UpdateAllCharts() when updateAllCharts != null:
+return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts();case _:
   return orElse();
 
@@ -145,11 +149,12 @@ return removeAllCharts();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String key,  CommunicatorChart chart)  addChart,required TResult Function( String key,  DataType dataType)  removeChart,required TResult Function()  removeAllCharts,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( CommunicatorChart chart)  addChart,required TResult Function( String key,  DataType dataType)  removeChart,required TResult Function( List<CommunicatorChart> charts)  updateAllCharts,required TResult Function()  removeAllCharts,}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart():
-return addChart(_that.key,_that.chart);case ChartEvent_RemoveChart():
-return removeChart(_that.key,_that.dataType);case ChartEvent_RemoveAllCharts():
+return addChart(_that.chart);case ChartEvent_RemoveChart():
+return removeChart(_that.key,_that.dataType);case ChartEvent_UpdateAllCharts():
+return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts():
 return removeAllCharts();}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -164,11 +169,12 @@ return removeAllCharts();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String key,  CommunicatorChart chart)?  addChart,TResult? Function( String key,  DataType dataType)?  removeChart,TResult? Function()?  removeAllCharts,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( CommunicatorChart chart)?  addChart,TResult? Function( String key,  DataType dataType)?  removeChart,TResult? Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult? Function()?  removeAllCharts,}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
-return addChart(_that.key,_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
-return removeChart(_that.key,_that.dataType);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
+return addChart(_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
+return removeChart(_that.key,_that.dataType);case ChartEvent_UpdateAllCharts() when updateAllCharts != null:
+return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts();case _:
   return null;
 
@@ -181,10 +187,9 @@ return removeAllCharts();case _:
 
 
 class ChartEvent_AddChart extends ChartEvent {
-  const ChartEvent_AddChart({required this.key, required this.chart}): super._();
+  const ChartEvent_AddChart({required this.chart}): super._();
   
 
- final  String key;
  final  CommunicatorChart chart;
 
 /// Create a copy of ChartEvent
@@ -197,16 +202,16 @@ $ChartEvent_AddChartCopyWith<ChartEvent_AddChart> get copyWith => _$ChartEvent_A
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChartEvent_AddChart&&(identical(other.key, key) || other.key == key)&&(identical(other.chart, chart) || other.chart == chart));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChartEvent_AddChart&&(identical(other.chart, chart) || other.chart == chart));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,key,chart);
+int get hashCode => Object.hash(runtimeType,chart);
 
 @override
 String toString() {
-  return 'ChartEvent.addChart(key: $key, chart: $chart)';
+  return 'ChartEvent.addChart(chart: $chart)';
 }
 
 
@@ -217,7 +222,7 @@ abstract mixin class $ChartEvent_AddChartCopyWith<$Res> implements $ChartEventCo
   factory $ChartEvent_AddChartCopyWith(ChartEvent_AddChart value, $Res Function(ChartEvent_AddChart) _then) = _$ChartEvent_AddChartCopyWithImpl;
 @useResult
 $Res call({
- String key, CommunicatorChart chart
+ CommunicatorChart chart
 });
 
 
@@ -234,10 +239,9 @@ class _$ChartEvent_AddChartCopyWithImpl<$Res>
 
 /// Create a copy of ChartEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? key = null,Object? chart = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? chart = null,}) {
   return _then(ChartEvent_AddChart(
-key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
-as String,chart: null == chart ? _self.chart : chart // ignore: cast_nullable_to_non_nullable
+chart: null == chart ? _self.chart : chart // ignore: cast_nullable_to_non_nullable
 as CommunicatorChart,
   ));
 }
@@ -307,6 +311,78 @@ class _$ChartEvent_RemoveChartCopyWithImpl<$Res>
 key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as String,dataType: null == dataType ? _self.dataType : dataType // ignore: cast_nullable_to_non_nullable
 as DataType,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ChartEvent_UpdateAllCharts extends ChartEvent {
+  const ChartEvent_UpdateAllCharts({required final  List<CommunicatorChart> charts}): _charts = charts,super._();
+  
+
+ final  List<CommunicatorChart> _charts;
+ List<CommunicatorChart> get charts {
+  if (_charts is EqualUnmodifiableListView) return _charts;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_charts);
+}
+
+
+/// Create a copy of ChartEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChartEvent_UpdateAllChartsCopyWith<ChartEvent_UpdateAllCharts> get copyWith => _$ChartEvent_UpdateAllChartsCopyWithImpl<ChartEvent_UpdateAllCharts>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChartEvent_UpdateAllCharts&&const DeepCollectionEquality().equals(other._charts, _charts));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_charts));
+
+@override
+String toString() {
+  return 'ChartEvent.updateAllCharts(charts: $charts)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChartEvent_UpdateAllChartsCopyWith<$Res> implements $ChartEventCopyWith<$Res> {
+  factory $ChartEvent_UpdateAllChartsCopyWith(ChartEvent_UpdateAllCharts value, $Res Function(ChartEvent_UpdateAllCharts) _then) = _$ChartEvent_UpdateAllChartsCopyWithImpl;
+@useResult
+$Res call({
+ List<CommunicatorChart> charts
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChartEvent_UpdateAllChartsCopyWithImpl<$Res>
+    implements $ChartEvent_UpdateAllChartsCopyWith<$Res> {
+  _$ChartEvent_UpdateAllChartsCopyWithImpl(this._self, this._then);
+
+  final ChartEvent_UpdateAllCharts _self;
+  final $Res Function(ChartEvent_UpdateAllCharts) _then;
+
+/// Create a copy of ChartEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? charts = null,}) {
+  return _then(ChartEvent_UpdateAllCharts(
+charts: null == charts ? _self._charts : charts // ignore: cast_nullable_to_non_nullable
+as List<CommunicatorChart>,
   ));
 }
 

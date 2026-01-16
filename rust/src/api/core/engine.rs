@@ -1,4 +1,4 @@
-use std::{ops::Index, sync::Arc};
+use std::sync::Arc;
 
 use log::info;
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
@@ -6,7 +6,6 @@ use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIter
 use crate::api::{
     communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
-    events::communicator_events::emit_chart_event,
     sampling::minmax::Minmax,
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
@@ -14,13 +13,12 @@ use crate::api::{
         audio_storage::AudioStorage,
         cached_chart_storage::CachedChartStorage,
         communicator::Communicator,
-        down_sample::{self, DownSample},
+        down_sample::DownSample,
     },
     types::{
-        chart::{Chart, DataType, Point},
+        chart::{Chart, ChartWIthKey, CommunicatorChart, DataType, Point},
         config::Config,
         error::AppError,
-        events::ChartEvent,
     },
     util::format_getter::{FormatGetter, SimpleFormatGetter},
 };
@@ -57,12 +55,38 @@ impl AudioProcessorEngine {
         }
     }
 
+    fn update_all(&mut self) {
+        let all_charts = self.cache.get_all_cache();
+
+        if let Ok(charts) = all_charts {
+            let visable_charts: Vec<ChartWIthKey> = charts.par_iter().map(|c| {
+                let visable_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
+                let downsampled_chart = self
+                    .down_sampler
+                    .down_sample(visable_chart, self.down_sample_points_num);
+                ChartWIthKey {
+                    key: c.key.clone(),
+                    chart: downsampled_chart,
+                }
+            }).collect();
+
+            self.communicator.update_all_charts(visable_charts);
+        }
+    }
+
     pub async fn set_down_sample_points_num(&mut self, points_num: usize) {
         self.down_sample_points_num = points_num;
+        self.update_all();
     }
 
     pub async fn set_index_range(&mut self, start: f32, end: f32) {
         self.index_range = (start, end);
+        self.update_all();
+    }
+
+    pub async fn set_config(&mut self, config: Config) {
+        self.config = config;
+        self.update_all();
     }
 
     pub async fn add(&self, file_path: String, audio_data: Vec<u8>) -> Result<(), AppError> {

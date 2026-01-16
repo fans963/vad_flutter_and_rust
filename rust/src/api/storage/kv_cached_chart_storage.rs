@@ -3,7 +3,7 @@ use dashmap::DashMap;
 use crate::api::{
     traits::cached_chart_storage::CachedChartStorage,
     types::{
-        chart::{Chart, DataType},
+        chart::{Chart, ChartWIthKey},
         config::Config,
         error::AppError,
     },
@@ -53,6 +53,22 @@ impl CachedChartStorage for KvCachedChartStorage {
         } else {
             Err(AppError::NotFound(format!("Chart key not found: {}", key)))
         }
+    }
+
+    fn get_all_cache(&self) -> Result<Vec<ChartWIthKey>, AppError> {
+        let mut all_charts = Vec::new();
+
+        for entry in self.dashmap.iter() {
+            let key = entry.key().clone();
+            for chart in entry.value().iter() {
+                all_charts.push(ChartWIthKey {
+                    key: key.clone(),
+                    chart: chart.clone(),
+                });
+            }
+        }
+
+        Ok(all_charts)
     }
 
     fn remove(

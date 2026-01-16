@@ -43,7 +43,6 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
   StreamSubscription<ChartEvent>? _chartEventSubscription;
   final _containerKey = GlobalKey();
   double? _lastWidth;
-
   late final _ChartDataContainer _chartDataContainer = _ChartDataContainer();
 
   @override
@@ -54,9 +53,20 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
         switch (event) {
           case ChartEvent_AddChart():
             {
-              _chartDataContainer.addSeries(event.key, event.chart);
+              _chartDataContainer.addSeries(event.chart.key, event.chart);
               debugPrint(
-                "Received ChartEvent_AddChart: ${event.key}, points: ${event.chart.chart.length}",
+                "Received ChartEvent_AddChart: ${event.chart.key}, points: ${event.chart.chart.length}",
+              );
+              setState(() {});
+            }
+          case ChartEvent_UpdateAllCharts():
+            {
+              _chartDataContainer.clearAll();
+              for (final chart in event.charts) {
+                _chartDataContainer.addSeries(chart.key, chart);
+              }
+              debugPrint(
+                "Received ChartEvent_UpdateAllCharts: total charts: ${event.charts.length}",
               );
               setState(() {});
             }
@@ -77,6 +87,7 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
       onError: (error) => debugPrint('Chart event stream error: $error'),
       cancelOnError: false,
     );
+
     _listenToSizeChanges();
   }
 
@@ -106,11 +117,16 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
     final chartControl = ref.watch(chartControlProvider);
     final chartParameters = ref.watch(chartParameterProvider);
 
-    chartControl.whenData((control) {
-      ref
-          .read(audioProcessorProvider)
-          .value
-          ?.setIndexRange(start: control.minX, end: control.maxX);
+    ref.listen(chartControlProvider, (previous, next) {
+      next.whenData((control) {
+        ref
+            .read(audioProcessorProvider)
+            .value
+            ?.setIndexRange(start: control.minX, end: control.maxX);
+        debugPrint(
+          "Chart control updated: minX=${control.minX}, maxX=${control.maxX}",
+        );
+      });
     });
 
     final seriesList = _buildChartSeries();
@@ -142,7 +158,7 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
             if (rangeChangedArgs.axisName == 'primaryXAxis') {
               final minX = (rangeChangedArgs.visibleMin as num).toDouble();
               final maxX = (rangeChangedArgs.visibleMax as num).toDouble();
-              
+
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 ref.read(chartControlProvider.notifier).setControlParameter((
                   minX: minX,
@@ -162,16 +178,16 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
   List<CartesianSeries> _buildChartSeries() {
     final keys = _chartDataContainer.getKeys();
     final colors = _getChartColors();
-    
+
     final seriesList = <CartesianSeries>[];
     int seriesIndex = 0;
-    
+
     for (final key in keys) {
       final charts = _chartDataContainer.getCharts(key)!;
-      
+
       for (final communicatorChart in charts) {
         final color = colors[seriesIndex % colors.length];
-        
+
         seriesList.add(
           FastLineSeries<Point, double>(
             name: key,
@@ -185,11 +201,13 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
             sortFieldValueMapper: (Point point, _) => point.x,
           ),
         );
-        
+
         seriesIndex++;
       }
     }
-    
+
+    debugPrint("Total series to render: ${seriesList.length}");
+
     return seriesList;
   }
 

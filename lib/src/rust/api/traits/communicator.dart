@@ -13,4 +13,6 @@ abstract class Communicator {
   void removeAllCharts();
 
   void removeChart({required String key, required DataType dataType});
+
+  void updateAllCharts({required List<ChartWIthKey> charts});
 }
