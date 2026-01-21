@@ -4,15 +4,27 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
-import '../traits/transform.dart';
 import '../types/audio.dart';
 import '../types/chart.dart';
 import '../types/config.dart';
 import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FftTransform>>
-abstract class FftTransform implements RustOpaqueInterface, SignalTransform {
+class FftTransform {
+  const FftTransform();
+
+  Chart transform({required Audio data, required Config config}) =>
+      RustLib.instance.api.crateApiTransformFftFftTransformTransform(
+        that: this,
+        data: data,
+        config: config,
+      );
+
   @override
-  Chart transform({required Audio data, required Config config});
+  int get hashCode => 0;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FftTransform && runtimeType == other.runtimeType;
 }

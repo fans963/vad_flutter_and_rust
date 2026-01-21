@@ -128,6 +128,10 @@ impl AudioProcessorEngine {
         self.storage.remove(file_path)
     }
 
+    pub async fn add_chart()->Result<(),AppError>{
+        Ok(())
+    } 
+
     pub async fn remove_chart(
         &self,
         file_path: String,

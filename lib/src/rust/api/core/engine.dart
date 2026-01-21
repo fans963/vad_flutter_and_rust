@@ -18,6 +18,9 @@ AudioProcessorEngine createDefaultEngine({required Config config}) =>
 abstract class AudioProcessorEngine implements RustOpaqueInterface {
   Future<void> add({required String filePath, required List<int> audioData});
 
+  static Future<void> addChart() =>
+      RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineAddChart();
+
   factory AudioProcessorEngine({
     required Config config,
     required BoxAudioDecoder decoder,
