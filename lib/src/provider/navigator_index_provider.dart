@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 
 class NavigatorIndexProvider extends Notifier<int> {

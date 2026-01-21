@@ -10,6 +10,7 @@ import 'api/communicator/communicator.dart';
 import 'api/core/engine.dart';
 import 'api/decoder/symphonia_decoder.dart';
 import 'api/events/communicator_events.dart';
+import 'api/sampling/equal_step.dart';
 import 'api/sampling/minmax.dart';
 import 'api/storage/kv_audio_storage.dart';
 import 'api/storage/kv_cached_chart_storage.dart';
@@ -19,6 +20,7 @@ import 'api/traits/cached_chart_storage.dart';
 import 'api/traits/communicator.dart';
 import 'api/traits/down_sample.dart';
 import 'api/traits/transform.dart';
+import 'api/transform/fft.dart';
 import 'api/types/audio.dart';
 import 'api/types/chart.dart';
 import 'api/types/config.dart';
@@ -89,6 +91,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CrossPlatformFinalizerArg
   get rust_arc_decrement_strong_count_ChartWIthKeyPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartWIthKey;
+
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_FftTransformPtr => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_FilePtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile;
@@ -183,6 +189,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  FftTransform
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    dynamic raw,
+  );
+
+  @protected
   File
   dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
     dynamic raw,
@@ -269,6 +281,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ChartWIthKey
   dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartWIthKey(
+    dynamic raw,
+  );
+
+  @protected
+  FftTransform
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
     dynamic raw,
   );
 
@@ -369,6 +387,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  FftTransform
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    dynamic raw,
+  );
+
+  @protected
   File
   dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
     dynamic raw,
@@ -429,6 +453,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Config dco_decode_box_autoadd_config(dynamic raw);
 
   @protected
+  EqualStep dco_decode_box_autoadd_equal_step(dynamic raw);
+
+  @protected
   Minmax dco_decode_box_autoadd_minmax(dynamic raw);
 
   @protected
@@ -451,6 +478,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DataType dco_decode_data_type(dynamic raw);
+
+  @protected
+  EqualStep dco_decode_equal_step(dynamic raw);
 
   @protected
   double dco_decode_f_32(dynamic raw);
@@ -585,6 +615,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  FftTransform
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   File
   sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
     SseDeserializer deserializer,
@@ -671,6 +707,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ChartWIthKey
   sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartWIthKey(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  FftTransform
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
     SseDeserializer deserializer,
   );
 
@@ -771,6 +813,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  FftTransform
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   File
   sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
     SseDeserializer deserializer,
@@ -814,6 +862,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Config sse_decode_box_autoadd_config(SseDeserializer deserializer);
 
   @protected
+  EqualStep sse_decode_box_autoadd_equal_step(SseDeserializer deserializer);
+
+  @protected
   Minmax sse_decode_box_autoadd_minmax(SseDeserializer deserializer);
 
   @protected
@@ -842,6 +893,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DataType sse_decode_data_type(SseDeserializer deserializer);
+
+  @protected
+  EqualStep sse_decode_equal_step(SseDeserializer deserializer);
 
   @protected
   double sse_decode_f_32(SseDeserializer deserializer);
@@ -1002,6 +1056,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    FftTransform self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
   sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
     File self,
     SseSerializer serializer,
@@ -1102,6 +1163,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
   sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartWIthKey(
     ChartWIthKey self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    FftTransform self,
     SseSerializer serializer,
   );
 
@@ -1219,6 +1287,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    FftTransform self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
   sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
     File self,
     SseSerializer serializer,
@@ -1269,6 +1344,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_config(Config self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_equal_step(
+    EqualStep self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_minmax(Minmax self, SseSerializer serializer);
 
   @protected
@@ -1303,6 +1384,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_data_type(DataType self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_equal_step(EqualStep self, SseSerializer serializer);
 
   @protected
   void sse_encode_f_32(double self, SseSerializer serializer);
@@ -1589,6 +1673,22 @@ class RustLibWire implements BaseWire {
       );
 
   void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+        ptr,
+      );
+
+  void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+        ptr,
+      );
+
+  void
   rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFile(
     int ptr,
   ) => wasmModule
@@ -1770,6 +1870,16 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
 
   external void
   rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartWIthKey(
+    int ptr,
+  );
+
+  external void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
+    int ptr,
+  );
+
+  external void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFftTransform(
     int ptr,
   );
 

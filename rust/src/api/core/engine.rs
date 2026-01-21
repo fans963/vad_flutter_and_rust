@@ -6,7 +6,7 @@ use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIter
 use crate::api::{
     communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
-    sampling::minmax::Minmax,
+    sampling::{equal_step::EqualStep, minmax::Minmax},
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
         audio_decoder::AudioDecoder,
@@ -143,7 +143,7 @@ pub fn create_default_engine(config: Config) -> AudioProcessorEngine {
         Box::new(SymphoniaDecoder::new()),
         Box::new(KvAudioStorage::new()),
         Box::new(KvCachedChartStorage::new()),
-        Box::new(Minmax {}),
+        Box::new(EqualStep {}),
         Box::new(communicator::communicator::StreamCommunicator::new()),
     )
 }

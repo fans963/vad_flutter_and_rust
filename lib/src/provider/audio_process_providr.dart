@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:vad/src/rust/api/core/engine.dart';
 import 'package:vad/src/rust/api/types/config.dart';

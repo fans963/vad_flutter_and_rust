@@ -147,7 +147,7 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
           primaryXAxis: NumericAxis(
             name: 'primaryXAxis',
             minimum: 0,
-            maximum: 100000,
+            maximum: 10000,
           ),
           primaryYAxis: const NumericAxis(
             name: 'primaryYAxis',

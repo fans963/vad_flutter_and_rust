@@ -1,4 +1,3 @@
-import 'package:riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 
 typedef ChartControlParameter = ({
