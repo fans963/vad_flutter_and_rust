@@ -3,5 +3,7 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.formatOnSaveMode": "modificationsIfAvailable",
-  "editor.formatOnType": true
+  "editor.formatOnType": true,
+  "python-envs.defaultEnvManager": "ms-python.python:system",
+  "python-envs.pythonProjects": []
 }

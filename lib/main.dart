@@ -13,12 +13,6 @@ import 'package:vad/src/ui/tool_plate.dart';
 import 'package:vad/src/util/util.dart';
 import 'package:window_manager/window_manager.dart';
 
-// class AudioChartData {
-//   final Audio? audioData;
-//   final ChartData? fftData;
-//   AudioChartData({this.audioData, this.fftData});
-// }
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
@@ -56,6 +50,7 @@ class MyApp extends ConsumerWidget {
       blendLevel: 20,
       appBarStyle: FlexAppBarStyle.surface,
       subThemesData: const FlexSubThemesData(defaultRadius: 12.0),
+      textTheme: _createTextTheme('MapleMonoNFCN'),
     );
   }
 
@@ -69,6 +64,27 @@ class MyApp extends ConsumerWidget {
       appBarStyle: FlexAppBarStyle.surface,
       subThemesData: const FlexSubThemesData(defaultRadius: 12.0),
       darkIsTrueBlack: true,
+      textTheme: _createTextTheme('MapleMonoNFCN'),
+    );
+  }
+
+  TextTheme _createTextTheme(String fontFamily) {
+    return TextTheme(
+      displayLarge: TextStyle(fontFamily: fontFamily),
+      displayMedium: TextStyle(fontFamily: fontFamily),
+      displaySmall: TextStyle(fontFamily: fontFamily),
+      headlineLarge: TextStyle(fontFamily: fontFamily),
+      headlineMedium: TextStyle(fontFamily: fontFamily),
+      headlineSmall: TextStyle(fontFamily: fontFamily),
+      titleLarge: TextStyle(fontFamily: fontFamily),
+      titleMedium: TextStyle(fontFamily: fontFamily),
+      titleSmall: TextStyle(fontFamily: fontFamily),
+      bodyLarge: TextStyle(fontFamily: fontFamily),
+      bodyMedium: TextStyle(fontFamily: fontFamily),
+      bodySmall: TextStyle(fontFamily: fontFamily),
+      labelLarge: TextStyle(fontFamily: fontFamily),
+      labelMedium: TextStyle(fontFamily: fontFamily),
+      labelSmall: TextStyle(fontFamily: fontFamily),
     );
   }
 

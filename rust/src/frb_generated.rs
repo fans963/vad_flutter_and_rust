@@ -240,12 +240,38 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_add_chart_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>,
+            >>::sse_decode(&mut deserializer);
+            let api_file_path = <String>::sse_decode(&mut deserializer);
+            let api_data_type = <crate::api::types::chart::DataType>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::types::error::AppError>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::core::engine::AudioProcessorEngine::add_chart().await?;
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok = crate::api::core::engine::AudioProcessorEngine::add_chart(
+                            &*api_that_guard,
+                            api_file_path,
+                            api_data_type,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
