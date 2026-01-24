@@ -11,7 +11,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `update_all`
 
-AudioProcessorEngine createDefaultEngine({required Config config}) =>
+Future<AudioProcessorEngine> createDefaultEngine({required Config config}) =>
     RustLib.instance.api.crateApiCoreEngineCreateDefaultEngine(config: config);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>>

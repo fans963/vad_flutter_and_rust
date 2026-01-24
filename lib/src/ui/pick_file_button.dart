@@ -1,13 +1,12 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vad/src/provider/audio_process_providr.dart';
+import 'package:vad/src/signals/audio_processor_signal.dart';
 
-class PickFileButton extends ConsumerWidget {
+class PickFileButton extends StatelessWidget {
   const PickFileButton({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return FloatingActionButton(
       tooltip: '添加音频文件',
       child: const Icon(Icons.add),
@@ -26,9 +25,7 @@ class PickFileButton extends ConsumerWidget {
             debugPrint(
               'Picked file: ${file.name}, size: ${await file.length()} bytes',
             );
-            await ref
-                .read(audioProcessorProvider.notifier)
-                .addFile(file.path, bytes);
+            await audioProcessorEngine.addFile(file.path, bytes);
             // ref.read(chartParameterProvider.notifier).add((
             //   filePath: file.path,
             //   visible: true,

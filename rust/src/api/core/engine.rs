@@ -9,10 +9,8 @@ use crate::api::{
     sampling::{equal_step::EqualStep, minmax::Minmax},
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
-        audio_decoder::AudioDecoder,
-        audio_storage::AudioStorage,
-        cached_chart_storage::CachedChartStorage,
-        communicator::Communicator,
+        audio_decoder::AudioDecoder, audio_storage::AudioStorage,
+        cached_chart_storage::CachedChartStorage, communicator::Communicator,
         down_sample::DownSample,
     },
     types::{
@@ -59,16 +57,19 @@ impl AudioProcessorEngine {
         let all_charts = self.cache.get_all_cache();
 
         if let Ok(charts) = all_charts {
-            let visable_charts: Vec<ChartWIthKey> = charts.par_iter().map(|c| {
-                let visable_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
-                let downsampled_chart = self
-                    .down_sampler
-                    .down_sample(visable_chart, self.down_sample_points_num);
-                ChartWIthKey {
-                    key: c.key.clone(),
-                    chart: downsampled_chart,
-                }
-            }).collect();
+            let visable_charts: Vec<ChartWIthKey> = charts
+                .par_iter()
+                .map(|c| {
+                    let visable_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
+                    let downsampled_chart = self
+                        .down_sampler
+                        .down_sample(visable_chart, self.down_sample_points_num);
+                    ChartWIthKey {
+                        key: c.key.clone(),
+                        chart: downsampled_chart,
+                    }
+                })
+                .collect();
 
             self.communicator.update_all_charts(visable_charts);
         }
@@ -128,9 +129,9 @@ impl AudioProcessorEngine {
         self.storage.remove(file_path)
     }
 
-    pub async fn add_chart(&self,file_path: String,data_type: DataType)->Result<(),AppError>{
+    pub async fn add_chart(&self, file_path: String, data_type: DataType) -> Result<(), AppError> {
         Ok(())
-    } 
+    }
 
     pub async fn remove_chart(
         &self,
@@ -141,7 +142,7 @@ impl AudioProcessorEngine {
     }
 }
 
-pub fn create_default_engine(config: Config) -> AudioProcessorEngine {
+pub async fn create_default_engine(config: Config) -> AudioProcessorEngine {
     AudioProcessorEngine::new(
         config,
         Box::new(SymphoniaDecoder::new()),

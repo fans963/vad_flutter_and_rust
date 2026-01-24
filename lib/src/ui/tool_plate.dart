@@ -1,18 +1,15 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:vad/src/provider/navigator_index_provider.dart';
+import 'package:vad/src/signals/navigator_index_signal.dart';
 import 'package:vad/src/util/drag_handler.dart';
 
-class ToolPlate extends ConsumerWidget {
+class ToolPlate extends StatelessWidget {
   const ToolPlate({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final activeWidgetIndex = ref.watch(navigatorIndexProvider);
-    final currentHeight = ref.watch(toolPlateHeightProvider);
-
+  Widget build(BuildContext context) {
     final widgets = [
       const HomePanel(),
       const InfoPanel(),
@@ -20,53 +17,56 @@ class ToolPlate extends ConsumerWidget {
     ];
     final colorScheme = Theme.of(context).colorScheme;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 100),
-      height: currentHeight,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16.0),
-          topRight: Radius.circular(16.0),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+    return Watch((context) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        height: toolPlateHeightSignal.value,
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16.0),
+            topRight: Radius.circular(16.0),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          GenericDragHandle(
-            onDragUpdate: (double newHeight) {
-              final screenHeight = MediaQuery.of(context).size.height;
-              ref
-                  .read(toolPlateHeightProvider.notifier)
-                  .updateHeight(newHeight.clamp(50.0, screenHeight * 0.6));
-            },
-            onDragStart: () {
-              return ref.read(toolPlateHeightProvider);
-            },
-          ),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: widgets[activeWidgetIndex],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+        child: Column(
+          children: [
+            GenericDragHandle(
+              onDragUpdate: (double newHeight) {
+                final screenHeight = MediaQuery.of(context).size.height;
+                toolPlateHeightSignal.value = newHeight.clamp(
+                  50.0,
+                  screenHeight * 0.6,
+                );
+              },
+              onDragStart: () {
+                return toolPlateHeightSignal.value;
+              },
+            ),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: widgets[navigatorIndexSignal.value],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
-class HomePanel extends ConsumerWidget {
+class HomePanel extends StatelessWidget {
   const HomePanel({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return ListView(
       children: [
         Column(
@@ -139,22 +139,22 @@ class HomePanel extends ConsumerWidget {
   }
 }
 
-class InfoPanel extends ConsumerWidget {
+class InfoPanel extends StatelessWidget {
   const InfoPanel({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Center(
       child: Text('信息', style: Theme.of(context).textTheme.headlineMedium),
     );
   }
 }
 
-class ControlPanel extends ConsumerWidget {
+class ControlPanel extends StatelessWidget {
   const ControlPanel({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Center(
       child: Text('控制', style: Theme.of(context).textTheme.headlineMedium),
     );

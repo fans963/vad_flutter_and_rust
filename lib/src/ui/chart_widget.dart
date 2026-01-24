@@ -2,20 +2,20 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:vad/src/provider/audio_process_providr.dart';
-import 'package:vad/src/provider/chart_control_provider.dart';
-import 'package:vad/src/provider/chart_paramater_provider.dart';
+import 'package:vad/src/rust/api/core/engine.dart';
+import 'package:vad/src/signals/audio_processor_signal.dart';
+import 'package:vad/src/signals/chart_control_signal.dart';
 import 'package:vad/src/rust/api/events/communicator_events.dart';
 import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/rust/api/types/events.dart';
 
-class ChartWidget extends ConsumerStatefulWidget {
+class ChartWidget extends StatefulWidget {
   const ChartWidget({super.key});
 
   @override
-  ConsumerState<ChartWidget> createState() => _ChartWidgetState();
+  State<ChartWidget> createState() => _ChartWidgetState();
 }
 
 class _ChartDataContainer {
@@ -39,7 +39,7 @@ class _ChartDataContainer {
   List<CommunicatorChart>? getCharts(String key) => seriesData[key];
 }
 
-class _ChartWidgetState extends ConsumerState<ChartWidget> {
+class _ChartWidgetState extends State<ChartWidget> {
   StreamSubscription<ChartEvent>? _chartEventSubscription;
   final _containerKey = GlobalKey();
   double? _lastWidth;
@@ -65,9 +65,9 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
               for (final chart in event.charts) {
                 _chartDataContainer.addSeries(chart.key, chart);
               }
-              debugPrint(
-                "Received ChartEvent_UpdateAllCharts: total charts: ${event.charts.length}",
-              );
+              // debugPrint(
+              //   "Received ChartEvent_UpdateAllCharts: total charts: ${event.charts.length}",
+              // );
               setState(() {});
             }
           case ChartEvent_RemoveChart():
@@ -100,79 +100,68 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
 
   void _updateDownsamplePointsNum() {
     final size = _containerKey.currentContext?.size;
+
     if (size != null && size.width != _lastWidth) {
       _lastWidth = size.width;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref
-            .read(audioProcessorProvider)
-            .value
-            ?.setDownSamplePointsNum(pointsNum: BigInt.from(size.width * 2));
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final engine = await audioProcessorEngine.engine();
+        engine.setDownSamplePointsNum(
+          pointsNum: BigInt.from(size.width.toInt() * 2),
+        );
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final chartControl = ref.watch(chartControlProvider);
-    final chartParameters = ref.watch(chartParameterProvider);
-
-    ref.listen(chartControlProvider, (previous, next) {
-      next.whenData((control) {
-        ref
-            .read(audioProcessorProvider)
-            .value
-            ?.setIndexRange(start: control.minX, end: control.maxX);
-        debugPrint(
-          "Chart control updated: minX=${control.minX}, maxX=${control.maxX}",
-        );
-      });
-    });
-
     final seriesList = _buildChartSeries();
 
-    return Container(
-      key: _containerKey,
-      height: 500,
-      padding: const EdgeInsets.all(10.0),
-      child: RepaintBoundary(
-        child: SfCartesianChart(
-          zoomPanBehavior: ZoomPanBehavior(
-            enablePinching: true,
-            enablePanning: true,
-            enableMouseWheelZooming: true,
-            enableSelectionZooming: true,
-            zoomMode: ZoomMode.x,
-          ),
-          primaryXAxis: NumericAxis(
-            name: 'primaryXAxis',
-            minimum: 0,
-            maximum: 10000,
-          ),
-          primaryYAxis: const NumericAxis(
-            name: 'primaryYAxis',
-            minimum: -0.5,
-            maximum: 0.5,
-          ),
-          onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
-            if (rangeChangedArgs.axisName == 'primaryXAxis') {
-              final minX = (rangeChangedArgs.visibleMin as num).toDouble();
-              final maxX = (rangeChangedArgs.visibleMax as num).toDouble();
+    return Watch((context) {
+      return Container(
+        key: _containerKey,
+        height: 500,
+        padding: const EdgeInsets.all(10.0),
+        child: RepaintBoundary(
+          child: SfCartesianChart(
+            zoomPanBehavior: ZoomPanBehavior(
+              enablePinching: true,
+              enablePanning: true,
+              enableMouseWheelZooming: true,
+              enableSelectionZooming: true,
+              zoomMode: ZoomMode.x,
+            ),
+            primaryXAxis: NumericAxis(
+              name: 'primaryXAxis',
+              minimum: 0,
+              maximum: 10000,
+            ),
+            primaryYAxis: const NumericAxis(
+              name: 'primaryYAxis',
+              minimum: -0.5,
+              maximum: 0.5,
+            ),
+            onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
+              if (rangeChangedArgs.axisName == 'primaryXAxis') {
+                final minX = (rangeChangedArgs.visibleMin as num).toDouble();
+                final maxX = (rangeChangedArgs.visibleMax as num).toDouble();
 
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ref.read(chartControlProvider.notifier).setControlParameter((
-                  minX: minX,
-                  maxX: maxX,
-                  minY: 0.0,
-                  maxY: 0.0,
-                ));
-              });
-            }
-          },
-          series: seriesList,
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  final engine = await audioProcessorEngine.engine();
+                  await engine.setIndexRange(start: minX, end: maxX);
+                  chartControlSignal.value = (
+                    minX: minX,
+                    maxX: maxX,
+                    minY: 0.0,
+                    maxY: 0.0,
+                  );
+                });
+              }
+            },
+            series: seriesList,
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   List<CartesianSeries> _buildChartSeries() {
@@ -206,7 +195,7 @@ class _ChartWidgetState extends ConsumerState<ChartWidget> {
       }
     }
 
-    debugPrint("Total series to render: ${seriesList.length}");
+    // debugPrint("Total series to render: ${seriesList.length}");
 
     return seriesList;
   }

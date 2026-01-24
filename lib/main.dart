@@ -1,9 +1,9 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:tray_manager/tray_manager.dart';
-import 'package:vad/src/provider/navigator_index_provider.dart';
+import 'package:vad/src/signals/navigator_index_signal.dart';
 import 'package:vad/src/rust/frb_generated.dart';
 import 'package:vad/src/ui/chart_widget.dart';
 import 'package:vad/src/ui/fps_counter.dart';
@@ -33,12 +33,12 @@ Future<void> main() async {
     });
   }
 
-  runApp(ProviderScope(child: const MyApp()));
+  runApp(const MyApp());
 }
 
 const Color primarySeedColor = Color(0xFF4B77C2);
 
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   ThemeData _buildTheme(ColorScheme colorScheme) {
@@ -89,7 +89,7 @@ class MyApp extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         final ColorScheme lightColorScheme;
@@ -138,17 +138,19 @@ class MyApp extends ConsumerWidget {
             ),
             floatingActionButton: const PickFileButton(),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            bottomNavigationBar: BottomNavigationBar(
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
-                BottomNavigationBarItem(icon: Icon(Icons.info), label: '信息'),
-                BottomNavigationBarItem(icon: Icon(Icons.edit), label: '控制'),
-              ],
-              currentIndex: ref.watch(navigatorIndexProvider),
-              onTap: (index) {
-                ref.read(navigatorIndexProvider.notifier).setIndex(index);
-              },
-            ),
+            bottomNavigationBar: Watch((context) {
+              return BottomNavigationBar(
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
+                  BottomNavigationBarItem(icon: Icon(Icons.info), label: '信息'),
+                  BottomNavigationBarItem(icon: Icon(Icons.edit), label: '控制'),
+                ],
+                currentIndex: navigatorIndexSignal.value,
+                onTap: (index) {
+                  navigatorIndexSignal.value = index;
+                },
+              );
+            }),
           ),
         );
       },

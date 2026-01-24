@@ -282,7 +282,7 @@ abstract class RustLibApi extends BaseApi {
 
   Stream<ChartEvent> crateApiEventsCommunicatorEventsCreateChartEventStream();
 
-  AudioProcessorEngine crateApiCoreEngineCreateDefaultEngine({
+  Future<AudioProcessorEngine> crateApiCoreEngineCreateDefaultEngine({
     required Config config,
   });
 
@@ -1880,15 +1880,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  AudioProcessorEngine crateApiCoreEngineCreateDefaultEngine({
+  Future<AudioProcessorEngine> crateApiCoreEngineCreateDefaultEngine({
     required Config config,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 56,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:

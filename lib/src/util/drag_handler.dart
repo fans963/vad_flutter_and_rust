@@ -1,12 +1,13 @@
-// 1. 定义回调函数类型
+import 'package:signals/signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+
+final toolPlateHeightSignal = signal<double>(250.0);
 
 typedef DragUpdateCallback = void Function(double newHeight);
 typedef DragStartCallback = double Function();
 
-class GenericDragHandle extends ConsumerStatefulWidget {
+class GenericDragHandle extends StatefulWidget {
+  // 改为 StatefulWidget
   final DragUpdateCallback onDragUpdate;
   final DragStartCallback onDragStart;
   final double height;
@@ -19,30 +20,18 @@ class GenericDragHandle extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<GenericDragHandle> createState() => _GenericDragHandleState();
+  State<GenericDragHandle> createState() => _GenericDragHandleState();
 }
 
-class _GenericDragHandleState extends ConsumerState<GenericDragHandle> {
+class _GenericDragHandleState extends State<GenericDragHandle> {
+  // 这里的变量会存储在 State 中，父组件 build 时它们不会丢失
   double _startHeight = 0;
   double _startY = 0;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: Container(
-        height: widget.height,
-        color: Colors.transparent,
-        child: Center(
-          child: Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ),
-      ),
+      behavior: HitTestBehavior.opaque,
       onVerticalDragStart: (details) {
         _startY = details.globalPosition.dy;
         _startHeight = widget.onDragStart();
@@ -52,19 +41,20 @@ class _GenericDragHandleState extends ConsumerState<GenericDragHandle> {
         final deltaY = currentY - _startY;
         widget.onDragUpdate(_startHeight - deltaY);
       },
+      child: Container(
+        height: widget.height,
+        color: Colors.transparent,
+        child: Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
-
-class ToolPlateHeightNotifier extends StateNotifier<double> {
-  ToolPlateHeightNotifier(super.initialHeight);
-
-  void updateHeight(double newHeight) {
-    state = newHeight;
-  }
-}
-
-final toolPlateHeightProvider =
-    StateNotifierProvider<ToolPlateHeightNotifier, double>(
-      (ref) => ToolPlateHeightNotifier(250.0),
-    );
