@@ -116,13 +116,13 @@ class _ChartWidgetState extends State<ChartWidget> {
   Widget build(BuildContext context) {
     final seriesList = _buildChartSeries();
 
-    return Watch((context) {
-      return Container(
-        key: _containerKey,
-        height: 500,
-        padding: const EdgeInsets.all(10.0),
-        child: RepaintBoundary(
-          child: SfCartesianChart(
+    return Container(
+      key: _containerKey,
+      height: 500,
+      padding: const EdgeInsets.all(10.0),
+      child: RepaintBoundary(
+        child: Watch((context) {
+          return SfCartesianChart(
             zoomPanBehavior: ZoomPanBehavior(
               enablePinching: true,
               enablePanning: true,
@@ -158,10 +158,10 @@ class _ChartWidgetState extends State<ChartWidget> {
               }
             },
             series: seriesList,
-          ),
-        ),
-      );
-    });
+          );
+        }),
+      ),
+    );
   }
 
   List<CartesianSeries> _buildChartSeries() {
