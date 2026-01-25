@@ -6,7 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
-import 'api/communicator/communicator.dart';
+import 'api/communicator/stream_sink_communicator.dart';
 import 'api/core/engine.dart';
 import 'api/decoder/symphonia_decoder.dart';
 import 'api/events/communicator_events.dart';

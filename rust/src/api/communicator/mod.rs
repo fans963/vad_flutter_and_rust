@@ -1,1 +1,1 @@
-pub mod communicator;
+pub mod stream_sink_communicator; 

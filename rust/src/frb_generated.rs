@@ -51,7 +51,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -946865722;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -100992314;
 
 // Section: executor
 
@@ -2199,45 +2199,22 @@ fn wire__crate__api__util__format_getter__simple_format_getter_get_format_impl(
         },
     )
 }
-fn wire__crate__api__communicator__communicator__stream_communicator_add_chart_impl(
+fn wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "stream_communicator_add_chart",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <crate::api::communicator::communicator::StreamCommunicator>::sse_decode(
-                &mut deserializer,
-            );
-            let api_key = <String>::sse_decode(&mut deserializer);
-            let api_chart = <Chart>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::communicator::communicator::StreamCommunicator::add_chart(
-                        &api_that, api_key, api_chart,
-                    );
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "stream_communicator_add_chart", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <crate::api::communicator::stream_sink_communicator::StreamCommunicator>::sse_decode(&mut deserializer);
+let api_key = <String>::sse_decode(&mut deserializer);
+let api_chart = <Chart>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok({ crate::api::communicator::stream_sink_communicator::StreamCommunicator::add_chart(&api_that, api_key, api_chart); })?;   Ok(output_ok)
+                })()) })
 }
-fn wire__crate__api__communicator__communicator__stream_communicator_new_impl(
+fn wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
@@ -2261,125 +2238,54 @@ fn wire__crate__api__communicator__communicator__stream_communicator_new_impl(
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::communicator::communicator::StreamCommunicator::new(),
+                    crate::api::communicator::stream_sink_communicator::StreamCommunicator::new(),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__communicator__communicator__stream_communicator_remove_all_charts_impl(
+fn wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "stream_communicator_remove_all_charts",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <crate::api::communicator::communicator::StreamCommunicator>::sse_decode(
-                &mut deserializer,
-            );
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::communicator::communicator::StreamCommunicator::remove_all_charts(
-                        &api_that,
-                    );
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "stream_communicator_remove_all_charts", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <crate::api::communicator::stream_sink_communicator::StreamCommunicator>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok({ crate::api::communicator::stream_sink_communicator::StreamCommunicator::remove_all_charts(&api_that); })?;   Ok(output_ok)
+                })()) })
 }
-fn wire__crate__api__communicator__communicator__stream_communicator_remove_chart_impl(
+fn wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "stream_communicator_remove_chart",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <crate::api::communicator::communicator::StreamCommunicator>::sse_decode(
-                &mut deserializer,
-            );
-            let api_key = <String>::sse_decode(&mut deserializer);
-            let api_data_type = <crate::api::types::chart::DataType>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::communicator::communicator::StreamCommunicator::remove_chart(
-                        &api_that,
-                        api_key,
-                        api_data_type,
-                    );
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "stream_communicator_remove_chart", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <crate::api::communicator::stream_sink_communicator::StreamCommunicator>::sse_decode(&mut deserializer);
+let api_key = <String>::sse_decode(&mut deserializer);
+let api_data_type = <crate::api::types::chart::DataType>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok({ crate::api::communicator::stream_sink_communicator::StreamCommunicator::remove_chart(&api_that, api_key, api_data_type); })?;   Ok(output_ok)
+                })()) })
 }
-fn wire__crate__api__communicator__communicator__stream_communicator_update_all_charts_impl(
+fn wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "stream_communicator_update_all_charts",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <crate::api::communicator::communicator::StreamCommunicator>::sse_decode(
-                &mut deserializer,
-            );
-            let api_charts = <Vec<ChartWIthKey>>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::communicator::communicator::StreamCommunicator::update_all_charts(
-                        &api_that, api_charts,
-                    );
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "stream_communicator_update_all_charts", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <crate::api::communicator::stream_sink_communicator::StreamCommunicator>::sse_decode(&mut deserializer);
+let api_charts = <Vec< ChartWIthKey>>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok({ crate::api::communicator::stream_sink_communicator::StreamCommunicator::update_all_charts(&api_that, api_charts); })?;   Ok(output_ok)
+                })()) })
 }
 fn wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3100,10 +3006,10 @@ impl SseDecode for crate::api::util::format_getter::SimpleFormatGetter {
     }
 }
 
-impl SseDecode for crate::api::communicator::communicator::StreamCommunicator {
+impl SseDecode for crate::api::communicator::stream_sink_communicator::StreamCommunicator {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        return crate::api::communicator::communicator::StreamCommunicator {};
+        return crate::api::communicator::stream_sink_communicator::StreamCommunicator {};
     }
 }
 
@@ -3254,11 +3160,11 @@ fn pde_ffi_dispatcher_sync_impl(
 59 => wire__crate__api__transform__fft__fft_transform_transform_impl(ptr, rust_vec_len, data_len),
 60 => wire__crate__api__sampling__minmax__minmax_down_sample_impl(ptr, rust_vec_len, data_len),
 61 => wire__crate__api__util__format_getter__simple_format_getter_get_format_impl(ptr, rust_vec_len, data_len),
-62 => wire__crate__api__communicator__communicator__stream_communicator_add_chart_impl(ptr, rust_vec_len, data_len),
-63 => wire__crate__api__communicator__communicator__stream_communicator_new_impl(ptr, rust_vec_len, data_len),
-64 => wire__crate__api__communicator__communicator__stream_communicator_remove_all_charts_impl(ptr, rust_vec_len, data_len),
-65 => wire__crate__api__communicator__communicator__stream_communicator_remove_chart_impl(ptr, rust_vec_len, data_len),
-66 => wire__crate__api__communicator__communicator__stream_communicator_update_all_charts_impl(ptr, rust_vec_len, data_len),
+62 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(ptr, rust_vec_len, data_len),
+63 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(ptr, rust_vec_len, data_len),
+64 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(ptr, rust_vec_len, data_len),
+65 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(ptr, rust_vec_len, data_len),
+66 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(ptr, rust_vec_len, data_len),
 67 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(ptr, rust_vec_len, data_len),
 68 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
@@ -3783,19 +3689,25 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::util::format_getter::SimpleFo
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::communicator::communicator::StreamCommunicator {
+impl flutter_rust_bridge::IntoDart
+    for crate::api::communicator::stream_sink_communicator::StreamCommunicator
+{
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         Vec::<u8>::new().into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::communicator::communicator::StreamCommunicator
+    for crate::api::communicator::stream_sink_communicator::StreamCommunicator
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::communicator::communicator::StreamCommunicator>
-    for crate::api::communicator::communicator::StreamCommunicator
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::api::communicator::stream_sink_communicator::StreamCommunicator,
+    > for crate::api::communicator::stream_sink_communicator::StreamCommunicator
 {
-    fn into_into_dart(self) -> crate::api::communicator::communicator::StreamCommunicator {
+    fn into_into_dart(
+        self,
+    ) -> crate::api::communicator::stream_sink_communicator::StreamCommunicator {
         self
     }
 }
@@ -4386,7 +4298,7 @@ impl SseEncode for crate::api::util::format_getter::SimpleFormatGetter {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
 }
 
-impl SseEncode for crate::api::communicator::communicator::StreamCommunicator {
+impl SseEncode for crate::api::communicator::stream_sink_communicator::StreamCommunicator {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
 }

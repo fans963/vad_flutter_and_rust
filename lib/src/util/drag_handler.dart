@@ -24,7 +24,6 @@ class GenericDragHandle extends StatefulWidget {
 }
 
 class _GenericDragHandleState extends State<GenericDragHandle> {
-  // 这里的变量会存储在 State 中，父组件 build 时它们不会丢失
   double _startHeight = 0;
   double _startY = 0;
 

@@ -3,7 +3,7 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/communicator/communicator.dart';
+import 'api/communicator/stream_sink_communicator.dart';
 import 'api/core/engine.dart';
 import 'api/decoder/symphonia_decoder.dart';
 import 'api/events/communicator_events.dart';
@@ -86,7 +86,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -946865722;
+  int get rustContentHash => -100992314;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -313,25 +313,28 @@ abstract class RustLibApi extends BaseApi {
     required String filePath,
   });
 
-  void crateApiCommunicatorCommunicatorStreamCommunicatorAddChart({
+  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChart({
     required StreamCommunicator that,
     required String key,
     required Chart chart,
   });
 
-  StreamCommunicator crateApiCommunicatorCommunicatorStreamCommunicatorNew();
+  StreamCommunicator
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorNew();
 
-  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllCharts({
+  void
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveAllCharts({
     required StreamCommunicator that,
   });
 
-  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveChart({
+  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChart({
     required StreamCommunicator that,
     required String key,
     required DataType dataType,
   });
 
-  void crateApiCommunicatorCommunicatorStreamCommunicatorUpdateAllCharts({
+  void
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllCharts({
     required StreamCommunicator that,
     required List<ChartWIthKey> charts,
   });
@@ -2079,7 +2082,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiCommunicatorCommunicatorStreamCommunicatorAddChart({
+  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChart({
     required StreamCommunicator that,
     required String key,
     required Chart chart,
@@ -2101,7 +2104,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta:
-            kCrateApiCommunicatorCommunicatorStreamCommunicatorAddChartConstMeta,
+            kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChartConstMeta,
         argValues: [that, key, chart],
         apiImpl: this,
       ),
@@ -2109,14 +2112,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateApiCommunicatorCommunicatorStreamCommunicatorAddChartConstMeta =>
+  get kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChartConstMeta =>
       const TaskConstMeta(
         debugName: "stream_communicator_add_chart",
         argNames: ["that", "key", "chart"],
       );
 
   @override
-  StreamCommunicator crateApiCommunicatorCommunicatorStreamCommunicatorNew() {
+  StreamCommunicator
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorNew() {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -2128,7 +2132,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta:
-            kCrateApiCommunicatorCommunicatorStreamCommunicatorNewConstMeta,
+            kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorNewConstMeta,
         argValues: [],
         apiImpl: this,
       ),
@@ -2136,11 +2140,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateApiCommunicatorCommunicatorStreamCommunicatorNewConstMeta =>
+  get kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorNewConstMeta =>
       const TaskConstMeta(debugName: "stream_communicator_new", argNames: []);
 
   @override
-  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllCharts({
+  void
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveAllCharts({
     required StreamCommunicator that,
   }) {
     return handler.executeSync(
@@ -2155,7 +2160,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta:
-            kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllChartsConstMeta,
+            kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveAllChartsConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
@@ -2163,14 +2168,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveAllChartsConstMeta =>
+  get kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveAllChartsConstMeta =>
       const TaskConstMeta(
         debugName: "stream_communicator_remove_all_charts",
         argNames: ["that"],
       );
 
   @override
-  void crateApiCommunicatorCommunicatorStreamCommunicatorRemoveChart({
+  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChart({
     required StreamCommunicator that,
     required String key,
     required DataType dataType,
@@ -2189,7 +2194,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta:
-            kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveChartConstMeta,
+            kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChartConstMeta,
         argValues: [that, key, dataType],
         apiImpl: this,
       ),
@@ -2197,14 +2202,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateApiCommunicatorCommunicatorStreamCommunicatorRemoveChartConstMeta =>
+  get kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChartConstMeta =>
       const TaskConstMeta(
         debugName: "stream_communicator_remove_chart",
         argNames: ["that", "key", "dataType"],
       );
 
   @override
-  void crateApiCommunicatorCommunicatorStreamCommunicatorUpdateAllCharts({
+  void
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllCharts({
     required StreamCommunicator that,
     required List<ChartWIthKey> charts,
   }) {
@@ -2224,7 +2230,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta:
-            kCrateApiCommunicatorCommunicatorStreamCommunicatorUpdateAllChartsConstMeta,
+            kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllChartsConstMeta,
         argValues: [that, charts],
         apiImpl: this,
       ),
@@ -2232,7 +2238,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateApiCommunicatorCommunicatorStreamCommunicatorUpdateAllChartsConstMeta =>
+  get kCrateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllChartsConstMeta =>
       const TaskConstMeta(
         debugName: "stream_communicator_update_all_charts",
         argNames: ["that", "charts"],

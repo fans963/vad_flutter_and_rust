@@ -149,6 +149,6 @@ pub async fn create_default_engine(config: Config) -> AudioProcessorEngine {
         Box::new(KvAudioStorage::new()),
         Box::new(KvCachedChartStorage::new()),
         Box::new(EqualStep {}),
-        Box::new(communicator::communicator::StreamCommunicator::new()),
+        Box::new(communicator::stream_sink_communicator::StreamCommunicator::new()),
     )
 }
