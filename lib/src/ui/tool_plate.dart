@@ -2,7 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:vad/src/signals/navigator_index_signal.dart';
+import 'package:vad/src/signals/page_controller_signal.dart';
 import 'package:vad/src/util/drag_handler.dart';
 
 class ToolPlate extends StatelessWidget {
@@ -50,9 +50,11 @@ class ToolPlate extends StatelessWidget {
               },
             ),
             Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: widgets[navigatorIndexSignal.value],
+              child: PageView(
+                controller: pageControllerSignal.value,
+                physics: const ClampingScrollPhysics(),
+                onPageChanged: (index) => pageIndexSignal.value = index,
+                children: widgets,
               ),
             ),
           ],

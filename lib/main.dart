@@ -3,8 +3,8 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:tray_manager/tray_manager.dart';
-import 'package:vad/src/signals/navigator_index_signal.dart';
 import 'package:vad/src/rust/frb_generated.dart';
+import 'package:vad/src/signals/page_controller_signal.dart';
 import 'package:vad/src/ui/chart_widget.dart';
 import 'package:vad/src/ui/fps_counter.dart';
 import 'package:vad/src/ui/pick_file_button.dart';
@@ -145,9 +145,13 @@ class MyApp extends StatelessWidget {
                   BottomNavigationBarItem(icon: Icon(Icons.info), label: '信息'),
                   BottomNavigationBarItem(icon: Icon(Icons.edit), label: '控制'),
                 ],
-                currentIndex: navigatorIndexSignal.value,
+                currentIndex: pageIndexSignal.value,
                 onTap: (index) {
-                  navigatorIndexSignal.value = index;
+                  pageControllerSignal.value.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOutQuart,
+                  );
                 },
               );
             }),
