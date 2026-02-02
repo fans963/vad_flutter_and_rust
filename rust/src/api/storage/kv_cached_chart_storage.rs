@@ -3,7 +3,7 @@ use dashmap::DashMap;
 use crate::api::{
     traits::cached_chart_storage::CachedChartStorage,
     types::{
-        chart::{Chart, ChartWIthKey},
+        chart::{Chart, ChartWIthKey, DataType},
         config::Config,
         error::AppError,
     },
@@ -41,14 +41,18 @@ impl CachedChartStorage for KvCachedChartStorage {
         Ok(())
     }
 
-    fn get(&self, key: String) -> Result<Chart, AppError> {
+    fn get(&self, key: String, data_type:DataType) -> Result<Chart, AppError> {
         if let Some(cached_charts) = self.dashmap.get(&key) {
-            if let Some(chart) = cached_charts.first() {
+            if let Some(chart) = cached_charts
+                .iter()
+                .find(|c| c.data_type == data_type)
+            {
                 Ok(chart.clone())
             } else {
-                Err(AppError::NotFound(
-                    "No charts available for the given key".to_string(),
-                ))
+                Err(AppError::NotFound(format!(
+                    "Chart with specified data type not found for key: {}",
+                    key
+                )))
             }
         } else {
             Err(AppError::NotFound(format!("Chart key not found: {}", key)))

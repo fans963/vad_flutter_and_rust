@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:vad/src/rust/api/core/engine.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
 import 'package:vad/src/signals/chart_control_signal.dart';
 import 'package:vad/src/rust/api/events/communicator_events.dart';
@@ -44,6 +44,14 @@ class _ChartWidgetState extends State<ChartWidget> {
   final _containerKey = GlobalKey();
   double? _lastWidth;
   late final _ChartDataContainer _chartDataContainer = _ChartDataContainer();
+  double minXAxis = 0.0;
+  double maxXAxis = 1000000.0;
+
+  @override
+  void dispose() {
+    _chartEventSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -54,9 +62,9 @@ class _ChartWidgetState extends State<ChartWidget> {
           case ChartEvent_AddChart():
             {
               _chartDataContainer.addSeries(event.chart.key, event.chart);
-              debugPrint(
-                "Received ChartEvent_AddChart: ${event.chart.key}, points: ${event.chart.chart.length}",
-              );
+              // debugPrint(
+              //   "Received ChartEvent_AddChart: ${event.chart.key}, points: ${event.chart.chart.length}",
+              // );
               setState(() {});
             }
           case ChartEvent_UpdateAllCharts():
@@ -73,13 +81,13 @@ class _ChartWidgetState extends State<ChartWidget> {
           case ChartEvent_RemoveChart():
             {
               _chartDataContainer.removeSeries(event.key);
-              debugPrint("Removed chart: ${event.key}");
+              // debugPrint("Removed chart: ${event.key}");
               setState(() {});
             }
           case ChartEvent_RemoveAllCharts():
             {
               _chartDataContainer.clearAll();
-              debugPrint("Removed all charts");
+              // debugPrint("Removed all charts");
               setState(() {});
             }
         }
@@ -88,79 +96,79 @@ class _ChartWidgetState extends State<ChartWidget> {
       cancelOnError: false,
     );
 
-    _listenToSizeChanges();
   }
 
-  void _listenToSizeChanges() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateDownsamplePointsNum();
-      _listenToSizeChanges();
-    });
-  }
-
-  void _updateDownsamplePointsNum() {
-    final size = _containerKey.currentContext?.size;
-
-    if (size != null && size.width != _lastWidth) {
+  void _onSizeChanged(Size size) {
+    if (size.width != _lastWidth) {
       _lastWidth = size.width;
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final engine = await audioProcessorEngine.engine();
-        engine.setDownSamplePointsNum(
-          pointsNum: BigInt.from(size.width.toInt() * 2),
-        );
-      });
+      _updateEnginePoints(size.width);
     }
+  }
+
+  Future<void> _updateEnginePoints(double width) async {
+    final engine = await audioProcessorEngine.engine();
+    await engine.setDownSamplePointsNum(pointsNum: BigInt.from(width.toInt()));
   }
 
   @override
   Widget build(BuildContext context) {
     final seriesList = _buildChartSeries();
 
-    return Container(
-      key: _containerKey,
-      height: 500,
-      padding: const EdgeInsets.all(10.0),
-      child: RepaintBoundary(
-        child: Watch((context) {
-          return SfCartesianChart(
-            zoomPanBehavior: ZoomPanBehavior(
-              enablePinching: true,
-              enablePanning: true,
-              enableMouseWheelZooming: true,
-              enableSelectionZooming: true,
-              zoomMode: ZoomMode.x,
-            ),
-            primaryXAxis: NumericAxis(
-              name: 'primaryXAxis',
-              minimum: 0,
-              maximum: 10000,
-            ),
-            primaryYAxis: const NumericAxis(
-              name: 'primaryYAxis',
-              minimum: -0.5,
-              maximum: 0.5,
-            ),
-            onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
-              if (rangeChangedArgs.axisName == 'primaryXAxis') {
-                final minX = (rangeChangedArgs.visibleMin as num).toDouble();
-                final maxX = (rangeChangedArgs.visibleMax as num).toDouble();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _onSizeChanged(constraints.biggest),
+        );
+        return Container(
+          key: _containerKey,
+          height: 500,
+          // padding: const EdgeInsets.all(10.0),
+          child: RepaintBoundary(
+            child: SfCartesianChart(
+              legend: Legend(
+                isVisible: true,
+                isResponsive: true,
+                position: LegendPosition.bottom,
+              ),
+              zoomPanBehavior: ZoomPanBehavior(
+                enablePinching: true,
+                enablePanning: true,
+                enableMouseWheelZooming: true,
+                enableSelectionZooming: true,
+                zoomMode: ZoomMode.x,
+              ),
+              primaryXAxis: NumericAxis(
+                name: 'primaryXAxis',
+                minimum: minXAxis,
+                maximum: maxXAxis,
+              ),
+              primaryYAxis: const NumericAxis(
+                name: 'primaryYAxis',
+                minimum: -0.5,
+                maximum: 100.0,
+              ),
+              onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
+                if (rangeChangedArgs.axisName == 'primaryXAxis') {
+                  final minX = (rangeChangedArgs.visibleMin as num).toDouble();
+                  final maxX = (rangeChangedArgs.visibleMax as num).toDouble();
 
-                WidgetsBinding.instance.addPostFrameCallback((_) async {
-                  final engine = await audioProcessorEngine.engine();
-                  await engine.setIndexRange(start: minX, end: maxX);
-                  chartControlSignal.value = (
-                    minX: minX,
-                    maxX: maxX,
-                    minY: 0.0,
-                    maxY: 0.0,
-                  );
-                });
-              }
-            },
-            series: seriesList,
-          );
-        }),
-      ),
+                  WidgetsBinding.instance.addPostFrameCallback((_) async {
+                    final engine = await audioProcessorEngine.engine();
+                    await engine.setIndexRange(start: minX, end: maxX);
+                    chartControlSignal.value = (
+                      minX: minX,
+                      maxX: maxX,
+                      minY: 0.0,
+                      maxY: 0.0,
+                    );
+                  });
+                }
+              },
+              series: seriesList,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -188,6 +196,11 @@ class _ChartWidgetState extends State<ChartWidget> {
             animationDuration: 0,
             sortingOrder: SortingOrder.ascending,
             sortFieldValueMapper: (Point point, _) => point.x,
+            selectionBehavior: SelectionBehavior(
+              enable: true,
+              selectedColor: Colors.yellow,
+              unselectedColor: color.withOpacity(0.5),
+            ),
           ),
         );
 

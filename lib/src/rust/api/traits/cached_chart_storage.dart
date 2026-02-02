@@ -11,7 +11,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 abstract class CachedChartStorage {
   void add({required String key, required Chart chart});
 
-  Chart get_({required String key});
+  Chart get_({required String key, required DataType dataType});
 
   List<ChartWIthKey> getAllCache();
 

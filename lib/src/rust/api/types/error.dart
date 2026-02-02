@@ -21,4 +21,6 @@ sealed class AppError with _$AppError implements FrbException {
   const factory AppError.cache(String field0) = AppError_Cache;
   const factory AppError.notFound(String field0) = AppError_NotFound;
   const factory AppError.generic(String field0) = AppError_Generic;
+  const factory AppError.processingError(String field0) =
+      AppError_ProcessingError;
 }

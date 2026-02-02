@@ -86,7 +86,7 @@ extension AppErrorPatterns on AppError {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AppError_Io value)?  io,TResult Function( AppError_Format value)?  format,TResult Function( AppError_Decode value)?  decode,TResult Function( AppError_Storage value)?  storage,TResult Function( AppError_Cache value)?  cache,TResult Function( AppError_NotFound value)?  notFound,TResult Function( AppError_Generic value)?  generic,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AppError_Io value)?  io,TResult Function( AppError_Format value)?  format,TResult Function( AppError_Decode value)?  decode,TResult Function( AppError_Storage value)?  storage,TResult Function( AppError_Cache value)?  cache,TResult Function( AppError_NotFound value)?  notFound,TResult Function( AppError_Generic value)?  generic,TResult Function( AppError_ProcessingError value)?  processingError,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case AppError_Io() when io != null:
@@ -96,7 +96,8 @@ return decode(_that);case AppError_Storage() when storage != null:
 return storage(_that);case AppError_Cache() when cache != null:
 return cache(_that);case AppError_NotFound() when notFound != null:
 return notFound(_that);case AppError_Generic() when generic != null:
-return generic(_that);case _:
+return generic(_that);case AppError_ProcessingError() when processingError != null:
+return processingError(_that);case _:
   return orElse();
 
 }
@@ -114,7 +115,7 @@ return generic(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AppError_Io value)  io,required TResult Function( AppError_Format value)  format,required TResult Function( AppError_Decode value)  decode,required TResult Function( AppError_Storage value)  storage,required TResult Function( AppError_Cache value)  cache,required TResult Function( AppError_NotFound value)  notFound,required TResult Function( AppError_Generic value)  generic,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AppError_Io value)  io,required TResult Function( AppError_Format value)  format,required TResult Function( AppError_Decode value)  decode,required TResult Function( AppError_Storage value)  storage,required TResult Function( AppError_Cache value)  cache,required TResult Function( AppError_NotFound value)  notFound,required TResult Function( AppError_Generic value)  generic,required TResult Function( AppError_ProcessingError value)  processingError,}){
 final _that = this;
 switch (_that) {
 case AppError_Io():
@@ -124,7 +125,8 @@ return decode(_that);case AppError_Storage():
 return storage(_that);case AppError_Cache():
 return cache(_that);case AppError_NotFound():
 return notFound(_that);case AppError_Generic():
-return generic(_that);}
+return generic(_that);case AppError_ProcessingError():
+return processingError(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -138,7 +140,7 @@ return generic(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AppError_Io value)?  io,TResult? Function( AppError_Format value)?  format,TResult? Function( AppError_Decode value)?  decode,TResult? Function( AppError_Storage value)?  storage,TResult? Function( AppError_Cache value)?  cache,TResult? Function( AppError_NotFound value)?  notFound,TResult? Function( AppError_Generic value)?  generic,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AppError_Io value)?  io,TResult? Function( AppError_Format value)?  format,TResult? Function( AppError_Decode value)?  decode,TResult? Function( AppError_Storage value)?  storage,TResult? Function( AppError_Cache value)?  cache,TResult? Function( AppError_NotFound value)?  notFound,TResult? Function( AppError_Generic value)?  generic,TResult? Function( AppError_ProcessingError value)?  processingError,}){
 final _that = this;
 switch (_that) {
 case AppError_Io() when io != null:
@@ -148,7 +150,8 @@ return decode(_that);case AppError_Storage() when storage != null:
 return storage(_that);case AppError_Cache() when cache != null:
 return cache(_that);case AppError_NotFound() when notFound != null:
 return notFound(_that);case AppError_Generic() when generic != null:
-return generic(_that);case _:
+return generic(_that);case AppError_ProcessingError() when processingError != null:
+return processingError(_that);case _:
   return null;
 
 }
@@ -165,7 +168,7 @@ return generic(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String field0)?  io,TResult Function( String field0)?  format,TResult Function( String field0)?  decode,TResult Function( String field0)?  storage,TResult Function( String field0)?  cache,TResult Function( String field0)?  notFound,TResult Function( String field0)?  generic,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String field0)?  io,TResult Function( String field0)?  format,TResult Function( String field0)?  decode,TResult Function( String field0)?  storage,TResult Function( String field0)?  cache,TResult Function( String field0)?  notFound,TResult Function( String field0)?  generic,TResult Function( String field0)?  processingError,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case AppError_Io() when io != null:
 return io(_that.field0);case AppError_Format() when format != null:
@@ -174,7 +177,8 @@ return decode(_that.field0);case AppError_Storage() when storage != null:
 return storage(_that.field0);case AppError_Cache() when cache != null:
 return cache(_that.field0);case AppError_NotFound() when notFound != null:
 return notFound(_that.field0);case AppError_Generic() when generic != null:
-return generic(_that.field0);case _:
+return generic(_that.field0);case AppError_ProcessingError() when processingError != null:
+return processingError(_that.field0);case _:
   return orElse();
 
 }
@@ -192,7 +196,7 @@ return generic(_that.field0);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String field0)  io,required TResult Function( String field0)  format,required TResult Function( String field0)  decode,required TResult Function( String field0)  storage,required TResult Function( String field0)  cache,required TResult Function( String field0)  notFound,required TResult Function( String field0)  generic,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String field0)  io,required TResult Function( String field0)  format,required TResult Function( String field0)  decode,required TResult Function( String field0)  storage,required TResult Function( String field0)  cache,required TResult Function( String field0)  notFound,required TResult Function( String field0)  generic,required TResult Function( String field0)  processingError,}) {final _that = this;
 switch (_that) {
 case AppError_Io():
 return io(_that.field0);case AppError_Format():
@@ -201,7 +205,8 @@ return decode(_that.field0);case AppError_Storage():
 return storage(_that.field0);case AppError_Cache():
 return cache(_that.field0);case AppError_NotFound():
 return notFound(_that.field0);case AppError_Generic():
-return generic(_that.field0);}
+return generic(_that.field0);case AppError_ProcessingError():
+return processingError(_that.field0);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -215,7 +220,7 @@ return generic(_that.field0);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String field0)?  io,TResult? Function( String field0)?  format,TResult? Function( String field0)?  decode,TResult? Function( String field0)?  storage,TResult? Function( String field0)?  cache,TResult? Function( String field0)?  notFound,TResult? Function( String field0)?  generic,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String field0)?  io,TResult? Function( String field0)?  format,TResult? Function( String field0)?  decode,TResult? Function( String field0)?  storage,TResult? Function( String field0)?  cache,TResult? Function( String field0)?  notFound,TResult? Function( String field0)?  generic,TResult? Function( String field0)?  processingError,}) {final _that = this;
 switch (_that) {
 case AppError_Io() when io != null:
 return io(_that.field0);case AppError_Format() when format != null:
@@ -224,7 +229,8 @@ return decode(_that.field0);case AppError_Storage() when storage != null:
 return storage(_that.field0);case AppError_Cache() when cache != null:
 return cache(_that.field0);case AppError_NotFound() when notFound != null:
 return notFound(_that.field0);case AppError_Generic() when generic != null:
-return generic(_that.field0);case _:
+return generic(_that.field0);case AppError_ProcessingError() when processingError != null:
+return processingError(_that.field0);case _:
   return null;
 
 }
@@ -686,6 +692,72 @@ class _$AppError_GenericCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
   return _then(AppError_Generic(
+null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class AppError_ProcessingError extends AppError {
+  const AppError_ProcessingError(this.field0): super._();
+  
+
+@override final  String field0;
+
+/// Create a copy of AppError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AppError_ProcessingErrorCopyWith<AppError_ProcessingError> get copyWith => _$AppError_ProcessingErrorCopyWithImpl<AppError_ProcessingError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppError_ProcessingError&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'AppError.processingError(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AppError_ProcessingErrorCopyWith<$Res> implements $AppErrorCopyWith<$Res> {
+  factory $AppError_ProcessingErrorCopyWith(AppError_ProcessingError value, $Res Function(AppError_ProcessingError) _then) = _$AppError_ProcessingErrorCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$AppError_ProcessingErrorCopyWithImpl<$Res>
+    implements $AppError_ProcessingErrorCopyWith<$Res> {
+  _$AppError_ProcessingErrorCopyWithImpl(this._self, this._then);
+
+  final AppError_ProcessingError _self;
+  final $Res Function(AppError_ProcessingError) _then;
+
+/// Create a copy of AppError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(AppError_ProcessingError(
 null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
 as String,
   ));

@@ -21,7 +21,7 @@ abstract class KvCachedChartStorage
   set config(Config config);
 
   @override
-  Chart get_({required String key});
+  Chart get_({required String key, required DataType dataType});
 
   @override
   List<ChartWIthKey> getAllCache();

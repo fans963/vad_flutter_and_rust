@@ -22,6 +22,9 @@ pub enum AppError {
 
     #[error("Generic error: {0}")]
     Generic(String),
+
+    #[error("Processing error: {0}")]
+    ProcessingError(String),
 }
 
 impl From<std::io::Error> for AppError {

@@ -36,7 +36,7 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-const Color primarySeedColor = Color(0xFF4B77C2);
+const Color primarySeedColor = Colors.blue;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -1,5 +1,6 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
 
 class PickFileButton extends StatelessWidget {
@@ -26,15 +27,12 @@ class PickFileButton extends StatelessWidget {
               'Picked file: ${file.name}, size: ${await file.length()} bytes',
             );
             await audioProcessorEngine.addFile(file.path, bytes);
-            // ref.read(chartParameterProvider.notifier).add((
-            //   filePath: file.path,
-            //   visible: true,
-            //   offset: (0.0, 0.0),
-            //   index: (BigInt.zero, BigInt.from(100000)),
-            //   dataType: DataType.audio,
-            //   targetWidth: 1000,
-            //   color: Colors.black,
-            // ));
+            audioProcessorEngine.engine().then((engine) async {
+              await engine.addChart(
+                filePath: file.path,
+                dataType: DataType.spectrum,
+              );
+            });
           }
         }
       },
