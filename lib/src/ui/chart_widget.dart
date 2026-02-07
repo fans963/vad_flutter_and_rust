@@ -126,6 +126,9 @@ class _ChartWidgetState extends State<ChartWidget> {
           // padding: const EdgeInsets.all(10.0),
           child: RepaintBoundary(
             child: SfCartesianChart(
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerLowest,
               legend: Legend(
                 isVisible: true,
                 isResponsive: true,
@@ -165,6 +168,8 @@ class _ChartWidgetState extends State<ChartWidget> {
                   });
                 }
               },
+              onLegendTapped: (legendTapArgs) =>
+                  debugPrint("Legend tapped: ${legendTapArgs.series.name}"),
               series: seriesList,
             ),
           ),
@@ -209,13 +214,6 @@ class _ChartWidgetState extends State<ChartWidget> {
                   color: color,
                   width: 0.4,
                   animationDuration: 0,
-                  sortingOrder: SortingOrder.ascending,
-                  sortFieldValueMapper: (Point point, _) => point.x,
-                  selectionBehavior: SelectionBehavior(
-                    enable: true,
-                    selectedColor: Colors.yellow,
-                    unselectedColor: color.withOpacity(0.5),
-                  ),
                 ),
               );
 

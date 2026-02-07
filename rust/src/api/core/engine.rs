@@ -34,6 +34,7 @@ pub struct AudioProcessorEngine {
     communicator: Box<dyn Communicator + Send + Sync>,
     down_sample_points_num: usize,
     index_range: (f32, f32),
+    selected_audio: Option<String>,
 }
 
 impl AudioProcessorEngine {
@@ -54,6 +55,7 @@ impl AudioProcessorEngine {
             communicator,
             down_sample_points_num: 500,
             index_range: (0.0, 0.0),
+            selected_audio: None,
         }
     }
 
@@ -156,6 +158,10 @@ impl AudioProcessorEngine {
         data_type: DataType,
     ) -> Result<(), AppError> {
         self.cache.remove(file_path, data_type)
+    }
+
+    pub async fn set_selected_audio(&mut self, file_path: Option<String>) {
+        self.selected_audio = file_path;
     }
 }
 
