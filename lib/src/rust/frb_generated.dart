@@ -120,7 +120,7 @@ abstract class RustLibApi extends BaseApi {
     required DataType dataType,
   });
 
-  AudioProcessorEngine crateApiCoreEngineAudioProcessorEngineNew({
+  Future<AudioProcessorEngine> crateApiCoreEngineAudioProcessorEngineNew({
     required Config config,
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
@@ -161,7 +161,7 @@ abstract class RustLibApi extends BaseApi {
     String? filePath,
   });
 
-  Chart crateApiTypesAudioAudioAudioToChart({required Audio that});
+  Future<Chart> crateApiTypesAudioAudioAudioToChart({required Audio that});
 
   AudioData crateApiTypesAudioAudioAutoAccessorGetData({required Audio that});
 
@@ -213,7 +213,7 @@ abstract class RustLibApi extends BaseApi {
     required ArcVecPoint points,
   });
 
-  Chart crateApiTypesChartChartGetRange({
+  Future<Chart> crateApiTypesChartChartGetRange({
     required Chart that,
     required double startX,
     required double endX,
@@ -233,25 +233,25 @@ abstract class RustLibApi extends BaseApi {
     required String filePath,
   });
 
-  Audio crateApiStorageKvAudioStorageKvAudioStorageLoad({
+  Future<Audio> crateApiStorageKvAudioStorageKvAudioStorageLoad({
     required KvAudioStorage that,
     required String key,
   });
 
-  KvAudioStorage crateApiStorageKvAudioStorageKvAudioStorageNew();
+  Future<KvAudioStorage> crateApiStorageKvAudioStorageKvAudioStorageNew();
 
-  void crateApiStorageKvAudioStorageKvAudioStorageRemove({
+  Future<void> crateApiStorageKvAudioStorageKvAudioStorageRemove({
     required KvAudioStorage that,
     required String key,
   });
 
-  void crateApiStorageKvAudioStorageKvAudioStorageSave({
+  Future<void> crateApiStorageKvAudioStorageKvAudioStorageSave({
     required KvAudioStorage that,
     required String key,
     required Audio storageUnit,
   });
 
-  void crateApiStorageKvCachedChartStorageKvCachedChartStorageAdd({
+  Future<void> crateApiStorageKvCachedChartStorageKvCachedChartStorageAdd({
     required KvCachedChartStorage that,
     required String key,
     required Chart chart,
@@ -268,27 +268,27 @@ abstract class RustLibApi extends BaseApi {
     required Config config,
   });
 
-  Chart crateApiStorageKvCachedChartStorageKvCachedChartStorageGet({
+  Future<Chart> crateApiStorageKvCachedChartStorageKvCachedChartStorageGet({
     required KvCachedChartStorage that,
     required String key,
     required DataType dataType,
   });
 
-  List<ChartWIthKey>
+  Future<List<ChartWIthKey>>
   crateApiStorageKvCachedChartStorageKvCachedChartStorageGetAllCache({
     required KvCachedChartStorage that,
   });
 
-  KvCachedChartStorage
+  Future<KvCachedChartStorage>
   crateApiStorageKvCachedChartStorageKvCachedChartStorageNew();
 
-  void crateApiStorageKvCachedChartStorageKvCachedChartStorageRemove({
+  Future<void> crateApiStorageKvCachedChartStorageKvCachedChartStorageRemove({
     required KvCachedChartStorage that,
     required String key,
     required DataType dataType,
   });
 
-  Config crateApiTypesConfigConfigDefault();
+  Future<Config> crateApiTypesConfigConfigDefault();
 
   Stream<ChartEvent> crateApiEventsCommunicatorEventsCreateChartEventStream();
 
@@ -296,74 +296,77 @@ abstract class RustLibApi extends BaseApi {
     required Config config,
   });
 
-  void crateApiEventsCommunicatorEventsEmitChartEvent({
+  Future<void> crateApiEventsCommunicatorEventsEmitChartEvent({
     required ChartEvent event,
   });
 
-  Chart crateApiTransformEnergyEnergyCalculatorTransform({
+  Future<Chart> crateApiTransformEnergyEnergyCalculatorTransform({
     required EnergyCalculator that,
     required Audio data,
     required Config config,
   });
 
-  Chart crateApiSamplingEqualStepEqualStepDownSample({
+  Future<Chart> crateApiSamplingEqualStepEqualStepDownSample({
     required EqualStep that,
     required Chart chart,
     required BigInt targetPointsNum,
   });
 
-  Chart crateApiTransformFftFftTransformTransform({
+  Future<Chart> crateApiTransformFftFftTransformTransform({
     required FftTransform that,
     required Audio data,
     required Config config,
   });
 
-  Chart crateApiSamplingMinmaxMinmaxDownSample({
+  Future<Chart> crateApiSamplingMinmaxMinmaxDownSample({
     required Minmax that,
     required Chart chart,
     required BigInt targetPointsNum,
   });
 
-  String crateApiUtilFormatGetterSimpleFormatGetterGetFormat({
+  Future<String> crateApiUtilFormatGetterSimpleFormatGetterGetFormat({
     required SimpleFormatGetter that,
     required String filePath,
   });
 
-  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChart({
+  Future<void>
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChart({
     required StreamCommunicator that,
     required String key,
     required Chart chart,
   });
 
-  StreamCommunicator
+  Future<StreamCommunicator>
   crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorNew();
 
-  void
+  Future<void>
   crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveAllCharts({
     required StreamCommunicator that,
   });
 
-  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChart({
+  Future<void>
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChart({
     required StreamCommunicator that,
     required String key,
     required DataType dataType,
   });
 
-  void
+  Future<void>
   crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllCharts({
     required StreamCommunicator that,
     required List<ChartWIthKey> charts,
   });
 
-  Audio crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode({
+  Future<Audio> crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode({
     required SymphoniaDecoder that,
     required String format,
     required List<int> data,
   });
 
-  SymphoniaDecoder crateApiDecoderSymphoniaDecoderSymphoniaDecoderNew();
+  Future<SymphoniaDecoder> crateApiDecoderSymphoniaDecoderSymphoniaDecoderNew();
 
-  Chart crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform({
+  Future<Chart>
+  crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform({
     required ZeroCrossingRateCalculator that,
     required Audio data,
     required Config config,
@@ -659,7 +662,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  AudioProcessorEngine crateApiCoreEngineAudioProcessorEngineNew({
+  Future<AudioProcessorEngine> crateApiCoreEngineAudioProcessorEngineNew({
     required Config config,
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
@@ -667,9 +670,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required BoxDownSample downSampler,
     required BoxCommunicator communicator,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_config(config, serializer);
           sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynAudioDecoderSendSync(
@@ -692,7 +695,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             communicator,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -960,16 +968,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Chart crateApiTypesAudioAudioAudioToChart({required Audio that}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<Chart> crateApiTypesAudioAudioAudioToChart({required Audio that}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudio(
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 12,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1386,14 +1399,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Chart crateApiTypesChartChartGetRange({
+  Future<Chart> crateApiTypesChartChartGetRange({
     required Chart that,
     required double startX,
     required double endX,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
             that,
@@ -1401,7 +1414,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_f_32(startX, serializer);
           sse_encode_f_32(endX, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 25,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1550,20 +1568,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Audio crateApiStorageKvAudioStorageKvAudioStorageLoad({
+  Future<Audio> crateApiStorageKvAudioStorageKvAudioStorageLoad({
     required KvAudioStorage that,
     required String key,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvAudioStorage(
             that,
             serializer,
           );
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 30,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1584,12 +1607,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  KvAudioStorage crateApiStorageKvAudioStorageKvAudioStorageNew() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<KvAudioStorage> crateApiStorageKvAudioStorageKvAudioStorageNew() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 31,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1607,20 +1635,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "KvAudioStorage_new", argNames: []);
 
   @override
-  void crateApiStorageKvAudioStorageKvAudioStorageRemove({
+  Future<void> crateApiStorageKvAudioStorageKvAudioStorageRemove({
     required KvAudioStorage that,
     required String key,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvAudioStorage(
             that,
             serializer,
           );
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 32,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1641,14 +1674,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiStorageKvAudioStorageKvAudioStorageSave({
+  Future<void> crateApiStorageKvAudioStorageKvAudioStorageSave({
     required KvAudioStorage that,
     required String key,
     required Audio storageUnit,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvAudioStorage(
             that,
@@ -1659,7 +1692,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             storageUnit,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 33,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1679,14 +1717,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiStorageKvCachedChartStorageKvCachedChartStorageAdd({
+  Future<void> crateApiStorageKvCachedChartStorageKvCachedChartStorageAdd({
     required KvCachedChartStorage that,
     required String key,
     required Chart chart,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvCachedChartStorage(
             that,
@@ -1697,7 +1735,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             chart,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 34,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1789,14 +1832,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Chart crateApiStorageKvCachedChartStorageKvCachedChartStorageGet({
+  Future<Chart> crateApiStorageKvCachedChartStorageKvCachedChartStorageGet({
     required KvCachedChartStorage that,
     required String key,
     required DataType dataType,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvCachedChartStorage(
             that,
@@ -1804,7 +1847,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(key, serializer);
           sse_encode_data_type(dataType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 37,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1827,19 +1875,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<ChartWIthKey>
+  Future<List<ChartWIthKey>>
   crateApiStorageKvCachedChartStorageKvCachedChartStorageGetAllCache({
     required KvCachedChartStorage that,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvCachedChartStorage(
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 38,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1862,13 +1915,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  KvCachedChartStorage
+  Future<KvCachedChartStorage>
   crateApiStorageKvCachedChartStorageKvCachedChartStorageNew() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 39,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1888,14 +1946,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "KvCachedChartStorage_new", argNames: []);
 
   @override
-  void crateApiStorageKvCachedChartStorageKvCachedChartStorageRemove({
+  Future<void> crateApiStorageKvCachedChartStorageKvCachedChartStorageRemove({
     required KvCachedChartStorage that,
     required String key,
     required DataType dataType,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvCachedChartStorage(
             that,
@@ -1903,7 +1961,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(key, serializer);
           sse_encode_data_type(dataType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 40,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1925,12 +1988,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Config crateApiTypesConfigConfigDefault() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<Config> crateApiTypesConfigConfigDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 56,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_config,
@@ -1949,21 +2017,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Stream<ChartEvent> crateApiEventsCommunicatorEventsCreateChartEventStream() {
     final sink = RustStreamSink<ChartEvent>();
-    handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_StreamSink_chart_event_Sse(sink, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: null,
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_chart_event_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 57,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: null,
+          ),
+          constMeta:
+              kCrateApiEventsCommunicatorEventsCreateChartEventStreamConstMeta,
+          argValues: [sink],
+          apiImpl: this,
         ),
-        constMeta:
-            kCrateApiEventsCommunicatorEventsCreateChartEventStreamConstMeta,
-        argValues: [sink],
-        apiImpl: this,
       ),
     );
     return sink.stream;
@@ -2011,15 +2086,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiEventsCommunicatorEventsEmitChartEvent({
+  Future<void> crateApiEventsCommunicatorEventsEmitChartEvent({
     required ChartEvent event,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_chart_event(event, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 59,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2036,14 +2116,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "emit_chart_event", argNames: ["event"]);
 
   @override
-  Chart crateApiTransformEnergyEnergyCalculatorTransform({
+  Future<Chart> crateApiTransformEnergyEnergyCalculatorTransform({
     required EnergyCalculator that,
     required Audio data,
     required Config config,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_energy_calculator(that, serializer);
           sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudio(
@@ -2051,7 +2131,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_box_autoadd_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 60,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2073,14 +2158,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Chart crateApiSamplingEqualStepEqualStepDownSample({
+  Future<Chart> crateApiSamplingEqualStepEqualStepDownSample({
     required EqualStep that,
     required Chart chart,
     required BigInt targetPointsNum,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_equal_step(that, serializer);
           sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
@@ -2088,7 +2173,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_usize(targetPointsNum, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 61,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2109,14 +2199,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Chart crateApiTransformFftFftTransformTransform({
+  Future<Chart> crateApiTransformFftFftTransformTransform({
     required FftTransform that,
     required Audio data,
     required Config config,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_fft_transform(that, serializer);
           sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudio(
@@ -2124,7 +2214,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_box_autoadd_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 62,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2145,14 +2240,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Chart crateApiSamplingMinmaxMinmaxDownSample({
+  Future<Chart> crateApiSamplingMinmaxMinmaxDownSample({
     required Minmax that,
     required Chart chart,
     required BigInt targetPointsNum,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_minmax(that, serializer);
           sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
@@ -2160,7 +2255,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_usize(targetPointsNum, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 63,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2181,17 +2281,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  String crateApiUtilFormatGetterSimpleFormatGetterGetFormat({
+  Future<String> crateApiUtilFormatGetterSimpleFormatGetterGetFormat({
     required SimpleFormatGetter that,
     required String filePath,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_simple_format_getter(that, serializer);
           sse_encode_String(filePath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 64,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -2213,14 +2318,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChart({
+  Future<void>
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChart({
     required StreamCommunicator that,
     required String key,
     required Chart chart,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_stream_communicator(that, serializer);
           sse_encode_String(key, serializer);
@@ -2228,7 +2334,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             chart,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 65,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2250,13 +2361,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  StreamCommunicator
+  Future<StreamCommunicator>
   crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorNew() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 66,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_stream_communicator,
@@ -2275,16 +2391,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "stream_communicator_new", argNames: []);
 
   @override
-  void
+  Future<void>
   crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveAllCharts({
     required StreamCommunicator that,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_stream_communicator(that, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 67,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2306,19 +2427,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChart({
+  Future<void>
+  crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChart({
     required StreamCommunicator that,
     required String key,
     required DataType dataType,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_stream_communicator(that, serializer);
           sse_encode_String(key, serializer);
           sse_encode_data_type(dataType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 68,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2340,21 +2467,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void
+  Future<void>
   crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllCharts({
     required StreamCommunicator that,
     required List<ChartWIthKey> charts,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_stream_communicator(that, serializer);
           sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChartWIthKey(
             charts,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 69,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2376,19 +2508,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Audio crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode({
+  Future<Audio> crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode({
     required SymphoniaDecoder that,
     required String format,
     required List<int> data,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_symphonia_decoder(that, serializer);
           sse_encode_String(format, serializer);
           sse_encode_list_prim_u_8_loose(data, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 70,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2411,12 +2548,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  SymphoniaDecoder crateApiDecoderSymphoniaDecoderSymphoniaDecoderNew() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<SymphoniaDecoder>
+  crateApiDecoderSymphoniaDecoderSymphoniaDecoderNew() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 71,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_symphonia_decoder,
@@ -2434,14 +2577,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "symphonia_decoder_new", argNames: []);
 
   @override
-  Chart crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform({
+  Future<Chart>
+  crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform({
     required ZeroCrossingRateCalculator that,
     required Audio data,
     required Config config,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_zero_crossing_rate_calculator(
             that,
@@ -2452,7 +2596,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_box_autoadd_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 72)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 72,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -3355,7 +3504,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     final arr = raw as List<dynamic>;
     if (arr.isNotEmpty)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return StreamCommunicator.raw();
+    return StreamCommunicator();
   }
 
   @protected
@@ -3364,7 +3513,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     final arr = raw as List<dynamic>;
     if (arr.isNotEmpty)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return SymphoniaDecoder.raw();
+    return SymphoniaDecoder();
   }
 
   @protected
@@ -4290,13 +4439,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return StreamCommunicator.raw();
+    return StreamCommunicator();
   }
 
   @protected
   SymphoniaDecoder sse_decode_symphonia_decoder(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SymphoniaDecoder.raw();
+    return SymphoniaDecoder();
   }
 
   @protected
@@ -5432,7 +5581,7 @@ class AudioImpl extends RustOpaque implements Audio {
         RustLib.instance.api.rust_arc_decrement_strong_count_AudioPtr,
   );
 
-  Chart audioToChart() =>
+  Future<Chart> audioToChart() =>
       RustLib.instance.api.crateApiTypesAudioAudioAudioToChart(that: this);
 
   AudioData get data => RustLib.instance.api
@@ -5678,10 +5827,12 @@ class ChartImpl extends RustOpaque implements Chart {
   set points(ArcVecPoint points) => RustLib.instance.api
       .crateApiTypesChartChartAutoAccessorSetPoints(that: this, points: points);
 
-  Chart getRange({required double startX, required double endX}) => RustLib
-      .instance
-      .api
-      .crateApiTypesChartChartGetRange(that: this, startX: startX, endX: endX);
+  Future<Chart> getRange({required double startX, required double endX}) =>
+      RustLib.instance.api.crateApiTypesChartChartGetRange(
+        that: this,
+        startX: startX,
+        endX: endX,
+      );
 }
 
 @sealed
@@ -5773,13 +5924,13 @@ class KvAudioStorageImpl extends RustOpaque implements KvAudioStorage {
         RustLib.instance.api.rust_arc_decrement_strong_count_KvAudioStoragePtr,
   );
 
-  Audio load({required String key}) => RustLib.instance.api
+  Future<Audio> load({required String key}) => RustLib.instance.api
       .crateApiStorageKvAudioStorageKvAudioStorageLoad(that: this, key: key);
 
-  void remove({required String key}) => RustLib.instance.api
+  Future<void> remove({required String key}) => RustLib.instance.api
       .crateApiStorageKvAudioStorageKvAudioStorageRemove(that: this, key: key);
 
-  void save({required String key, required Audio storageUnit}) =>
+  Future<void> save({required String key, required Audio storageUnit}) =>
       RustLib.instance.api.crateApiStorageKvAudioStorageKvAudioStorageSave(
         that: this,
         key: key,
@@ -5815,7 +5966,9 @@ class KvCachedChartStorageImpl extends RustOpaque
         .rust_arc_decrement_strong_count_KvCachedChartStoragePtr,
   );
 
-  void add({required String key, required Chart chart}) => RustLib.instance.api
+  Future<void> add({required String key, required Chart chart}) => RustLib
+      .instance
+      .api
       .crateApiStorageKvCachedChartStorageKvCachedChartStorageAdd(
         that: this,
         key: key,
@@ -5833,26 +5986,24 @@ class KvCachedChartStorageImpl extends RustOpaque
         config: config,
       );
 
-  Chart get_({required String key, required DataType dataType}) => RustLib
-      .instance
-      .api
-      .crateApiStorageKvCachedChartStorageKvCachedChartStorageGet(
-        that: this,
-        key: key,
-        dataType: dataType,
-      );
+  Future<Chart> get_({required String key, required DataType dataType}) =>
+      RustLib.instance.api
+          .crateApiStorageKvCachedChartStorageKvCachedChartStorageGet(
+            that: this,
+            key: key,
+            dataType: dataType,
+          );
 
-  List<ChartWIthKey> getAllCache() => RustLib.instance.api
+  Future<List<ChartWIthKey>> getAllCache() => RustLib.instance.api
       .crateApiStorageKvCachedChartStorageKvCachedChartStorageGetAllCache(
         that: this,
       );
 
-  void remove({required String key, required DataType dataType}) => RustLib
-      .instance
-      .api
-      .crateApiStorageKvCachedChartStorageKvCachedChartStorageRemove(
-        that: this,
-        key: key,
-        dataType: dataType,
-      );
+  Future<void> remove({required String key, required DataType dataType}) =>
+      RustLib.instance.api
+          .crateApiStorageKvCachedChartStorageKvCachedChartStorageRemove(
+            that: this,
+            key: key,
+            dataType: dataType,
+          );
 }

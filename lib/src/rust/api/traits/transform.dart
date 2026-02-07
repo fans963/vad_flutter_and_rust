@@ -11,5 +11,5 @@ import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 abstract class SignalTransform {
-  Chart transform({required Audio data, required Config config});
+  Future<Chart> transform({required Audio data, required Config config});
 }

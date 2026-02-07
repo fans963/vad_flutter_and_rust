@@ -13,7 +13,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 class FftTransform {
   const FftTransform();
 
-  Chart transform({required Audio data, required Config config}) =>
+  Future<Chart> transform({required Audio data, required Config config}) =>
       RustLib.instance.api.crateApiTransformFftFftTransformTransform(
         that: this,
         data: data,

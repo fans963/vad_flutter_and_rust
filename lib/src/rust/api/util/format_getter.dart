@@ -8,13 +8,13 @@ import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 abstract class FormatGetter {
-  String getFormat({required String filePath});
+  Future<String> getFormat({required String filePath});
 }
 
 class SimpleFormatGetter {
   const SimpleFormatGetter();
 
-  String getFormat({required String filePath}) =>
+  Future<String> getFormat({required String filePath}) =>
       RustLib.instance.api.crateApiUtilFormatGetterSimpleFormatGetterGetFormat(
         that: this,
         filePath: filePath,

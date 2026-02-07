@@ -9,5 +9,5 @@ import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 abstract class AudioDecoder {
-  Audio decode({required String format, required List<int> data});
+  Future<Audio> decode({required String format, required List<int> data});
 }

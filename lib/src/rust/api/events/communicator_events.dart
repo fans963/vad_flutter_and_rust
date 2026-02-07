@@ -11,5 +11,5 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Stream<ChartEvent> createChartEventStream() => RustLib.instance.api
     .crateApiEventsCommunicatorEventsCreateChartEventStream();
 
-void emitChartEvent({required ChartEvent event}) => RustLib.instance.api
+Future<void> emitChartEvent({required ChartEvent event}) => RustLib.instance.api
     .crateApiEventsCommunicatorEventsEmitChartEvent(event: event);

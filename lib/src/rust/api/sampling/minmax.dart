@@ -10,12 +10,14 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 class Minmax {
   const Minmax();
 
-  Chart downSample({required Chart chart, required BigInt targetPointsNum}) =>
-      RustLib.instance.api.crateApiSamplingMinmaxMinmaxDownSample(
-        that: this,
-        chart: chart,
-        targetPointsNum: targetPointsNum,
-      );
+  Future<Chart> downSample({
+    required Chart chart,
+    required BigInt targetPointsNum,
+  }) => RustLib.instance.api.crateApiSamplingMinmaxMinmaxDownSample(
+    that: this,
+    chart: chart,
+    targetPointsNum: targetPointsNum,
+  );
 
   @override
   int get hashCode => 0;

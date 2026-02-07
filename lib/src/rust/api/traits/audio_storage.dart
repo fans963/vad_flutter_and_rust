@@ -9,9 +9,9 @@ import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 abstract class AudioStorage {
-  Audio load({required String key});
+  Future<Audio> load({required String key});
 
-  void remove({required String key});
+  Future<void> remove({required String key});
 
-  void save({required String key, required Audio storageUnit});
+  Future<void> save({required String key, required Audio storageUnit});
 }

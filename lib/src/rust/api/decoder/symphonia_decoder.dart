@@ -9,18 +9,18 @@ import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class SymphoniaDecoder {
-  const SymphoniaDecoder.raw();
+  const SymphoniaDecoder();
 
-  Audio decode({required String format, required List<int> data}) => RustLib
-      .instance
-      .api
-      .crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode(
-        that: this,
-        format: format,
-        data: data,
-      );
+  Future<Audio> decode({required String format, required List<int> data}) =>
+      RustLib.instance.api
+          .crateApiDecoderSymphoniaDecoderSymphoniaDecoderDecode(
+            that: this,
+            format: format,
+            data: data,
+          );
 
-  factory SymphoniaDecoder() =>
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<SymphoniaDecoder> newInstance() =>
       RustLib.instance.api.crateApiDecoderSymphoniaDecoderSymphoniaDecoderNew();
 
   @override

@@ -19,7 +19,7 @@ abstract class Chart implements RustOpaqueInterface {
 
   set points(ArcVecPoint points);
 
-  Chart getRange({required double startX, required double endX});
+  Future<Chart> getRange({required double startX, required double endX});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartWIthKey>>

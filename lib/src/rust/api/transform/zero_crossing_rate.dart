@@ -13,14 +13,13 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 class ZeroCrossingRateCalculator {
   const ZeroCrossingRateCalculator();
 
-  Chart transform({required Audio data, required Config config}) => RustLib
-      .instance
-      .api
-      .crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform(
-        that: this,
-        data: data,
-        config: config,
-      );
+  Future<Chart> transform({required Audio data, required Config config}) =>
+      RustLib.instance.api
+          .crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform(
+            that: this,
+            data: data,
+            config: config,
+          );
 
   @override
   int get hashCode => 0;

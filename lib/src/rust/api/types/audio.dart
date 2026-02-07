@@ -12,7 +12,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Audio>>
 abstract class Audio implements RustOpaqueInterface {
-  Chart audioToChart();
+  Future<Chart> audioToChart();
 
   AudioData get data;
 

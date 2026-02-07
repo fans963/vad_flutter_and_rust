@@ -8,11 +8,11 @@ import '../types/chart.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 abstract class Communicator {
-  void addChart({required String key, required Chart chart});
+  Future<void> addChart({required String key, required Chart chart});
 
-  void removeAllCharts();
+  Future<void> removeAllCharts();
 
-  void removeChart({required String key, required DataType dataType});
+  Future<void> removeChart({required String key, required DataType dataType});
 
-  void updateAllCharts({required List<ChartWIthKey> charts});
+  Future<void> updateAllCharts({required List<ChartWIthKey> charts});
 }

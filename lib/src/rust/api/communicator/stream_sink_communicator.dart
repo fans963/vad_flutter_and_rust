@@ -8,9 +8,9 @@ import '../types/chart.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class StreamCommunicator {
-  const StreamCommunicator.raw();
+  const StreamCommunicator();
 
-  void addChart({required String key, required Chart chart}) => RustLib
+  Future<void> addChart({required String key, required Chart chart}) => RustLib
       .instance
       .api
       .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorAddChart(
@@ -19,24 +19,26 @@ class StreamCommunicator {
         chart: chart,
       );
 
-  factory StreamCommunicator() => RustLib.instance.api
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<StreamCommunicator> newInstance() => RustLib.instance.api
       .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorNew();
 
-  void removeAllCharts() => RustLib.instance.api
+  Future<void> removeAllCharts() => RustLib.instance.api
       .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveAllCharts(
         that: this,
       );
 
-  void removeChart({required String key, required DataType dataType}) => RustLib
-      .instance
-      .api
+  Future<void> removeChart({
+    required String key,
+    required DataType dataType,
+  }) => RustLib.instance.api
       .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorRemoveChart(
         that: this,
         key: key,
         dataType: dataType,
       );
 
-  void updateAllCharts({required List<ChartWIthKey> charts}) => RustLib
+  Future<void> updateAllCharts({required List<ChartWIthKey> charts}) => RustLib
       .instance
       .api
       .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllCharts(

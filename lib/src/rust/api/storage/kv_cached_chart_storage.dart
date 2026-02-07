@@ -14,21 +14,22 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 abstract class KvCachedChartStorage
     implements RustOpaqueInterface, CachedChartStorage {
   @override
-  void add({required String key, required Chart chart});
+  Future<void> add({required String key, required Chart chart});
 
   Config get config;
 
   set config(Config config);
 
   @override
-  Chart get_({required String key, required DataType dataType});
+  Future<Chart> get_({required String key, required DataType dataType});
 
   @override
-  List<ChartWIthKey> getAllCache();
+  Future<List<ChartWIthKey>> getAllCache();
 
-  factory KvCachedChartStorage() => RustLib.instance.api
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<KvCachedChartStorage> newInstance() => RustLib.instance.api
       .crateApiStorageKvCachedChartStorageKvCachedChartStorageNew();
 
   @override
-  void remove({required String key, required DataType dataType});
+  Future<void> remove({required String key, required DataType dataType});
 }

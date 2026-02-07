@@ -13,7 +13,7 @@ class Config {
 
   const Config({required this.frameSize});
 
-  static Config default_() =>
+  static Future<Config> default_() =>
       RustLib.instance.api.crateApiTypesConfigConfigDefault();
 
   @override

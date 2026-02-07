@@ -20,7 +20,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<void> addChart({required String filePath, required DataType dataType});
 
-  factory AudioProcessorEngine({
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<AudioProcessorEngine> newInstance({
     required Config config,
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,

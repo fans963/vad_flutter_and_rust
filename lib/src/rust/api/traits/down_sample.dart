@@ -8,5 +8,8 @@ import '../types/chart.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 abstract class DownSample {
-  Chart downSample({required Chart chart, required BigInt targetPointsNum});
+  Future<Chart> downSample({
+    required Chart chart,
+    required BigInt targetPointsNum,
+  });
 }

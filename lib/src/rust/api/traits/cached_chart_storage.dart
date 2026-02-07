@@ -9,11 +9,11 @@ import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 abstract class CachedChartStorage {
-  void add({required String key, required Chart chart});
+  Future<void> add({required String key, required Chart chart});
 
-  Chart get_({required String key, required DataType dataType});
+  Future<Chart> get_({required String key, required DataType dataType});
 
-  List<ChartWIthKey> getAllCache();
+  Future<List<ChartWIthKey>> getAllCache();
 
-  void remove({required String key, required DataType dataType});
+  Future<void> remove({required String key, required DataType dataType});
 }
