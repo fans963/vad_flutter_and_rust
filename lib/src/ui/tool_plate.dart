@@ -18,7 +18,9 @@ class ToolPlate extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Watch((context) {
-      return AnimatedContainer(
+      return Container(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
         height: toolPlateHeightSignal.value,
         decoration: BoxDecoration(
@@ -59,7 +61,9 @@ class ToolPlate extends StatelessWidget {
             ),
           ],
         ),
+        ),
       );
+     
     });
   }
 }
