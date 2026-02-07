@@ -17,7 +17,9 @@ import 'api/traits/cached_chart_storage.dart';
 import 'api/traits/communicator.dart';
 import 'api/traits/down_sample.dart';
 import 'api/traits/transform.dart';
+import 'api/transform/energy.dart';
 import 'api/transform/fft.dart';
+import 'api/transform/zero_crossing_rate.dart';
 import 'api/types/audio.dart';
 import 'api/types/chart.dart';
 import 'api/types/config.dart';
@@ -429,6 +431,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Config dco_decode_box_autoadd_config(dynamic raw);
 
   @protected
+  EnergyCalculator dco_decode_box_autoadd_energy_calculator(dynamic raw);
+
+  @protected
   EqualStep dco_decode_box_autoadd_equal_step(dynamic raw);
 
   @protected
@@ -447,6 +452,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SymphoniaDecoder dco_decode_box_autoadd_symphonia_decoder(dynamic raw);
 
   @protected
+  ZeroCrossingRateCalculator
+  dco_decode_box_autoadd_zero_crossing_rate_calculator(dynamic raw);
+
+  @protected
   ChartEvent dco_decode_chart_event(dynamic raw);
 
   @protected
@@ -457,6 +466,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DataType dco_decode_data_type(dynamic raw);
+
+  @protected
+  EnergyCalculator dco_decode_energy_calculator(dynamic raw);
 
   @protected
   EqualStep dco_decode_equal_step(dynamic raw);
@@ -514,6 +526,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt dco_decode_usize(dynamic raw);
+
+  @protected
+  ZeroCrossingRateCalculator dco_decode_zero_crossing_rate_calculator(
+    dynamic raw,
+  );
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
@@ -826,6 +843,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Config sse_decode_box_autoadd_config(SseDeserializer deserializer);
 
   @protected
+  EnergyCalculator sse_decode_box_autoadd_energy_calculator(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   EqualStep sse_decode_box_autoadd_equal_step(SseDeserializer deserializer);
 
   @protected
@@ -852,6 +874,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ZeroCrossingRateCalculator
+  sse_decode_box_autoadd_zero_crossing_rate_calculator(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ChartEvent sse_decode_chart_event(SseDeserializer deserializer);
 
   @protected
@@ -862,6 +890,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DataType sse_decode_data_type(SseDeserializer deserializer);
+
+  @protected
+  EnergyCalculator sse_decode_energy_calculator(SseDeserializer deserializer);
 
   @protected
   EqualStep sse_decode_equal_step(SseDeserializer deserializer);
@@ -925,6 +956,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
+
+  @protected
+  ZeroCrossingRateCalculator sse_decode_zero_crossing_rate_calculator(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
@@ -1295,6 +1331,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_config(Config self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_energy_calculator(
+    EnergyCalculator self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_equal_step(
     EqualStep self,
     SseSerializer serializer,
@@ -1328,6 +1370,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_zero_crossing_rate_calculator(
+    ZeroCrossingRateCalculator self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_chart_event(ChartEvent self, SseSerializer serializer);
 
   @protected
@@ -1341,6 +1389,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_data_type(DataType self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_energy_calculator(
+    EnergyCalculator self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_equal_step(EqualStep self, SseSerializer serializer);
@@ -1414,6 +1468,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_zero_crossing_rate_calculator(
+    ZeroCrossingRateCalculator self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);

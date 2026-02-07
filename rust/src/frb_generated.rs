@@ -51,7 +51,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 432098867;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 2036402359;
 
 // Section: executor
 
@@ -2103,6 +2103,41 @@ fn wire__crate__api__events__communicator_events__emit_chart_event_impl(
         },
     )
 }
+fn wire__crate__api__transform__energy__energy_calculator_transform_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "energy_calculator_transform",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that =
+                <crate::api::transform::energy::EnergyCalculator>::sse_decode(&mut deserializer);
+            let api_data = <Audio>::sse_decode(&mut deserializer);
+            let api_config = <crate::api::types::config::Config>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::types::error::AppError>((move || {
+                let output_ok = crate::api::transform::energy::EnergyCalculator::transform(
+                    &api_that, api_data, api_config,
+                )?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__sampling__equal_step__equal_step_down_sample_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2403,6 +2438,21 @@ fn wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(
             })())
         },
     )
+}
+fn wire__crate__api__transform__zero_crossing_rate__zero_crossing_rate_calculator_transform_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "zero_crossing_rate_calculator_transform", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator>::sse_decode(&mut deserializer);
+let api_data = <Audio>::sse_decode(&mut deserializer);
+let api__config = <crate::api::types::config::Config>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::types::error::AppError>((move || {
+                     let output_ok = crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator::transform(&api_that, api_data, api__config)?;   Ok(output_ok)
+                })()) })
 }
 
 // Section: related_funcs
@@ -2959,6 +3009,13 @@ impl SseDecode for crate::api::types::chart::DataType {
     }
 }
 
+impl SseDecode for crate::api::transform::energy::EnergyCalculator {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        return crate::api::transform::energy::EnergyCalculator {};
+    }
+}
+
 impl SseDecode for crate::api::sampling::equal_step::EqualStep {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3100,6 +3157,13 @@ impl SseDecode for usize {
     }
 }
 
+impl SseDecode for crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        return crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator {};
+    }
+}
+
 impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3211,17 +3275,19 @@ fn pde_ffi_dispatcher_sync_impl(
 55 => wire__crate__api__types__config__config_default_impl(ptr, rust_vec_len, data_len),
 56 => wire__crate__api__events__communicator_events__create_chart_event_stream_impl(ptr, rust_vec_len, data_len),
 58 => wire__crate__api__events__communicator_events__emit_chart_event_impl(ptr, rust_vec_len, data_len),
-59 => wire__crate__api__sampling__equal_step__equal_step_down_sample_impl(ptr, rust_vec_len, data_len),
-60 => wire__crate__api__transform__fft__fft_transform_transform_impl(ptr, rust_vec_len, data_len),
-61 => wire__crate__api__sampling__minmax__minmax_down_sample_impl(ptr, rust_vec_len, data_len),
-62 => wire__crate__api__util__format_getter__simple_format_getter_get_format_impl(ptr, rust_vec_len, data_len),
-63 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(ptr, rust_vec_len, data_len),
-64 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(ptr, rust_vec_len, data_len),
-65 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(ptr, rust_vec_len, data_len),
-66 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(ptr, rust_vec_len, data_len),
-67 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(ptr, rust_vec_len, data_len),
-68 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(ptr, rust_vec_len, data_len),
-69 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(ptr, rust_vec_len, data_len),
+59 => wire__crate__api__transform__energy__energy_calculator_transform_impl(ptr, rust_vec_len, data_len),
+60 => wire__crate__api__sampling__equal_step__equal_step_down_sample_impl(ptr, rust_vec_len, data_len),
+61 => wire__crate__api__transform__fft__fft_transform_transform_impl(ptr, rust_vec_len, data_len),
+62 => wire__crate__api__sampling__minmax__minmax_down_sample_impl(ptr, rust_vec_len, data_len),
+63 => wire__crate__api__util__format_getter__simple_format_getter_get_format_impl(ptr, rust_vec_len, data_len),
+64 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(ptr, rust_vec_len, data_len),
+65 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(ptr, rust_vec_len, data_len),
+66 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(ptr, rust_vec_len, data_len),
+67 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(ptr, rust_vec_len, data_len),
+68 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(ptr, rust_vec_len, data_len),
+69 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(ptr, rust_vec_len, data_len),
+70 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(ptr, rust_vec_len, data_len),
+71 => wire__crate__api__transform__zero_crossing_rate__zero_crossing_rate_calculator_transform_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -3658,6 +3724,23 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::types::chart::DataType>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::transform::energy::EnergyCalculator {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        Vec::<u8>::new().into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::transform::energy::EnergyCalculator
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::transform::energy::EnergyCalculator>
+    for crate::api::transform::energy::EnergyCalculator
+{
+    fn into_into_dart(self) -> crate::api::transform::energy::EnergyCalculator {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::sampling::equal_step::EqualStep {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         Vec::<u8>::new().into_dart()
@@ -3783,6 +3866,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::decoder::symphonia_decoder::S
     for crate::api::decoder::symphonia_decoder::SymphoniaDecoder
 {
     fn into_into_dart(self) -> crate::api::decoder::symphonia_decoder::SymphoniaDecoder {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        Vec::<u8>::new().into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator,
+    > for crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator
+{
+    fn into_into_dart(
+        self,
+    ) -> crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator {
         self
     }
 }
@@ -4278,6 +4384,11 @@ impl SseEncode for crate::api::types::chart::DataType {
     }
 }
 
+impl SseEncode for crate::api::transform::energy::EnergyCalculator {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+}
+
 impl SseEncode for crate::api::sampling::equal_step::EqualStep {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
@@ -4397,6 +4508,11 @@ impl SseEncode for usize {
             .write_u64::<NativeEndian>(self as _)
             .unwrap();
     }
+}
+
+impl SseEncode for crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
 }
 
 impl SseEncode for bool {

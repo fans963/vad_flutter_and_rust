@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
@@ -119,7 +120,7 @@ class _ChartWidgetState extends State<ChartWidget> {
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => _onSizeChanged(constraints.biggest),
         );
-        return Container(
+        return SizedBox(
           key: _containerKey,
           height: 500,
           // padding: const EdgeInsets.all(10.0),
@@ -185,25 +186,41 @@ class _ChartWidgetState extends State<ChartWidget> {
       for (final communicatorChart in charts) {
         final color = colors[seriesIndex % colors.length];
 
-        seriesList.add(
-          FastLineSeries<Point, double>(
-            name: key,
-            dataSource: communicatorChart.chart,
-            xValueMapper: (Point point, _) => point.x,
-            yValueMapper: (Point point, _) => point.y,
-            color: color,
-            width: 0.4,
-            animationDuration: 0,
-            sortingOrder: SortingOrder.ascending,
-            sortFieldValueMapper: (Point point, _) => point.x,
-            selectionBehavior: SelectionBehavior(
-              enable: true,
-              selectedColor: Colors.yellow,
-              unselectedColor: color.withOpacity(0.5),
-            ),
-          ),
-        );
+        switch (communicatorChart.dataType) {
+          case DataType.zeroCrossingRate || DataType.energy:
+            {
+              seriesList.add(
+                StepLineSeries<Point, double>(
+                  dataSource: communicatorChart.chart,
+                  xValueMapper: (Point point, _) => point.x,
+                  yValueMapper: (Point point, _) => point.y,
+                  animationDuration: 0,
+                ),
+              );
+            }
+          default:
+            {
+              seriesList.add(
+                FastLineSeries<Point, double>(
+                  name: key,
+                  dataSource: communicatorChart.chart,
+                  xValueMapper: (Point point, _) => point.x,
+                  yValueMapper: (Point point, _) => point.y,
+                  color: color,
+                  width: 0.4,
+                  animationDuration: 0,
+                  sortingOrder: SortingOrder.ascending,
+                  sortFieldValueMapper: (Point point, _) => point.x,
+                  selectionBehavior: SelectionBehavior(
+                    enable: true,
+                    selectedColor: Colors.yellow,
+                    unselectedColor: color.withOpacity(0.5),
+                  ),
+                ),
+              );
 
+            }
+        }
         seriesIndex++;
       }
     }

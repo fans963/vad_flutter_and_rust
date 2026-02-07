@@ -17,7 +17,9 @@ import 'api/traits/cached_chart_storage.dart';
 import 'api/traits/communicator.dart';
 import 'api/traits/down_sample.dart';
 import 'api/traits/transform.dart';
+import 'api/transform/energy.dart';
 import 'api/transform/fft.dart';
+import 'api/transform/zero_crossing_rate.dart';
 import 'api/types/audio.dart';
 import 'api/types/chart.dart';
 import 'api/types/config.dart';
@@ -86,7 +88,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 432098867;
+  int get rustContentHash => 2036402359;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -293,6 +295,12 @@ abstract class RustLibApi extends BaseApi {
     required ChartEvent event,
   });
 
+  Chart crateApiTransformEnergyEnergyCalculatorTransform({
+    required EnergyCalculator that,
+    required Audio data,
+    required Config config,
+  });
+
   Chart crateApiSamplingEqualStepEqualStepDownSample({
     required EqualStep that,
     required Chart chart,
@@ -349,6 +357,12 @@ abstract class RustLibApi extends BaseApi {
   });
 
   SymphoniaDecoder crateApiDecoderSymphoniaDecoderSymphoniaDecoderNew();
+
+  Chart crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform({
+    required ZeroCrossingRateCalculator that,
+    required Audio data,
+    required Config config,
+  });
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_ArcVecPoint;
@@ -1977,6 +1991,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "emit_chart_event", argNames: ["event"]);
 
   @override
+  Chart crateApiTransformEnergyEnergyCalculatorTransform({
+    required EnergyCalculator that,
+    required Audio data,
+    required Config config,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_energy_calculator(that, serializer);
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudio(
+            data,
+            serializer,
+          );
+          sse_encode_box_autoadd_config(config, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart,
+          decodeErrorData: sse_decode_app_error,
+        ),
+        constMeta: kCrateApiTransformEnergyEnergyCalculatorTransformConstMeta,
+        argValues: [that, data, config],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiTransformEnergyEnergyCalculatorTransformConstMeta =>
+      const TaskConstMeta(
+        debugName: "energy_calculator_transform",
+        argNames: ["that", "data", "config"],
+      );
+
+  @override
   Chart crateApiSamplingEqualStepEqualStepDownSample({
     required EqualStep that,
     required Chart chart,
@@ -1992,7 +2043,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_usize(targetPointsNum, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2028,7 +2079,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_box_autoadd_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2064,7 +2115,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_usize(targetPointsNum, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2095,7 +2146,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_simple_format_getter(that, serializer);
           sse_encode_String(filePath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -2132,7 +2183,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             chart,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2160,7 +2211,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_stream_communicator,
@@ -2188,7 +2239,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_stream_communicator(that, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2222,7 +2273,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_stream_communicator(that, serializer);
           sse_encode_String(key, serializer);
           sse_encode_data_type(dataType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2258,7 +2309,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             charts,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2292,7 +2343,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_symphonia_decoder(that, serializer);
           sse_encode_String(format, serializer);
           sse_encode_list_prim_u_8_loose(data, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -2320,7 +2371,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_symphonia_decoder,
@@ -2336,6 +2387,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta
   get kCrateApiDecoderSymphoniaDecoderSymphoniaDecoderNewConstMeta =>
       const TaskConstMeta(debugName: "symphonia_decoder_new", argNames: []);
+
+  @override
+  Chart crateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransform({
+    required ZeroCrossingRateCalculator that,
+    required Audio data,
+    required Config config,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_zero_crossing_rate_calculator(
+            that,
+            serializer,
+          );
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudio(
+            data,
+            serializer,
+          );
+          sse_encode_box_autoadd_config(config, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart,
+          decodeErrorData: sse_decode_app_error,
+        ),
+        constMeta:
+            kCrateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransformConstMeta,
+        argValues: [that, data, config],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiTransformZeroCrossingRateZeroCrossingRateCalculatorTransformConstMeta =>
+      const TaskConstMeta(
+        debugName: "zero_crossing_rate_calculator_transform",
+        argNames: ["that", "data", "config"],
+      );
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_ArcVecPoint => wire
@@ -3003,6 +3095,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  EnergyCalculator dco_decode_box_autoadd_energy_calculator(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_energy_calculator(raw);
+  }
+
+  @protected
   EqualStep dco_decode_box_autoadd_equal_step(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_equal_step(raw);
@@ -3036,6 +3134,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SymphoniaDecoder dco_decode_box_autoadd_symphonia_decoder(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_symphonia_decoder(raw);
+  }
+
+  @protected
+  ZeroCrossingRateCalculator
+  dco_decode_box_autoadd_zero_crossing_rate_calculator(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_zero_crossing_rate_calculator(raw);
   }
 
   @protected
@@ -3088,6 +3193,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   DataType dco_decode_data_type(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return DataType.values[raw as int];
+  }
+
+  @protected
+  EnergyCalculator dco_decode_energy_calculator(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.isNotEmpty)
+      throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
+    return EnergyCalculator();
   }
 
   @protected
@@ -3224,6 +3338,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt dco_decode_usize(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodeU64(raw);
+  }
+
+  @protected
+  ZeroCrossingRateCalculator dco_decode_zero_crossing_rate_calculator(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.isNotEmpty)
+      throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
+    return ZeroCrossingRateCalculator();
   }
 
   @protected
@@ -3875,6 +4000,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  EnergyCalculator sse_decode_box_autoadd_energy_calculator(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_energy_calculator(deserializer));
+  }
+
+  @protected
   EqualStep sse_decode_box_autoadd_equal_step(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_equal_step(deserializer));
@@ -3916,6 +4049,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_symphonia_decoder(deserializer));
+  }
+
+  @protected
+  ZeroCrossingRateCalculator
+  sse_decode_box_autoadd_zero_crossing_rate_calculator(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_zero_crossing_rate_calculator(deserializer));
   }
 
   @protected
@@ -3968,6 +4110,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return DataType.values[inner];
+  }
+
+  @protected
+  EnergyCalculator sse_decode_energy_calculator(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return EnergyCalculator();
   }
 
   @protected
@@ -4110,6 +4258,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt sse_decode_usize(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
+  ZeroCrossingRateCalculator sse_decode_zero_crossing_rate_calculator(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ZeroCrossingRateCalculator();
   }
 
   @protected
@@ -4823,6 +4979,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_energy_calculator(
+    EnergyCalculator self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_energy_calculator(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_equal_step(
     EqualStep self,
     SseSerializer serializer,
@@ -4874,6 +5039,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_zero_crossing_rate_calculator(
+    ZeroCrossingRateCalculator self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_zero_crossing_rate_calculator(self, serializer);
+  }
+
+  @protected
   void sse_encode_chart_event(ChartEvent self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
@@ -4913,6 +5087,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_data_type(DataType self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_energy_calculator(
+    EnergyCalculator self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
   }
 
   @protected
@@ -5053,6 +5235,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_usize(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
+  void sse_encode_zero_crossing_rate_calculator(
+    ZeroCrossingRateCalculator self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
   }
 
   @protected

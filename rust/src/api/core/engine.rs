@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use env_logger::Target;
 use log::info;
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
@@ -13,7 +14,9 @@ use crate::api::{
         cached_chart_storage::CachedChartStorage, communicator::Communicator,
         down_sample::DownSample, transform::SignalTransform,
     },
-    transform::fft::FftTransform,
+    transform::{
+        energy::EnergyCalculator, fft::FftTransform, zero_crossing_rate::ZeroCrossingRateCalculator,
+    },
     types::{
         chart::{Chart, ChartWIthKey, CommunicatorChart, DataType, Point},
         config::Config,
@@ -117,44 +120,33 @@ impl AudioProcessorEngine {
     }
 
     pub async fn add_chart(&self, file_path: String, data_type: DataType) -> Result<(), AppError> {
-        match data_type {
-            DataType::Audio => {
-                let stored_audio = self.storage.load(file_path.clone())?;
-                let audio_chart = stored_audio.audio_to_chart();
+        let target_chart = if let Ok(cached_data) = self.cache.get(file_path.clone(), data_type) {
+            cached_data
+        } else {
+            let stored_audio = self.storage.load(file_path.clone())?;
+            let chart = match data_type {
+                DataType::Audio => stored_audio.audio_to_chart(),
+                DataType::Spectrum => {
+                    (FftTransform {}).transform(stored_audio, self.config.clone())?
+                }
+                DataType::Energy => {
+                    (EnergyCalculator {}).transform(stored_audio, self.config.clone())?
+                }
+                DataType::ZeroCrossingRate => {
+                    (ZeroCrossingRateCalculator {}).transform(stored_audio, self.config.clone())?
+                }
+            };
+            self.cache.add(file_path.clone(), chart.clone())?;
+            info!("{:?} data length: {}", data_type, chart.points.len());
+            chart
+        };
 
-                self.cache.add(file_path.clone(), audio_chart.clone())?;
+        let visible_chart = target_chart.get_range(self.index_range.0, self.index_range.1);
 
-                let visible_chart = audio_chart.get_range(self.index_range.0, self.index_range.1);
-
-                let downsampled_chart = self
-                    .down_sampler
-                    .down_sample(visible_chart, self.down_sample_points_num);
-                self.communicator.add_chart(file_path, downsampled_chart);
-            }
-            DataType::Spectrum => {
-                let stored_audio = self.storage.load(file_path.clone())?;
-
-                let fft_data = if let Ok(cached_data) =
-                    self.cache.get(file_path.clone(), DataType::Spectrum)
-                {
-                    cached_data
-                } else {
-                    let data =
-                        (FftTransform {}).transform(stored_audio.clone(), self.config.clone())?;
-                    self.cache.add(file_path.clone(), data.clone())?;
-                    info!("data length: {}", data.points.len());
-                    data
-                };
-
-                let visible_chart = fft_data.get_range(self.index_range.0, self.index_range.1);
-                let downsampled_chart = self
-                    .down_sampler
-                    .down_sample(visible_chart, self.down_sample_points_num);
-                self.communicator.add_chart(file_path, downsampled_chart);
-            }
-            DataType::Energy => todo!(),
-            DataType::ZeroCrossingRate => todo!(),
-        }
+        let downsampled_chart = self
+            .down_sampler
+            .down_sample(visible_chart, self.down_sample_points_num);
+        self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
     }
 
@@ -173,7 +165,7 @@ pub async fn create_default_engine(config: Config) -> AudioProcessorEngine {
         Box::new(SymphoniaDecoder::new()),
         Box::new(KvAudioStorage::new()),
         Box::new(KvCachedChartStorage::new()),
-        Box::new(EqualStep {}),
+        Box::new(Minmax {}),
         Box::new(communicator::stream_sink_communicator::StreamCommunicator::new()),
     )
 }
