@@ -1,12 +1,12 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:show_fps/show_fps.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:vad/src/rust/frb_generated.dart';
 import 'package:vad/src/signals/page_controller_signal.dart';
 import 'package:vad/src/ui/chart_widget.dart';
-import 'package:vad/src/ui/fps_counter.dart';
 import 'package:vad/src/ui/pick_file_button.dart';
 import 'package:vad/src/ui/title_bar.dart';
 import 'package:vad/src/ui/tool_plate.dart';
@@ -111,51 +111,59 @@ class MyApp extends StatelessWidget {
           theme: _buildTheme(lightColorScheme),
           darkTheme: _buildDarkTheme(darkColorScheme),
           themeMode: ThemeMode.system,
-          home: Scaffold(
-            backgroundColor: Theme.of(context).brightness == Brightness.dark
-                ? darkColorScheme.surface
-                : lightColorScheme.surface,
-            body: Stack(
-              children: [
-                Column(
-                  children: [
-                    if (isDesktop) const TitleBar(),
-                    Expanded(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(),
-                        child: const ChartWidget(),
+          home: ShowFPS(
+            alignment: Alignment.topLeft,
+            child: Scaffold(
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? darkColorScheme.surface
+                  : lightColorScheme.surface,
+              body: Stack(
+                children: [
+                  Column(
+                    children: [
+                      if (isDesktop) const TitleBar(),
+                      Expanded(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(),
+                          child: const ChartWidget(),
+                        ),
                       ),
-                    ),
-                    const ToolPlate(),
-                  ],
-                ),
-                Positioned(
-                  top: isDesktop ? 45 : 10,
-                  right: 10,
-                  child: const FpsCounter(),
-                ),
-              ],
-            ),
-            floatingActionButton: const PickFileButton(),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            bottomNavigationBar: Watch((context) {
-              return BottomNavigationBar(
-                items: const [
-                  BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
-                  BottomNavigationBarItem(icon: Icon(Icons.info), label: '信息'),
-                  BottomNavigationBarItem(icon: Icon(Icons.edit), label: '控制'),
+                      const ToolPlate(),
+                    ],
+                  ),
                 ],
-                currentIndex: pageIndexSignal.value,
-                onTap: (index) {
-                  pageControllerSignal.value.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOutQuart,
-                  );
-                },
-              );
-            }),
-          ),
+              ),
+              floatingActionButton: const PickFileButton(),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endFloat,
+              bottomNavigationBar: Watch((context) {
+                return BottomNavigationBar(
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: '首页',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.info),
+                      label: '信息',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.edit),
+                      label: '控制',
+                    ),
+                  ],
+                  currentIndex: pageIndexSignal.value,
+                  onTap: (index) {
+                    pageControllerSignal.value.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOutQuart,
+                    );
+                  },
+                );
+              }),
+            ),
+          )
         );
       },
     );
