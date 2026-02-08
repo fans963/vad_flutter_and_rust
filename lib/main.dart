@@ -134,23 +134,23 @@ class MyApp extends StatelessWidget {
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.endFloat,
               bottomNavigationBar: Watch((context) {
-                return BottomNavigationBar(
-                  items: const [
-                    BottomNavigationBarItem(
+                return NavigationBar(
+                  destinations: const [
+                    NavigationDestination(
                       icon: Icon(Icons.home),
                       label: '首页',
                     ),
-                    BottomNavigationBarItem(
+                    NavigationDestination(
                       icon: Icon(Icons.info),
                       label: '信息',
                     ),
-                    BottomNavigationBarItem(
+                    NavigationDestination(
                       icon: Icon(Icons.edit),
                       label: '控制',
                     ),
                   ],
-                  currentIndex: pageIndexSignal.value,
-                  onTap: (index) {
+                  selectedIndex: pageIndexSignal.value,
+                  onDestinationSelected: (index) {
                     pageControllerSignal.value.animateToPage(
                       index,
                       duration: const Duration(milliseconds: 300),

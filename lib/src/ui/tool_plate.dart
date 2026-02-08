@@ -24,7 +24,7 @@ class ToolPlate extends StatelessWidget {
         duration: const Duration(milliseconds: 100),
         height: toolPlateHeightSignal.value,
         decoration: BoxDecoration(
-          color: colorScheme.surface,
+          color: colorScheme.surfaceContainer,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(16.0),
             topRight: Radius.circular(16.0),
