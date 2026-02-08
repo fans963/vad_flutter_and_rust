@@ -46,7 +46,7 @@ class _ChartWidgetState extends State<ChartWidget> {
   double? _lastWidth;
   late final _ChartDataContainer _chartDataContainer = _ChartDataContainer();
   double minXAxis = 0.0;
-  double maxXAxis = 1000000.0;
+  double maxXAxis = 10000.0; 
 
   @override
   void dispose() {
@@ -113,6 +113,14 @@ class _ChartWidgetState extends State<ChartWidget> {
   @override
   Widget build(BuildContext context) {
     final seriesList = _buildChartSeries();
+    audioProcessorEngine.engine().then((engine) async {
+      final maxIndex = await engine.getMaxIndex();
+      if (maxIndex != maxXAxis) {
+        setState(() {
+          maxXAxis = maxIndex;
+        });
+      }
+    });
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -148,16 +156,15 @@ class _ChartWidgetState extends State<ChartWidget> {
                 enablePinching: true,
                 enablePanning: true,
                 enableMouseWheelZooming: true,
+                maximumZoomLevel: 0.0005, 
               ),
               primaryXAxis: NumericAxis(
                 name: 'primaryXAxis',
-                minimum: minXAxis,
+                minimum: 0.0,
                 maximum: maxXAxis,
               ),
               primaryYAxis: NumericAxis(
                 name: 'primaryYAxis',
-                minimum: -0.5,
-                maximum: 100.0,
               ),
               onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
                 if (rangeChangedArgs.axisName == 'primaryXAxis') {

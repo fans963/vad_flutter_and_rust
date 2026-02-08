@@ -3,10 +3,11 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  desktop_drop
   dynamic_color
   file_selector_windows
+  irondash_engine_context
   screen_retriever_windows
+  super_native_extensions
   tray_manager
   url_launcher_windows
   window_manager

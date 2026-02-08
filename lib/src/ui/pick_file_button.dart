@@ -2,6 +2,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
+import 'package:vad/src/signals/support_audio_format_signal.dart';
 
 class PickFileButton extends StatelessWidget {
   const PickFileButton({super.key});
@@ -12,9 +13,9 @@ class PickFileButton extends StatelessWidget {
       tooltip: '添加音频文件',
       child: const Icon(Icons.add),
       onPressed: () async {
-        const XTypeGroup typeGroup = XTypeGroup(
+        final XTypeGroup typeGroup = XTypeGroup(
           label: 'Audio',
-          extensions: <String>['wav', 'mp3', 'flac', 'aac', 'ogg', 'opus'],
+          extensions: supportAudioFormatSignal.value,
         );
         final List<XFile> files = await openFiles(
           acceptedTypeGroups: <XTypeGroup>[typeGroup],

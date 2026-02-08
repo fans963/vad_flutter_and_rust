@@ -1,13 +1,11 @@
-use std::sync::Arc;
 
-use env_logger::Target;
 use log::info;
-use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::api::{
     communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
-    sampling::{equal_step::EqualStep, minmax::Minmax},
+    sampling::minmax::Minmax,
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
         audio_decoder::AudioDecoder, audio_storage::AudioStorage,
@@ -18,7 +16,7 @@ use crate::api::{
         energy::EnergyCalculator, fft::FftTransform, zero_crossing_rate::ZeroCrossingRateCalculator,
     },
     types::{
-        chart::{Chart, ChartWIthKey, CommunicatorChart, DataType, Point},
+        chart::{Chart, ChartWIthKey, DataType},
         config::Config,
         error::AppError,
     },
@@ -34,6 +32,7 @@ pub struct AudioProcessorEngine {
     down_sample_points_num: usize,
     index_range: (f32, f32),
     selected_audio: Option<String>,
+    max_index: f32,
 }
 
 impl AudioProcessorEngine {
@@ -55,6 +54,7 @@ impl AudioProcessorEngine {
             down_sample_points_num: 500,
             index_range: (0.0, 0.0),
             selected_audio: None,
+            max_index: 10000.0,
         }
     }
 
@@ -96,7 +96,7 @@ impl AudioProcessorEngine {
     }
 
     pub async fn add(
-        &self,
+        &mut self,
         file_path: String,
         format: String,
         audio_data: Vec<u8>,
@@ -108,6 +108,7 @@ impl AudioProcessorEngine {
             .save(file_path.clone(), decoded_audio.clone())?;
 
         let audio_chart = decoded_audio.audio_to_chart();
+        self.update_max_index(&audio_chart);
 
         self.cache.add(file_path.clone(), audio_chart.clone())?;
 
@@ -124,7 +125,7 @@ impl AudioProcessorEngine {
         self.storage.remove(file_path)
     }
 
-    pub async fn add_chart(&self, file_path: String, data_type: DataType) -> Result<(), AppError> {
+    pub async fn add_chart(&mut self, file_path: String, data_type: DataType) -> Result<(), AppError> {
         let target_chart = if let Ok(cached_data) = self.cache.get(file_path.clone(), data_type) {
             cached_data
         } else {
@@ -145,7 +146,7 @@ impl AudioProcessorEngine {
             info!("{:?} data length: {}", data_type, chart.points.len());
             chart
         };
-
+        self.update_max_index(&target_chart);
         let visible_chart = target_chart.get_range(self.index_range.0, self.index_range.1);
 
         let downsampled_chart = self
@@ -165,6 +166,18 @@ impl AudioProcessorEngine {
 
     pub async fn set_selected_audio(&mut self, chart_name: Option<String>) {
         self.selected_audio = chart_name;
+    }
+
+    fn update_max_index(&mut self, chart: &Chart) {
+        chart.points.last().map(|p| {
+            if p.x > self.max_index {
+                self.max_index = (p.x / self.config.frame_size as f32).ceil() * self.config.frame_size as f32;
+            }
+        });
+    }
+
+    pub async fn get_max_index(&self) -> f32 {
+        self.max_index
     }
 }
 

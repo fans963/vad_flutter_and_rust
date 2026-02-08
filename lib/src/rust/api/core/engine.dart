@@ -9,7 +9,7 @@ import '../types/config.dart';
 import '../types/error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `update_all`
+// These functions are ignored because they are not marked as `pub`: `update_all`, `update_max_index`
 
 Future<AudioProcessorEngine> createDefaultEngine({required Config config}) =>
     RustLib.instance.api.crateApiCoreEngineCreateDefaultEngine(config: config);
@@ -23,6 +23,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
   });
 
   Future<void> addChart({required String filePath, required DataType dataType});
+
+  Future<double> getMaxIndex();
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<AudioProcessorEngine> newInstance({
