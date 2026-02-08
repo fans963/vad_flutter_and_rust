@@ -96,7 +96,6 @@ class _ChartWidgetState extends State<ChartWidget> {
       onError: (error) => debugPrint('Chart event stream error: $error'),
       cancelOnError: false,
     );
-
   }
 
   void _onSizeChanged(Size size) {
@@ -135,18 +134,27 @@ class _ChartWidgetState extends State<ChartWidget> {
                 position: LegendPosition.bottom,
               ),
               zoomPanBehavior: ZoomPanBehavior(
+                zoomMode: ZoomMode.xy,
+                enableDoubleTapZooming: true,
+                enableDirectionalZooming: true,
+                selectionRectColor: Theme.of(
+                  context,
+                ).colorScheme.primary.withOpacity(0.3), // 选框的颜色
+                selectionRectBorderColor: Theme.of(
+                  context,
+                ).colorScheme.primary, // 选框边框颜色
+                selectionRectBorderWidth: 1,
+                enableSelectionZooming: true,
                 enablePinching: true,
                 enablePanning: true,
                 enableMouseWheelZooming: true,
-                enableSelectionZooming: true,
-                zoomMode: ZoomMode.x,
               ),
               primaryXAxis: NumericAxis(
                 name: 'primaryXAxis',
                 minimum: minXAxis,
                 maximum: maxXAxis,
               ),
-              primaryYAxis: const NumericAxis(
+              primaryYAxis: NumericAxis(
                 name: 'primaryYAxis',
                 minimum: -0.5,
                 maximum: 100.0,
@@ -168,8 +176,13 @@ class _ChartWidgetState extends State<ChartWidget> {
                   });
                 }
               },
-              onLegendTapped: (legendTapArgs) =>
-                  debugPrint("Legend tapped: ${legendTapArgs.series.name}"),
+              onLegendTapped: (legendTapArgs) => {
+                audioProcessorEngine.engine().then((engine) async {
+                  String? seriesName = legendTapArgs.series.name;
+                  engine.setSelectedAudio(chartName: seriesName);
+                  debugPrint('Selected series: $seriesName');
+                }),
+              },
               series: seriesList,
             ),
           ),
@@ -190,13 +203,12 @@ class _ChartWidgetState extends State<ChartWidget> {
 
       for (final communicatorChart in charts) {
         final color = colors[seriesIndex % colors.length];
-
         switch (communicatorChart.dataType) {
           case DataType.zeroCrossingRate || DataType.energy:
             {
               seriesList.add(
                 StepLineSeries<Point, double>(
-                  name: key,
+                  name: '$key ${communicatorChart.dataType.name}',
                   dataSource: communicatorChart.chart,
                   xValueMapper: (Point point, _) => point.x,
                   yValueMapper: (Point point, _) => point.y,
@@ -209,7 +221,7 @@ class _ChartWidgetState extends State<ChartWidget> {
             {
               seriesList.add(
                 FastLineSeries<Point, double>(
-                  name: key,
+                  name: '$key ${communicatorChart.dataType.name}',
                   dataSource: communicatorChart.chart,
                   xValueMapper: (Point point, _) => point.x,
                   yValueMapper: (Point point, _) => point.y,
@@ -218,7 +230,6 @@ class _ChartWidgetState extends State<ChartWidget> {
                   animationDuration: 0,
                 ),
               );
-
             }
         }
         seriesIndex++;

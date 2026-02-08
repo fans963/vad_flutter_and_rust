@@ -163,8 +163,8 @@ impl AudioProcessorEngine {
         self.cache.remove(file_path, data_type)
     }
 
-    pub async fn set_selected_audio(&mut self, file_path: Option<String>) {
-        self.selected_audio = file_path;
+    pub async fn set_selected_audio(&mut self, chart_name: Option<String>) {
+        self.selected_audio = chart_name;
     }
 }
 

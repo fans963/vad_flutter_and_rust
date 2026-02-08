@@ -631,7 +631,7 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_set_selected_audio_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>,
             >>::sse_decode(&mut deserializer);
-            let api_file_path = <Option<String>>::sse_decode(&mut deserializer);
+            let api_chart_name = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, ()>(
@@ -656,7 +656,7 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_set_selected_audio_impl(
                         let output_ok = Result::<_, ()>::Ok({
                             crate::api::core::engine::AudioProcessorEngine::set_selected_audio(
                                 &mut *api_that_guard,
-                                api_file_path,
+                                api_chart_name,
                             )
                             .await;
                         })?;

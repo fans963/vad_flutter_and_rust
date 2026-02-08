@@ -54,7 +54,7 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<void> setIndexRange({required double start, required double end});
 
-  Future<void> setSelectedAudio({String? filePath});
+  Future<void> setSelectedAudio({String? chartName});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn AudioDecoder + Send + Sync >>>

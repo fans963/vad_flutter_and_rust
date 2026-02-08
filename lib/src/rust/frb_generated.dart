@@ -159,7 +159,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiCoreEngineAudioProcessorEngineSetSelectedAudio({
     required AudioProcessorEngine that,
-    String? filePath,
+    String? chartName,
   });
 
   Future<Chart> crateApiTypesAudioAudioAudioToChart({required Audio that});
@@ -933,7 +933,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<void> crateApiCoreEngineAudioProcessorEngineSetSelectedAudio({
     required AudioProcessorEngine that,
-    String? filePath,
+    String? chartName,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -943,7 +943,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          sse_encode_opt_String(filePath, serializer);
+          sse_encode_opt_String(chartName, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -957,7 +957,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         ),
         constMeta:
             kCrateApiCoreEngineAudioProcessorEngineSetSelectedAudioConstMeta,
-        argValues: [that, filePath],
+        argValues: [that, chartName],
         apiImpl: this,
       ),
     );
@@ -967,7 +967,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   get kCrateApiCoreEngineAudioProcessorEngineSetSelectedAudioConstMeta =>
       const TaskConstMeta(
         debugName: "AudioProcessorEngine_set_selected_audio",
-        argNames: ["that", "filePath"],
+        argNames: ["that", "chartName"],
       );
 
   @override
@@ -5684,10 +5684,10 @@ class AudioProcessorEngineImpl extends RustOpaque
         end: end,
       );
 
-  Future<void> setSelectedAudio({String? filePath}) => RustLib.instance.api
+  Future<void> setSelectedAudio({String? chartName}) => RustLib.instance.api
       .crateApiCoreEngineAudioProcessorEngineSetSelectedAudio(
         that: this,
-        filePath: filePath,
+        chartName: chartName,
       );
 }
 
