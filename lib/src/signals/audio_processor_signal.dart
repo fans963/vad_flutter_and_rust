@@ -16,10 +16,19 @@ class AudioProcessorController {
     return await _engineSignal.future;
   }
 
-  Future<void> addFile(String filePath, Uint8List fileData) async {
+  Future<void> addFile(
+    String filePath,
+    Uint8List fileData, {
+    String? format,
+  }) async {
     try {
       final audioEngine = await engine();
-      await audioEngine.add(filePath: filePath, audioData: fileData);
+      final actualFormat = format ?? filePath.split('.').last.toLowerCase();
+      await audioEngine.add(
+        filePath: filePath,
+        format: actualFormat,
+        audioData: fileData,
+      );
     } catch (e, st) {
       _engineSignal.setError(e, st);
       rethrow;

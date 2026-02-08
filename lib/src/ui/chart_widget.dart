@@ -200,6 +200,7 @@ class _ChartWidgetState extends State<ChartWidget> {
                   xValueMapper: (Point point, _) => point.x,
                   yValueMapper: (Point point, _) => point.y,
                   animationDuration: 0,
+                  width: 0.4,
                 ),
               );
             }

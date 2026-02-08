@@ -47,9 +47,9 @@ dependencies:
   file_selector: ^1.1.0
   syncfusion_flutter_charts: ^32.2.3
   flutter_colorpicker: ^1.1.0
-  signals: ^6.3.0
   freezed_annotation: ^3.1.0
   show_fps: ^1.1.0
+  signals: ^6.3.0
 
 dev_dependencies:
   flutter_launcher_icons:

@@ -22,7 +22,6 @@ use crate::api::{
         config::Config,
         error::AppError,
     },
-    util::format_getter::{FormatGetter, SimpleFormatGetter},
 };
 
 pub struct AudioProcessorEngine {
@@ -96,9 +95,13 @@ impl AudioProcessorEngine {
         self.update_all();
     }
 
-    pub async fn add(&self, file_path: String, audio_data: Vec<u8>) -> Result<(), AppError> {
-        info!("Adding audio file: {}", file_path);
-        let format = (SimpleFormatGetter {}).get_format(file_path.clone())?;
+    pub async fn add(
+        &self,
+        file_path: String,
+        format: String,
+        audio_data: Vec<u8>,
+    ) -> Result<(), AppError> {
+        info!("Adding audio file: {}, format: {}", file_path, format);
         let decoded_audio = self.decoder.decode(format, audio_data)?;
 
         self.storage

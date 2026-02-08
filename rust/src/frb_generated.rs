@@ -182,6 +182,7 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_add_impl(
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>,
             >>::sse_decode(&mut deserializer);
             let api_file_path = <String>::sse_decode(&mut deserializer);
+            let api_format = <String>::sse_decode(&mut deserializer);
             let api_audio_data = <Vec<u8>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -207,6 +208,7 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_add_impl(
                         let output_ok = crate::api::core::engine::AudioProcessorEngine::add(
                             &*api_that_guard,
                             api_file_path,
+                            api_format,
                             api_audio_data,
                         )
                         .await?;

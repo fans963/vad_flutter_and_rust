@@ -49,7 +49,6 @@ class MyApp extends StatelessWidget {
       surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
       blendLevel: 20,
       appBarStyle: FlexAppBarStyle.surface,
-      subThemesData: const FlexSubThemesData(defaultRadius: 12.0),
       textTheme: _createTextTheme('MapleMonoNFCN'),
     );
   }
@@ -62,8 +61,6 @@ class MyApp extends StatelessWidget {
       surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
       blendLevel: 20,
       appBarStyle: FlexAppBarStyle.surface,
-      subThemesData: const FlexSubThemesData(defaultRadius: 12.0),
-      darkIsTrueBlack: true,
       textTheme: _createTextTheme('MapleMonoNFCN'),
     );
   }

@@ -14,7 +14,7 @@ class PickFileButton extends StatelessWidget {
       onPressed: () async {
         const XTypeGroup typeGroup = XTypeGroup(
           label: 'Audio',
-          extensions: <String>['wav', 'mp3', 'flac'],
+          extensions: <String>['wav', 'mp3', 'flac', 'aac', 'ogg', 'opus'],
         );
         final List<XFile> files = await openFiles(
           acceptedTypeGroups: <XTypeGroup>[typeGroup],
@@ -26,7 +26,12 @@ class PickFileButton extends StatelessWidget {
             debugPrint(
               'Picked file: ${file.name}, size: ${await file.length()} bytes',
             );
-            await audioProcessorEngine.addFile(file.path, bytes);
+            final format = file.name.split('.').last.toLowerCase();
+            await audioProcessorEngine.addFile(
+              file.path,
+              bytes,
+              format: format,
+            );
             audioProcessorEngine.engine().then((engine) async {
               await engine.addChart(
                 filePath: file.path,

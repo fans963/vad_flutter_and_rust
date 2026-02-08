@@ -111,6 +111,7 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiCoreEngineAudioProcessorEngineAdd({
     required AudioProcessorEngine that,
     required String filePath,
+    required String format,
     required List<int> audioData,
   });
 
@@ -585,6 +586,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiCoreEngineAudioProcessorEngineAdd({
     required AudioProcessorEngine that,
     required String filePath,
+    required String format,
     required List<int> audioData,
   }) {
     return handler.executeNormal(
@@ -596,6 +598,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(filePath, serializer);
+          sse_encode_String(format, serializer);
           sse_encode_list_prim_u_8_loose(audioData, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -609,7 +612,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_app_error,
         ),
         constMeta: kCrateApiCoreEngineAudioProcessorEngineAddConstMeta,
-        argValues: [that, filePath, audioData],
+        argValues: [that, filePath, format, audioData],
         apiImpl: this,
       ),
     );
@@ -618,7 +621,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiCoreEngineAudioProcessorEngineAddConstMeta =>
       const TaskConstMeta(
         debugName: "AudioProcessorEngine_add",
-        argNames: ["that", "filePath", "audioData"],
+        argNames: ["that", "filePath", "format", "audioData"],
       );
 
   @override
@@ -5625,12 +5628,16 @@ class AudioProcessorEngineImpl extends RustOpaque
         .rust_arc_decrement_strong_count_AudioProcessorEnginePtr,
   );
 
-  Future<void> add({required String filePath, required List<int> audioData}) =>
-      RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineAdd(
-        that: this,
-        filePath: filePath,
-        audioData: audioData,
-      );
+  Future<void> add({
+    required String filePath,
+    required String format,
+    required List<int> audioData,
+  }) => RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineAdd(
+    that: this,
+    filePath: filePath,
+    format: format,
+    audioData: audioData,
+  );
 
   Future<void> addChart({
     required String filePath,
