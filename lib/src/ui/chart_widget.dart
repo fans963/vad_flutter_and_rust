@@ -196,6 +196,7 @@ class _ChartWidgetState extends State<ChartWidget> {
             {
               seriesList.add(
                 StepLineSeries<Point, double>(
+                  name: key,
                   dataSource: communicatorChart.chart,
                   xValueMapper: (Point point, _) => point.x,
                   yValueMapper: (Point point, _) => point.y,

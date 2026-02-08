@@ -2598,9 +2598,9 @@ fn wire__crate__api__transform__zero_crossing_rate__zero_crossing_rate_calculato
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator>::sse_decode(&mut deserializer);
 let api_data = <Audio>::sse_decode(&mut deserializer);
-let api__config = <crate::api::types::config::Config>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+let api_config = <crate::api::types::config::Config>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
                     transform_result_sse::<_, crate::api::types::error::AppError>((move ||  {
-                         let output_ok = crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator::transform(&api_that, api_data, api__config)?;   Ok(output_ok)
+                         let output_ok = crate::api::transform::zero_crossing_rate::ZeroCrossingRateCalculator::transform(&api_that, api_data, api_config)?;   Ok(output_ok)
                     })())
                 } })
 }

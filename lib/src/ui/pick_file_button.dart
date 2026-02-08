@@ -41,6 +41,10 @@ class PickFileButton extends StatelessWidget {
                 filePath: file.path,
                 dataType: DataType.energy,
               );
+              await engine.addChart(
+                filePath: file.path,
+                dataType: DataType.zeroCrossingRate,
+              );
             });
           }
         }
