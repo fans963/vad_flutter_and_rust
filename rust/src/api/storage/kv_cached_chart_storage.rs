@@ -41,12 +41,9 @@ impl CachedChartStorage for KvCachedChartStorage {
         Ok(())
     }
 
-    fn get(&self, key: String, data_type:DataType) -> Result<Chart, AppError> {
+    fn get(&self, key: String, data_type: DataType) -> Result<Chart, AppError> {
         if let Some(cached_charts) = self.dashmap.get(&key) {
-            if let Some(chart) = cached_charts
-                .iter()
-                .find(|c| c.data_type == data_type)
-            {
+            if let Some(chart) = cached_charts.iter().find(|c| c.data_type == data_type) {
                 Ok(chart.clone())
             } else {
                 Err(AppError::NotFound(format!(

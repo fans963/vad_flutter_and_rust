@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, atomic::AtomicBool};
 
 use rayon::{
     iter::{IndexedParallelIterator, ParallelIterator},
@@ -13,28 +13,34 @@ use crate::api::{
         config::Config,
         error::AppError,
     },
+    util::get_min_max::get_min_max_par,
 };
 
 pub struct EnergyCalculator {}
 
 impl SignalTransform for EnergyCalculator {
-    fn transform(&self, data: Audio, config: Config) -> Result<Chart, AppError> {
+    async fn transform(&self, data: Audio, config: Config) -> Result<Chart, AppError> {
+        let points = data
+            .data
+            .samples
+            .par_chunks(config.frame_size)
+            .enumerate()
+            .map(|(index, chunk)| {
+                let energy: f32 = chunk.iter().map(|&sample| sample * sample).sum();
+                Point {
+                    x: (index * config.frame_size) as f32,
+                    y: energy,
+                }
+            })
+            .collect::<Vec<Point>>();
+
+        let (min_y, max_y) = get_min_max_par(&points).await;
         Ok(Chart {
             data_type: DataType::Energy,
-            points: Arc::new(
-                data.data
-                    .samples
-                    .par_chunks(config.frame_size)
-                    .enumerate()
-                    .map(|(index, chunk)| {
-                        let energy: f32 = chunk.iter().map(|&sample| sample * sample).sum();
-                        Point {
-                            x: (index * config.frame_size) as f32,
-                            y: energy,
-                        }
-                    })
-                    .collect::<Vec<Point>>(),
-            ),
+            points: Arc::new(points),
+            min_y,
+            max_y,
+            visible: Arc::new(AtomicBool::new(true)),
         })
     }
 }

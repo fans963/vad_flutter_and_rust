@@ -27,6 +27,7 @@ import 'api/types/error.dart';
 import 'api/types/events.dart';
 import 'api/types/file.dart';
 import 'api/util/format_getter.dart';
+import 'api/util/get_min_max.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -88,7 +89,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 1182688050;
+  int get rustContentHash => 175616552;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -125,6 +126,10 @@ abstract class RustLibApi extends BaseApi {
     required AudioProcessorEngine that,
   });
 
+  Future<(double, double)> crateApiCoreEngineAudioProcessorEngineGetYRange({
+    required AudioProcessorEngine that,
+  });
+
   Future<AudioProcessorEngine> crateApiCoreEngineAudioProcessorEngineNew({
     required Config config,
     required BoxAudioDecoder decoder,
@@ -142,6 +147,11 @@ abstract class RustLibApi extends BaseApi {
     required AudioProcessorEngine that,
     required String filePath,
     required DataType dataType,
+  });
+
+  Future<void> crateApiCoreEngineAudioProcessorEngineReserveVisible({
+    required AudioProcessorEngine that,
+    required String chartName,
   });
 
   Future<void> crateApiCoreEngineAudioProcessorEngineSetConfig({
@@ -203,7 +213,15 @@ abstract class RustLibApi extends BaseApi {
     required Chart that,
   });
 
+  double crateApiTypesChartChartAutoAccessorGetMaxY({required Chart that});
+
+  double crateApiTypesChartChartAutoAccessorGetMinY({required Chart that});
+
   ArcVecPoint crateApiTypesChartChartAutoAccessorGetPoints({
+    required Chart that,
+  });
+
+  ArcAtomicBool crateApiTypesChartChartAutoAccessorGetVisible({
     required Chart that,
   });
 
@@ -212,9 +230,24 @@ abstract class RustLibApi extends BaseApi {
     required DataType dataType,
   });
 
+  void crateApiTypesChartChartAutoAccessorSetMaxY({
+    required Chart that,
+    required double maxY,
+  });
+
+  void crateApiTypesChartChartAutoAccessorSetMinY({
+    required Chart that,
+    required double minY,
+  });
+
   void crateApiTypesChartChartAutoAccessorSetPoints({
     required Chart that,
     required ArcVecPoint points,
+  });
+
+  void crateApiTypesChartChartAutoAccessorSetVisible({
+    required Chart that,
+    required ArcAtomicBool visible,
   });
 
   Future<Chart> crateApiTypesChartChartGetRange({
@@ -322,6 +355,10 @@ abstract class RustLibApi extends BaseApi {
     required Config config,
   });
 
+  Future<(double, double)> crateApiUtilGetMinMaxGetMinMaxPar({
+    required List<Point> points,
+  });
+
   Future<Chart> crateApiSamplingMinmaxMinmaxDownSample({
     required Minmax that,
     required Chart chart,
@@ -375,6 +412,15 @@ abstract class RustLibApi extends BaseApi {
     required Audio data,
     required Config config,
   });
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_ArcAtomicBool;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_ArcAtomicBool;
+
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_ArcAtomicBoolPtr;
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_ArcVecPoint;
@@ -696,6 +742,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<(double, double)> crateApiCoreEngineAudioProcessorEngineGetYRange({
+    required AudioProcessorEngine that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessorEngine(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_record_f_32_f_32,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiCoreEngineAudioProcessorEngineGetYRangeConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiCoreEngineAudioProcessorEngineGetYRangeConstMeta =>
+      const TaskConstMeta(
+        debugName: "AudioProcessorEngine_get_y_range",
+        argNames: ["that"],
+      );
+
+  @override
   Future<AudioProcessorEngine> crateApiCoreEngineAudioProcessorEngineNew({
     required Config config,
     required BoxAudioDecoder decoder,
@@ -727,7 +809,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 7,
             port: port_,
           );
         },
@@ -766,7 +848,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 8,
             port: port_,
           );
         },
@@ -807,7 +889,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 9,
             port: port_,
           );
         },
@@ -830,6 +912,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiCoreEngineAudioProcessorEngineReserveVisible({
+    required AudioProcessorEngine that,
+    required String chartName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAudioProcessorEngine(
+            that,
+            serializer,
+          );
+          sse_encode_String(chartName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_app_error,
+        ),
+        constMeta:
+            kCrateApiCoreEngineAudioProcessorEngineReserveVisibleConstMeta,
+        argValues: [that, chartName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiCoreEngineAudioProcessorEngineReserveVisibleConstMeta =>
+      const TaskConstMeta(
+        debugName: "AudioProcessorEngine_reserve_visible",
+        argNames: ["that", "chartName"],
+      );
+
+  @override
   Future<void> crateApiCoreEngineAudioProcessorEngineSetConfig({
     required AudioProcessorEngine that,
     required Config config,
@@ -846,7 +968,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 9,
+            funcId: 11,
             port: port_,
           );
         },
@@ -884,7 +1006,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 12,
             port: port_,
           );
         },
@@ -926,7 +1048,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 13,
             port: port_,
           );
         },
@@ -966,7 +1088,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 14,
             port: port_,
           );
         },
@@ -1002,7 +1124,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 15,
             port: port_,
           );
         },
@@ -1034,7 +1156,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1064,7 +1186,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_audio_info,
@@ -1100,7 +1222,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             data,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1133,7 +1255,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_audio_info(info, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1164,7 +1286,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1197,7 +1319,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1234,7 +1356,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             chart,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1268,7 +1390,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1300,7 +1422,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_data_type,
@@ -1320,6 +1442,64 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  double crateApiTypesChartChartAutoAccessorGetMaxY({required Chart that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_f_32,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTypesChartChartAutoAccessorGetMaxYConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTypesChartChartAutoAccessorGetMaxYConstMeta =>
+      const TaskConstMeta(
+        debugName: "Chart_auto_accessor_get_max_y",
+        argNames: ["that"],
+      );
+
+  @override
+  double crateApiTypesChartChartAutoAccessorGetMinY({required Chart that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_f_32,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTypesChartChartAutoAccessorGetMinYConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTypesChartChartAutoAccessorGetMinYConstMeta =>
+      const TaskConstMeta(
+        debugName: "Chart_auto_accessor_get_min_y",
+        argNames: ["that"],
+      );
+
+  @override
   ArcVecPoint crateApiTypesChartChartAutoAccessorGetPoints({
     required Chart that,
   }) {
@@ -1331,7 +1511,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1352,6 +1532,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  ArcAtomicBool crateApiTypesChartChartAutoAccessorGetVisible({
+    required Chart that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTypesChartChartAutoAccessorGetVisibleConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTypesChartChartAutoAccessorGetVisibleConstMeta =>
+      const TaskConstMeta(
+        debugName: "Chart_auto_accessor_get_visible",
+        argNames: ["that"],
+      );
+
+  @override
   void crateApiTypesChartChartAutoAccessorSetDataType({
     required Chart that,
     required DataType dataType,
@@ -1365,7 +1577,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_data_type(dataType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1385,6 +1597,72 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  void crateApiTypesChartChartAutoAccessorSetMaxY({
+    required Chart that,
+    required double maxY,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            that,
+            serializer,
+          );
+          sse_encode_f_32(maxY, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTypesChartChartAutoAccessorSetMaxYConstMeta,
+        argValues: [that, maxY],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTypesChartChartAutoAccessorSetMaxYConstMeta =>
+      const TaskConstMeta(
+        debugName: "Chart_auto_accessor_set_max_y",
+        argNames: ["that", "maxY"],
+      );
+
+  @override
+  void crateApiTypesChartChartAutoAccessorSetMinY({
+    required Chart that,
+    required double minY,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            that,
+            serializer,
+          );
+          sse_encode_f_32(minY, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTypesChartChartAutoAccessorSetMinYConstMeta,
+        argValues: [that, minY],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTypesChartChartAutoAccessorSetMinYConstMeta =>
+      const TaskConstMeta(
+        debugName: "Chart_auto_accessor_set_min_y",
+        argNames: ["that", "minY"],
+      );
+
+  @override
   void crateApiTypesChartChartAutoAccessorSetPoints({
     required Chart that,
     required ArcVecPoint points,
@@ -1401,7 +1679,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             points,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1418,6 +1696,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(
         debugName: "Chart_auto_accessor_set_points",
         argNames: ["that", "points"],
+      );
+
+  @override
+  void crateApiTypesChartChartAutoAccessorSetVisible({
+    required Chart that,
+    required ArcAtomicBool visible,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
+            that,
+            serializer,
+          );
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+            visible,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTypesChartChartAutoAccessorSetVisibleConstMeta,
+        argValues: [that, visible],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTypesChartChartAutoAccessorSetVisibleConstMeta =>
+      const TaskConstMeta(
+        debugName: "Chart_auto_accessor_set_visible",
+        argNames: ["that", "visible"],
       );
 
   @override
@@ -1439,7 +1753,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 26,
+            funcId: 34,
             port: port_,
           );
         },
@@ -1471,7 +1785,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1501,7 +1815,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -1537,7 +1851,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             bytes,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1570,7 +1884,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(filePath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1606,7 +1920,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 31,
+            funcId: 39,
             port: port_,
           );
         },
@@ -1637,7 +1951,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 32,
+            funcId: 40,
             port: port_,
           );
         },
@@ -1673,7 +1987,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 33,
+            funcId: 41,
             port: port_,
           );
         },
@@ -1717,7 +2031,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 34,
+            funcId: 42,
             port: port_,
           );
         },
@@ -1760,7 +2074,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 35,
+            funcId: 43,
             port: port_,
           );
         },
@@ -1796,7 +2110,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_config,
@@ -1832,7 +2146,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1872,7 +2186,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 38,
+            funcId: 46,
             port: port_,
           );
         },
@@ -1912,7 +2226,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 39,
+            funcId: 47,
             port: port_,
           );
         },
@@ -1946,7 +2260,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 40,
+            funcId: 48,
             port: port_,
           );
         },
@@ -1986,7 +2300,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 41,
+            funcId: 49,
             port: port_,
           );
         },
@@ -2018,7 +2332,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 57,
+            funcId: 65,
             port: port_,
           );
         },
@@ -2048,7 +2362,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 58,
+              funcId: 66,
               port: port_,
             );
           },
@@ -2085,7 +2399,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 59,
+            funcId: 67,
             port: port_,
           );
         },
@@ -2119,7 +2433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 60,
+            funcId: 68,
             port: port_,
           );
         },
@@ -2156,7 +2470,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 61,
+            funcId: 69,
             port: port_,
           );
         },
@@ -2198,7 +2512,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 62,
+            funcId: 70,
             port: port_,
           );
         },
@@ -2239,7 +2553,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 63,
+            funcId: 71,
             port: port_,
           );
         },
@@ -2262,6 +2576,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<(double, double)> crateApiUtilGetMinMaxGetMinMaxPar({
+    required List<Point> points,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_point(points, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 72,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_record_f_32_f_32,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiUtilGetMinMaxGetMinMaxParConstMeta,
+        argValues: [points],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiUtilGetMinMaxGetMinMaxParConstMeta =>
+      const TaskConstMeta(debugName: "get_min_max_par", argNames: ["points"]);
+
+  @override
   Future<Chart> crateApiSamplingMinmaxMinmaxDownSample({
     required Minmax that,
     required Chart chart,
@@ -2280,7 +2624,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 64,
+            funcId: 73,
             port: port_,
           );
         },
@@ -2316,7 +2660,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 65,
+            funcId: 74,
             port: port_,
           );
         },
@@ -2359,7 +2703,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 66,
+            funcId: 75,
             port: port_,
           );
         },
@@ -2392,7 +2736,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 67,
+            funcId: 76,
             port: port_,
           );
         },
@@ -2425,7 +2769,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 68,
+            funcId: 77,
             port: port_,
           );
         },
@@ -2465,7 +2809,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 69,
+            funcId: 78,
             port: port_,
           );
         },
@@ -2506,7 +2850,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 70,
+            funcId: 79,
             port: port_,
           );
         },
@@ -2545,7 +2889,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 71,
+            funcId: 80,
             port: port_,
           );
         },
@@ -2579,7 +2923,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 72,
+            funcId: 81,
             port: port_,
           );
         },
@@ -2621,7 +2965,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 73,
+            funcId: 82,
             port: port_,
           );
         },
@@ -2644,6 +2988,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "zero_crossing_rate_calculator_transform",
         argNames: ["that", "data", "config"],
       );
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_ArcAtomicBool => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_ArcAtomicBool => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool;
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_ArcVecPoint => wire
@@ -2769,6 +3121,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return AnyhowException(raw as String);
+  }
+
+  @protected
+  ArcAtomicBool
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ArcAtomicBoolImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -3042,6 +3403,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ArcAtomicBool
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ArcAtomicBoolImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   ArcVecPoint
   dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcVecPoint(
     dynamic raw,
@@ -3252,6 +3622,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return AppError_Generic(dco_decode_String(raw[1]));
       case 7:
         return AppError_ProcessingError(dco_decode_String(raw[1]));
+      case 8:
+        return AppError_InvalidChartName(dco_decode_String(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -3486,6 +3858,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (double, double) dco_decode_record_f_32_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_f_32(arr[0]), dco_decode_f_32(arr[1]));
+  }
+
+  @protected
   SimpleFormatGetter dco_decode_simple_format_getter(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -3552,6 +3934,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
     return AnyhowException(inner);
+  }
+
+  @protected
+  ArcAtomicBool
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ArcAtomicBoolImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
@@ -3915,6 +4309,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ArcAtomicBool
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ArcAtomicBoolImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
   ArcVecPoint
   sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcVecPoint(
     SseDeserializer deserializer,
@@ -4139,6 +4545,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 7:
         var var_field0 = sse_decode_String(deserializer);
         return AppError_ProcessingError(var_field0);
+      case 8:
+        var var_field0 = sse_decode_String(deserializer);
+        return AppError_InvalidChartName(var_field0);
       default:
         throw UnimplementedError('');
     }
@@ -4399,6 +4808,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (double, double) sse_decode_record_f_32_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_f_32(deserializer);
+    var var_field1 = sse_decode_f_32(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
   SimpleFormatGetter sse_decode_simple_format_getter(
     SseDeserializer deserializer,
   ) {
@@ -4464,6 +4881,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    ArcAtomicBool self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ArcAtomicBoolImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
@@ -4858,6 +5288,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    ArcAtomicBool self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ArcAtomicBoolImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void
   sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcVecPoint(
     ArcVecPoint self,
     SseSerializer serializer,
@@ -5101,6 +5544,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(field0, serializer);
       case AppError_ProcessingError(field0: final field0):
         sse_encode_i_32(7, serializer);
+        sse_encode_String(field0, serializer);
+      case AppError_InvalidChartName(field0: final field0):
+        sse_encode_i_32(8, serializer);
         sse_encode_String(field0, serializer);
     }
   }
@@ -5358,6 +5804,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_record_f_32_f_32(
+    (double, double) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_32(self.$1, serializer);
+    sse_encode_f_32(self.$2, serializer);
+  }
+
+  @protected
   void sse_encode_simple_format_getter(
     SimpleFormatGetter self,
     SseSerializer serializer,
@@ -5417,6 +5873,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
   }
+}
+
+@sealed
+class ArcAtomicBoolImpl extends RustOpaque implements ArcAtomicBool {
+  // Not to be used by end users
+  ArcAtomicBoolImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  ArcAtomicBoolImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_ArcAtomicBool,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_ArcAtomicBool,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_ArcAtomicBoolPtr,
+  );
 }
 
 @sealed
@@ -5594,6 +6070,9 @@ class AudioProcessorEngineImpl extends RustOpaque
   Future<double> getMaxIndex() => RustLib.instance.api
       .crateApiCoreEngineAudioProcessorEngineGetMaxIndex(that: this);
 
+  Future<(double, double)> getYRange() => RustLib.instance.api
+      .crateApiCoreEngineAudioProcessorEngineGetYRange(that: this);
+
   Future<void> removeAudio({required String filePath}) =>
       RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineRemoveAudio(
         that: this,
@@ -5608,6 +6087,12 @@ class AudioProcessorEngineImpl extends RustOpaque
     filePath: filePath,
     dataType: dataType,
   );
+
+  Future<void> reserveVisible({required String chartName}) =>
+      RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineReserveVisible(
+        that: this,
+        chartName: chartName,
+      );
 
   Future<void> setConfig({required Config config}) =>
       RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineSetConfig(
@@ -5748,8 +6233,17 @@ class ChartImpl extends RustOpaque implements Chart {
   DataType get dataType => RustLib.instance.api
       .crateApiTypesChartChartAutoAccessorGetDataType(that: this);
 
+  double get maxY => RustLib.instance.api
+      .crateApiTypesChartChartAutoAccessorGetMaxY(that: this);
+
+  double get minY => RustLib.instance.api
+      .crateApiTypesChartChartAutoAccessorGetMinY(that: this);
+
   ArcVecPoint get points => RustLib.instance.api
       .crateApiTypesChartChartAutoAccessorGetPoints(that: this);
+
+  ArcAtomicBool get visible => RustLib.instance.api
+      .crateApiTypesChartChartAutoAccessorGetVisible(that: this);
 
   set dataType(DataType dataType) =>
       RustLib.instance.api.crateApiTypesChartChartAutoAccessorSetDataType(
@@ -5757,8 +6251,20 @@ class ChartImpl extends RustOpaque implements Chart {
         dataType: dataType,
       );
 
+  set maxY(double maxY) => RustLib.instance.api
+      .crateApiTypesChartChartAutoAccessorSetMaxY(that: this, maxY: maxY);
+
+  set minY(double minY) => RustLib.instance.api
+      .crateApiTypesChartChartAutoAccessorSetMinY(that: this, minY: minY);
+
   set points(ArcVecPoint points) => RustLib.instance.api
       .crateApiTypesChartChartAutoAccessorSetPoints(that: this, points: points);
+
+  set visible(ArcAtomicBool visible) =>
+      RustLib.instance.api.crateApiTypesChartChartAutoAccessorSetVisible(
+        that: this,
+        visible: visible,
+      );
 
   Future<Chart> getRange({required double startX, required double endX}) =>
       RustLib.instance.api.crateApiTypesChartChartGetRange(

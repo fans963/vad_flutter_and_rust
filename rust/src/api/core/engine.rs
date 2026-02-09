@@ -1,3 +1,4 @@
+use std::sync::atomic;
 
 use log::info;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
@@ -32,6 +33,7 @@ pub struct AudioProcessorEngine {
     index_range: (f32, f32),
     selected_audio: Option<String>,
     max_index: f32,
+    y_range: (f32, f32),
 }
 
 impl AudioProcessorEngine {
@@ -52,19 +54,26 @@ impl AudioProcessorEngine {
             index_range: (0.0, 0.0),
             selected_audio: None,
             max_index: 10000.0,
+            y_range: (-0.5, 0.5),
         }
     }
 
     fn update_all(&mut self) {
         let all_charts = self.cache.get_all_cache();
-
+        self.y_range = (-0.5, 0.5);
         if let Ok(charts) = all_charts {
-            let visable_charts: Vec<ChartWIthKey> = charts
-                .par_iter()
+            let visible_charts: Vec<ChartWIthKey> = charts
+                .iter()
                 .map(|c| {
-                    let visable_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
-                    let downsampled_chart = Minmax{}
-                        .down_sample(visable_chart, self.down_sample_points_num);
+                    if c.chart.visible.load(atomic::Ordering::Relaxed) {
+                        self.y_range = (
+                            self.y_range.0.min(c.chart.min_y),
+                            self.y_range.1.max(c.chart.max_y),
+                        );
+                    }
+                    let visible_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
+                    let downsampled_chart =
+                        Minmax {}.down_sample(visible_chart, self.down_sample_points_num);
                     ChartWIthKey {
                         key: c.key.clone(),
                         chart: downsampled_chart,
@@ -72,7 +81,7 @@ impl AudioProcessorEngine {
                 })
                 .collect();
 
-            self.communicator.update_all_charts(visable_charts);
+            self.communicator.update_all_charts(visible_charts);
         }
     }
 
@@ -103,15 +112,18 @@ impl AudioProcessorEngine {
         self.storage
             .save(file_path.clone(), decoded_audio.clone())?;
 
-        let audio_chart = decoded_audio.audio_to_chart();
+        let audio_chart = decoded_audio.audio_to_chart().await;
+        self.y_range = (
+            self.y_range.0.min(audio_chart.min_y),
+            self.y_range.1.max(audio_chart.max_y),
+        );
         self.update_max_index(&audio_chart);
 
         self.cache.add(file_path.clone(), audio_chart.clone())?;
 
         let visible_chart = audio_chart.get_range(self.index_range.0, self.index_range.1);
 
-        let downsampled_chart = Minmax{}
-            .down_sample(visible_chart, self.down_sample_points_num);
+        let downsampled_chart = Minmax {}.down_sample(visible_chart, self.down_sample_points_num);
         self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
     }
@@ -120,21 +132,31 @@ impl AudioProcessorEngine {
         self.storage.remove(file_path)
     }
 
-    pub async fn add_chart(&mut self, file_path: String, data_type: DataType) -> Result<(), AppError> {
+    pub async fn add_chart(
+        &mut self,
+        file_path: String,
+        data_type: DataType,
+    ) -> Result<(), AppError> {
         let target_chart = if let Ok(cached_data) = self.cache.get(file_path.clone(), data_type) {
             cached_data
         } else {
             let stored_audio = self.storage.load(file_path.clone())?;
             let chart = match data_type {
-                DataType::Audio => stored_audio.audio_to_chart(),
+                DataType::Audio => stored_audio.audio_to_chart().await,
                 DataType::Spectrum => {
-                    (FftTransform {}).transform(stored_audio, self.config.clone())?
+                    (FftTransform {})
+                        .transform(stored_audio, self.config.clone())
+                        .await?
                 }
                 DataType::Energy => {
-                    (EnergyCalculator {}).transform(stored_audio, self.config.clone())?
+                    (EnergyCalculator {})
+                        .transform(stored_audio, self.config.clone())
+                        .await?
                 }
                 DataType::ZeroCrossingRate => {
-                    (ZeroCrossingRateCalculator {}).transform(stored_audio, self.config.clone())?
+                    (ZeroCrossingRateCalculator {})
+                        .transform(stored_audio, self.config.clone())
+                        .await?
                 }
             };
             self.cache.add(file_path.clone(), chart.clone())?;
@@ -144,8 +166,7 @@ impl AudioProcessorEngine {
         self.update_max_index(&target_chart);
         let visible_chart = target_chart.get_range(self.index_range.0, self.index_range.1);
 
-        let downsampled_chart = Minmax{}
-            .down_sample(visible_chart, self.down_sample_points_num);
+        let downsampled_chart = Minmax {}.down_sample(visible_chart, self.down_sample_points_num);
         self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
     }
@@ -165,13 +186,44 @@ impl AudioProcessorEngine {
     fn update_max_index(&mut self, chart: &Chart) {
         chart.points.last().map(|p| {
             if p.x > self.max_index {
-                self.max_index = (p.x / self.config.frame_size as f32).ceil() * self.config.frame_size as f32;
+                self.max_index =
+                    (p.x / self.config.frame_size as f32).ceil() * self.config.frame_size as f32;
             }
         });
     }
 
+    pub async fn reserve_visible(&mut self, chart_name: String) -> Result<(), AppError> {
+        let (file_path, data_part) = chart_name.rsplit_once(' ').unwrap_or(("", &chart_name));
+
+        let data_type = match data_part {
+            "audio" => DataType::Audio,
+            "spectrum" => DataType::Spectrum,
+            "energy" => DataType::Energy,
+            "zeroCrossingRate" => DataType::ZeroCrossingRate,
+            _ => return Err(AppError::InvalidChartName(chart_name)),
+        };
+
+        let chart = self.cache.get(file_path.to_string(), data_type)?;
+        chart.visible.store(
+            !chart.visible.load(atomic::Ordering::Relaxed),
+            atomic::Ordering::Relaxed,
+        );
+        info!(
+            "Set visible: {}, {}, {}",
+            file_path,
+            data_part,
+            chart.visible.load(atomic::Ordering::Relaxed)
+        );
+        self.update_all();
+        Ok(())
+    }
+
     pub async fn get_max_index(&self) -> f32 {
         self.max_index
+    }
+
+    pub async fn get_y_range(&self) -> (f32, f32) {
+        self.y_range
     }
 }
 

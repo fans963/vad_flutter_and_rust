@@ -25,7 +25,10 @@ pub enum AppError {
 
     #[error("Processing error: {0}")]
     ProcessingError(String),
-}
+
+    #[error("Invalid chart name: {0}")]
+    InvalidChartName(String),
+} 
 
 impl From<std::io::Error> for AppError {
     fn from(err: std::io::Error) -> Self {

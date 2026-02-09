@@ -30,6 +30,7 @@ import 'api/types/error.dart';
 import 'api/types/events.dart';
 import 'api/types/file.dart';
 import 'api/util/format_getter.dart';
+import 'api/util/get_min_max.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -43,6 +44,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     required super.generalizedFrbRustBinding,
     required super.portManager,
   });
+
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_ArcAtomicBoolPtr => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool;
 
   CrossPlatformFinalizerArg
   get rust_arc_decrement_strong_count_ArcVecPointPtr => wire
@@ -103,6 +108,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw);
+
+  @protected
+  ArcAtomicBool
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    dynamic raw,
+  );
 
   @protected
   ArcVecPoint
@@ -281,6 +292,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   KvCachedChartStorage
   dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvCachedChartStorage(
+    dynamic raw,
+  );
+
+  @protected
+  ArcAtomicBool
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
     dynamic raw,
   );
 
@@ -496,6 +513,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Point dco_decode_point(dynamic raw);
 
   @protected
+  (double, double) dco_decode_record_f_32_f_32(dynamic raw);
+
+  @protected
   SimpleFormatGetter dco_decode_simple_format_getter(dynamic raw);
 
   @protected
@@ -523,6 +543,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+
+  @protected
+  ArcAtomicBool
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ArcVecPoint
@@ -701,6 +727,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   KvCachedChartStorage
   sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvCachedChartStorage(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ArcAtomicBool
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
     SseDeserializer deserializer,
   );
 
@@ -913,6 +945,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Point sse_decode_point(SseDeserializer deserializer);
 
   @protected
+  (double, double) sse_decode_record_f_32_f_32(SseDeserializer deserializer);
+
+  @protected
   SimpleFormatGetter sse_decode_simple_format_getter(
     SseDeserializer deserializer,
   );
@@ -948,6 +983,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_AnyhowException(
     AnyhowException self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    ArcAtomicBool self,
     SseSerializer serializer,
   );
 
@@ -1158,6 +1200,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
   sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKvCachedChartStorage(
     KvCachedChartStorage self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    ArcAtomicBool self,
     SseSerializer serializer,
   );
 
@@ -1409,6 +1458,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_point(Point self, SseSerializer serializer);
 
   @protected
+  void sse_encode_record_f_32_f_32(
+    (double, double) self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_simple_format_getter(
     SimpleFormatGetter self,
     SseSerializer serializer,
@@ -1452,6 +1507,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
 class RustLibWire implements BaseWire {
   RustLibWire.fromExternalLibrary(ExternalLibrary lib);
+
+  void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+        ptr,
+      );
+
+  void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+        ptr,
+      );
 
   void
   rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcVecPoint(
@@ -1700,6 +1771,16 @@ external RustLibWasmModule get wasmModule;
 @JS()
 @anonymous
 extension type RustLibWasmModule._(JSObject _) implements JSObject {
+  external void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    int ptr,
+  );
+
+  external void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcAtomicBool(
+    int ptr,
+  );
+
   external void
   rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcVecPoint(
     int ptr,

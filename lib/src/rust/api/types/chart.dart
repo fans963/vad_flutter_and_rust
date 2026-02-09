@@ -7,17 +7,29 @@ import '../../frb_generated.dart';
 import '../../lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Chart>>
 abstract class Chart implements RustOpaqueInterface {
   DataType get dataType;
 
+  double get maxY;
+
+  double get minY;
+
   ArcVecPoint get points;
+
+  ArcAtomicBool get visible;
 
   set dataType(DataType dataType);
 
+  set maxY(double maxY);
+
+  set minY(double minY);
+
   set points(ArcVecPoint points);
+
+  set visible(ArcAtomicBool visible);
 
   Future<Chart> getRange({required double startX, required double endX});
 }

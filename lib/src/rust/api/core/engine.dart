@@ -26,6 +26,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<double> getMaxIndex();
 
+  Future<(double, double)> getYRange();
+
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<AudioProcessorEngine> newInstance({
     required Config config,
@@ -47,6 +49,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
     required String filePath,
     required DataType dataType,
   });
+
+  Future<void> reserveVisible({required String chartName});
 
   Future<void> setConfig({required Config config});
 

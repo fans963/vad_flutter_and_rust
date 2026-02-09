@@ -2,12 +2,8 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
-import 'package:vad/src/signals/chart_control_signal.dart';
 import 'package:vad/src/rust/api/events/communicator_events.dart';
 import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/rust/api/types/events.dart';
@@ -46,7 +42,9 @@ class _ChartWidgetState extends State<ChartWidget> {
   double? _lastWidth;
   late final _ChartDataContainer _chartDataContainer = _ChartDataContainer();
   double minXAxis = 0.0;
-  double maxXAxis = 10000.0; 
+  double maxXAxis = 10000.0;
+  double minYAxis = -0.5;
+  double maxYAxis = 0.5;
 
   @override
   void dispose() {
@@ -122,6 +120,16 @@ class _ChartWidgetState extends State<ChartWidget> {
       }
     });
 
+    audioProcessorEngine.engine().then((engine) async {
+      final yRange = await engine.getYRange();
+      if (yRange.$1 != minYAxis || yRange.$2 != maxYAxis) {
+        setState(() {
+          minYAxis = yRange.$1;
+          maxYAxis = yRange.$2;
+        });
+      }
+    });
+
     return LayoutBuilder(
       builder: (context, constraints) {
         WidgetsBinding.instance.addPostFrameCallback(
@@ -130,7 +138,6 @@ class _ChartWidgetState extends State<ChartWidget> {
         return SizedBox(
           key: _containerKey,
           height: 500,
-          // padding: const EdgeInsets.all(10.0),
           child: RepaintBoundary(
             child: SfCartesianChart(
               backgroundColor: Theme.of(
@@ -147,16 +154,14 @@ class _ChartWidgetState extends State<ChartWidget> {
                 enableDirectionalZooming: true,
                 selectionRectColor: Theme.of(
                   context,
-                ).colorScheme.primary.withOpacity(0.3), // 选框的颜色
-                selectionRectBorderColor: Theme.of(
-                  context,
-                ).colorScheme.primary, // 选框边框颜色
+                ).colorScheme.primary.withOpacity(0.3),
+                selectionRectBorderColor: Theme.of(context).colorScheme.primary,
                 selectionRectBorderWidth: 1,
                 enableSelectionZooming: true,
                 enablePinching: true,
                 enablePanning: true,
                 enableMouseWheelZooming: true,
-                maximumZoomLevel: 0.0005, 
+                maximumZoomLevel: 0.0005,
               ),
               primaryXAxis: NumericAxis(
                 name: 'primaryXAxis',
@@ -165,6 +170,8 @@ class _ChartWidgetState extends State<ChartWidget> {
               ),
               primaryYAxis: NumericAxis(
                 name: 'primaryYAxis',
+                minimum: minYAxis - 0.1 * minYAxis.abs(),
+                maximum: maxYAxis + 0.1 * maxYAxis.abs(),
               ),
               onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
                 if (rangeChangedArgs.axisName == 'primaryXAxis') {
@@ -174,20 +181,16 @@ class _ChartWidgetState extends State<ChartWidget> {
                   WidgetsBinding.instance.addPostFrameCallback((_) async {
                     final engine = await audioProcessorEngine.engine();
                     await engine.setIndexRange(start: minX, end: maxX);
-                    chartControlSignal.value = (
-                      minX: minX,
-                      maxX: maxX,
-                      minY: 0.0,
-                      maxY: 0.0,
-                    );
                   });
                 }
               },
               onLegendTapped: (legendTapArgs) => {
                 audioProcessorEngine.engine().then((engine) async {
                   String? seriesName = legendTapArgs.series.name;
-                  engine.setSelectedAudio(chartName: seriesName);
-                  debugPrint('Selected series: $seriesName');
+                  if (seriesName != null) {
+                    engine.setSelectedAudio(chartName: seriesName);
+                    engine.reserveVisible(chartName: seriesName);
+                  }
                 }),
               },
               series: seriesList,
@@ -242,9 +245,6 @@ class _ChartWidgetState extends State<ChartWidget> {
         seriesIndex++;
       }
     }
-
-    // debugPrint("Total series to render: ${seriesList.length}");
-
     return seriesList;
   }
 

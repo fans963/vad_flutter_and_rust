@@ -7,7 +7,7 @@ pub struct Minmax {}
 
 impl DownSample for Minmax {
     fn down_sample(&self, chart: Chart, target_points_num: usize) -> Chart {
-         let original_points = &chart.points;
+        let original_points = &chart.points;
         let n = original_points.len();
 
         if n <= target_points_num || target_points_num < 2 {
@@ -18,7 +18,7 @@ impl DownSample for Minmax {
         let bucket_size = (n / num_buckets).max(1);
 
         let mut mid_points: Vec<_> = original_points
-            .par_chunks(bucket_size) // 并行切分
+            .par_chunks(bucket_size)
             .flat_map(|chunk| {
                 if chunk.is_empty() {
                     return vec![];
@@ -54,6 +54,9 @@ impl DownSample for Minmax {
         Chart {
             data_type: chart.data_type,
             points: Arc::new(final_points),
+            min_y: chart.min_y,
+            max_y: chart.max_y,
+            visible: chart.visible,
         }
     }
 }

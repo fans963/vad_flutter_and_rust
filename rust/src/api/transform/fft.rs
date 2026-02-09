@@ -1,7 +1,7 @@
 use num_complex::Complex;
 use rayon::prelude::*;
 use rustfft::FftPlanner;
-use std::sync::Arc;
+use std::sync::{atomic::AtomicBool, Arc};
 
 use crate::api::{
     traits::transform::SignalTransform,
@@ -11,12 +11,13 @@ use crate::api::{
         config::Config,
         error::AppError,
     },
+    util::get_min_max::get_min_max_par,
 };
 
 pub struct FftTransform {}
 
 impl SignalTransform for FftTransform {
-    fn transform(&self, data: Audio, config: Config) -> Result<Chart, AppError> {
+    async fn transform(&self, data: Audio, config: Config) -> Result<Chart, AppError> {
         let samples = &data.data.samples;
         let n = samples.len();
 
@@ -24,6 +25,9 @@ impl SignalTransform for FftTransform {
             return Ok(Chart {
                 data_type: DataType::Spectrum,
                 points: Arc::new(vec![]),
+                min_y: 0.0,
+                max_y: 0.0,
+                visible: Arc::new(AtomicBool::new(true)),
             });
         }
 
@@ -61,16 +65,20 @@ impl SignalTransform for FftTransform {
                 (0..output_len).map(move |i| {
                     let magnitude = buffer[i].norm();
                     Point {
-                        x: (chunk_index*frame_size+ i * 2) as f32,
+                        x: (chunk_index * frame_size + i * 2) as f32,
                         y: magnitude,
                     }
                 })
             })
             .collect();
 
+        let (min_y, max_y) = get_min_max_par(&points).await;
         Ok(Chart {
             data_type: DataType::Spectrum,
             points: Arc::new(points),
+            min_y,
+            max_y,
+            visible: Arc::new(AtomicBool::new(true)),
         })
     }
 }

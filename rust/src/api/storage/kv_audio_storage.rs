@@ -29,7 +29,10 @@ impl AudioStorage for KvAudioStorage {
         if self.dashmap.remove(&key).is_some() {
             Ok(())
         } else {
-            Err(AppError::NotFound(format!("Audio key not found for removal: {}", key)))
+            Err(AppError::NotFound(format!(
+                "Audio key not found for removal: {}",
+                key
+            )))
         }
     }
 

@@ -28,6 +28,9 @@ impl DownSample for EqualStep {
         Chart {
             data_type: chart.data_type,
             points: Arc::new(sampled_points),
+            min_y: chart.min_y,
+            max_y: chart.max_y,
+            visible: chart.visible,
         }
     }
 }
