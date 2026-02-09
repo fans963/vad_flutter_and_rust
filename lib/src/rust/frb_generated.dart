@@ -130,7 +130,6 @@ abstract class RustLibApi extends BaseApi {
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
     required BoxCachedChartStorage cache,
-    required BoxDownSample downSampler,
     required BoxCommunicator communicator,
   });
 
@@ -460,15 +459,6 @@ abstract class RustLibApi extends BaseApi {
   CrossPlatformFinalizerArg
   get rust_arc_decrement_strong_count_BoxCommunicatorPtr;
 
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_BoxDownSample;
-
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_BoxDownSample;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_BoxDownSamplePtr;
-
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Chart;
 
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Chart;
@@ -711,7 +701,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
     required BoxCachedChartStorage cache,
-    required BoxDownSample downSampler,
     required BoxCommunicator communicator,
   }) {
     return handler.executeNormal(
@@ -731,10 +720,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             cache,
             serializer,
           );
-          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
-            downSampler,
-            serializer,
-          );
           sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync(
             communicator,
             serializer,
@@ -752,7 +737,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiCoreEngineAudioProcessorEngineNewConstMeta,
-        argValues: [config, decoder, storage, cache, downSampler, communicator],
+        argValues: [config, decoder, storage, cache, communicator],
         apiImpl: this,
       ),
     );
@@ -761,14 +746,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiCoreEngineAudioProcessorEngineNewConstMeta =>
       const TaskConstMeta(
         debugName: "AudioProcessorEngine_new",
-        argNames: [
-          "config",
-          "decoder",
-          "storage",
-          "cache",
-          "downSampler",
-          "communicator",
-        ],
+        argNames: ["config", "decoder", "storage", "cache", "communicator"],
       );
 
   @override
@@ -2748,14 +2726,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynCommunicatorSendSync;
 
   RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_BoxDownSample => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync;
-
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_BoxDownSample => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync;
-
-  RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_Chart => wire
       .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart;
 
@@ -2889,15 +2859,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return BoxCommunicatorImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  BoxDownSample
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return BoxDownSampleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -3168,15 +3129,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return BoxCommunicatorImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  BoxDownSample
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return BoxDownSampleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -3723,18 +3675,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  BoxDownSample
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return BoxDownSampleImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
   Chart
   sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
     SseDeserializer deserializer,
@@ -4089,18 +4029,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return BoxCommunicatorImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  BoxDownSample
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return BoxDownSampleImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -4670,19 +4598,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
-    BoxDownSample self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as BoxDownSampleImpl).frbInternalSseEncode(move: true),
-      serializer,
-    );
-  }
-
-  @protected
-  void
   sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerChart(
     Chart self,
     SseSerializer serializer,
@@ -5067,19 +4982,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
       (self as BoxCommunicatorImpl).frbInternalSseEncode(move: null),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxdynDownSampleSendSync(
-    BoxDownSample self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as BoxDownSampleImpl).frbInternalSseEncode(move: null),
       serializer,
     );
   }
@@ -5821,26 +5723,6 @@ class BoxCommunicatorImpl extends RustOpaque implements BoxCommunicator {
         RustLib.instance.api.rust_arc_decrement_strong_count_BoxCommunicator,
     rustArcDecrementStrongCountPtr:
         RustLib.instance.api.rust_arc_decrement_strong_count_BoxCommunicatorPtr,
-  );
-}
-
-@sealed
-class BoxDownSampleImpl extends RustOpaque implements BoxDownSample {
-  // Not to be used by end users
-  BoxDownSampleImpl.frbInternalDcoDecode(List<dynamic> wire)
-    : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  BoxDownSampleImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_BoxDownSample,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_BoxDownSample,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_BoxDownSamplePtr,
   );
 }
 

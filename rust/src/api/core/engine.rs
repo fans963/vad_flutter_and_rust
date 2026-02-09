@@ -5,7 +5,7 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use crate::api::{
     communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
-    sampling::minmax::Minmax,
+    sampling::minmax::{self, Minmax},
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
         audio_decoder::AudioDecoder, audio_storage::AudioStorage,
@@ -27,7 +27,6 @@ pub struct AudioProcessorEngine {
     decoder: Box<dyn AudioDecoder + Send + Sync>,
     storage: Box<dyn AudioStorage + Send + Sync>,
     cache: Box<dyn CachedChartStorage + Send + Sync>,
-    down_sampler: Box<dyn DownSample + Send + Sync>,
     communicator: Box<dyn Communicator + Send + Sync>,
     down_sample_points_num: usize,
     index_range: (f32, f32),
@@ -41,7 +40,6 @@ impl AudioProcessorEngine {
         decoder: Box<dyn AudioDecoder + Send + Sync>,
         storage: Box<dyn AudioStorage + Send + Sync>,
         cache: Box<dyn CachedChartStorage + Send + Sync>,
-        down_sampler: Box<dyn DownSample + Send + Sync>,
         communicator: Box<dyn Communicator + Send + Sync>,
     ) -> Self {
         Self {
@@ -49,7 +47,6 @@ impl AudioProcessorEngine {
             decoder,
             storage,
             cache,
-            down_sampler,
             communicator,
             down_sample_points_num: 500,
             index_range: (0.0, 0.0),
@@ -66,8 +63,7 @@ impl AudioProcessorEngine {
                 .par_iter()
                 .map(|c| {
                     let visable_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
-                    let downsampled_chart = self
-                        .down_sampler
+                    let downsampled_chart = Minmax{}
                         .down_sample(visable_chart, self.down_sample_points_num);
                     ChartWIthKey {
                         key: c.key.clone(),
@@ -114,8 +110,7 @@ impl AudioProcessorEngine {
 
         let visible_chart = audio_chart.get_range(self.index_range.0, self.index_range.1);
 
-        let downsampled_chart = self
-            .down_sampler
+        let downsampled_chart = Minmax{}
             .down_sample(visible_chart, self.down_sample_points_num);
         self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
@@ -149,8 +144,7 @@ impl AudioProcessorEngine {
         self.update_max_index(&target_chart);
         let visible_chart = target_chart.get_range(self.index_range.0, self.index_range.1);
 
-        let downsampled_chart = self
-            .down_sampler
+        let downsampled_chart = Minmax{}
             .down_sample(visible_chart, self.down_sample_points_num);
         self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
@@ -187,7 +181,6 @@ pub async fn create_default_engine(config: Config) -> AudioProcessorEngine {
         Box::new(SymphoniaDecoder::new()),
         Box::new(KvAudioStorage::new()),
         Box::new(KvCachedChartStorage::new()),
-        Box::new(Minmax {}),
         Box::new(communicator::stream_sink_communicator::StreamCommunicator::new()),
     )
 }

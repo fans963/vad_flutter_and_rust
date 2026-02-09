@@ -32,14 +32,12 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
     required BoxAudioDecoder decoder,
     required BoxAudioStorage storage,
     required BoxCachedChartStorage cache,
-    required BoxDownSample downSampler,
     required BoxCommunicator communicator,
   }) => RustLib.instance.api.crateApiCoreEngineAudioProcessorEngineNew(
     config: config,
     decoder: decoder,
     storage: storage,
     cache: cache,
-    downSampler: downSampler,
     communicator: communicator,
   );
 
@@ -70,6 +68,3 @@ abstract class BoxCachedChartStorage implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn Communicator + Send + Sync >>>
 abstract class BoxCommunicator implements RustOpaqueInterface {}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn DownSample + Send + Sync >>>
-abstract class BoxDownSample implements RustOpaqueInterface {}
