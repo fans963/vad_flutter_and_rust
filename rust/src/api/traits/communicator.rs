@@ -5,4 +5,6 @@ pub trait Communicator {
     fn remove_chart(&self, key: String, data_type: DataType);
     fn update_all_charts(&self,charts:Vec<ChartWIthKey>);
     fn remove_all_charts(&self);
+    fn update_max_index(&self, max_index: f32);
+    fn update_y_range(&self, min_y: f32, max_y: f32);
 }

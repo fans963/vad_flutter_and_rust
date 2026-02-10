@@ -13,4 +13,11 @@ pub enum ChartEvent {
         charts: Vec<CommunicatorChart>,
     },
     RemoveAllCharts,
+    UpdateMaxIndex{
+        max_index:f32,
+    },
+    UpdateYRange{
+        min_y:f32,
+        max_y:f32,
+    },
 }

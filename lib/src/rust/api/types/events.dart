@@ -25,4 +25,10 @@ sealed class ChartEvent with _$ChartEvent {
     required List<CommunicatorChart> charts,
   }) = ChartEvent_UpdateAllCharts;
   const factory ChartEvent.removeAllCharts() = ChartEvent_RemoveAllCharts;
+  const factory ChartEvent.updateMaxIndex({required double maxIndex}) =
+      ChartEvent_UpdateMaxIndex;
+  const factory ChartEvent.updateYRange({
+    required double minY,
+    required double maxY,
+  }) = ChartEvent_UpdateYRange;
 }

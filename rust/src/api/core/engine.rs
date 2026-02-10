@@ -61,6 +61,7 @@ impl AudioProcessorEngine {
     fn update_all(&mut self) {
         let all_charts = self.cache.get_all_cache();
         self.y_range = (-0.5, 0.5);
+        self.max_index = 10000.0;
         if let Ok(charts) = all_charts {
             let visible_charts: Vec<ChartWIthKey> = charts
                 .iter()
@@ -70,6 +71,8 @@ impl AudioProcessorEngine {
                             self.y_range.0.min(c.chart.min_y),
                             self.y_range.1.max(c.chart.max_y),
                         );
+
+                        self.update_max_index(&c.chart);
                     }
                     let visible_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
                     let downsampled_chart =
@@ -82,6 +85,10 @@ impl AudioProcessorEngine {
                 .collect();
 
             self.communicator.update_all_charts(visible_charts);
+            self.communicator
+                .update_max_index(self.max_index);
+            self.communicator
+                .update_y_range(self.y_range.0, self.y_range.1);
         }
     }
 
@@ -118,6 +125,10 @@ impl AudioProcessorEngine {
             self.y_range.1.max(audio_chart.max_y),
         );
         self.update_max_index(&audio_chart);
+        self.communicator
+            .update_max_index(self.max_index);
+        self.communicator
+            .update_y_range(self.y_range.0, self.y_range.1);
 
         self.cache.add(file_path.clone(), audio_chart.clone())?;
 
@@ -164,6 +175,10 @@ impl AudioProcessorEngine {
             chart
         };
         self.update_max_index(&target_chart);
+        self.communicator
+            .update_max_index(self.max_index);
+        self.communicator
+            .update_y_range(self.y_range.0, self.y_range.1);
         let visible_chart = target_chart.get_range(self.index_range.0, self.index_range.1);
 
         let downsampled_chart = Minmax {}.down_sample(visible_chart, self.down_sample_points_num);
@@ -216,14 +231,6 @@ impl AudioProcessorEngine {
         );
         self.update_all();
         Ok(())
-    }
-
-    pub async fn get_max_index(&self) -> f32 {
-        self.max_index
-    }
-
-    pub async fn get_y_range(&self) -> (f32, f32) {
-        self.y_range
     }
 }
 

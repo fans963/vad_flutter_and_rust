@@ -46,6 +46,24 @@ class StreamCommunicator {
         charts: charts,
       );
 
+  Future<void> updateMaxIndex({required double maxIndex}) => RustLib
+      .instance
+      .api
+      .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateMaxIndex(
+        that: this,
+        maxIndex: maxIndex,
+      );
+
+  Future<void> updateYRange({
+    required double minY,
+    required double maxY,
+  }) => RustLib.instance.api
+      .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateYRange(
+        that: this,
+        minY: minY,
+        maxY: maxY,
+      );
+
   @override
   int get hashCode => 0;
 

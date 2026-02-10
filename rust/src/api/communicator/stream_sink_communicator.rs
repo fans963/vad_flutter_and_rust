@@ -49,4 +49,12 @@ impl Communicator for StreamCommunicator {
     fn remove_chart(&self, key: String, data_type: DataType) {
         emit_chart_event(ChartEvent::RemoveChart { key, data_type });
     }
+
+    fn update_max_index(&self, max_index: f32) {
+        emit_chart_event(ChartEvent::UpdateMaxIndex { max_index });
+    }
+    
+    fn update_y_range(&self, min_y: f32, max_y: f32) {
+        emit_chart_event(ChartEvent::UpdateYRange { min_y, max_y });
+    }
 }

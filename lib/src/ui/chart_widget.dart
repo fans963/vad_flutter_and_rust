@@ -55,7 +55,6 @@ class _ChartWidgetState extends State<ChartWidget> {
   @override
   void initState() {
     super.initState();
-    _updateRanges();
     _chartEventSubscription = createChartEventStream().listen(
       (event) {
         switch (event) {
@@ -78,36 +77,21 @@ class _ChartWidgetState extends State<ChartWidget> {
             {
               _chartDataContainer.clearAll();
             }
+          case ChartEvent_UpdateMaxIndex():
+            {
+              maxXAxis = event.maxIndex.toDouble();
+            }
+          case ChartEvent_UpdateYRange():
+            {
+              minYAxis = event.minY.toDouble();
+              maxYAxis = event.maxY.toDouble();
+            }
         }
         setState(() {});
-        _updateRanges();
       },
       onError: (error) => debugPrint('Chart event stream error: $error'),
       cancelOnError: false,
     );
-  }
-
-  Future<void> _updateRanges() async {
-    final engine = await audioProcessorEngine.engine();
-    final maxIndex = await engine.getMaxIndex();
-    final yRange = await engine.getYRange();
-
-    if (mounted) {
-      bool changed = false;
-      if (maxIndex != maxXAxis) {
-        maxXAxis = maxIndex;
-        changed = true;
-      }
-      if (yRange.$1 != minYAxis || yRange.$2 != maxYAxis) {
-        minYAxis = yRange.$1;
-        maxYAxis = yRange.$2;
-        changed = true;
-      }
-
-      if (changed) {
-        setState(() {});
-      }
-    }
   }
 
   void _onSizeChanged(Size size) {
@@ -161,24 +145,24 @@ class _ChartWidgetState extends State<ChartWidget> {
               primaryXAxis: NumericAxis(
                 minimum: 0.0,
                 maximum: maxXAxis,
-                interval: 512,
-                enableAutoIntervalOnZooming: false,
+                enableAutoIntervalOnZooming: true,
                 rangePadding: ChartRangePadding.none,
-                majorGridLines: const MajorGridLines(width: 1),
-                majorTickLines: const MajorTickLines(size: 5),
+                majorGridLines: const MajorGridLines(width: 0),
+                majorTickLines: const MajorTickLines(size: 0),
+                plotBands: [
+                  PlotBand(
+                    isVisible: true,
+                    start: 0.0,
+                    end: 0.0,
+                    borderColor: Colors.red,
+                    borderWidth: 1,
+                  ),
+                ],
               ),
               onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
                 if (rangeChangedArgs.axisName == 'primaryXAxis') {
                   double minX = (rangeChangedArgs.visibleMin as num).toDouble();
                   double maxX = (rangeChangedArgs.visibleMax as num).toDouble();
-
-                  // Snap visible range to 512 multiples
-                  final double delta = maxX - minX;
-                  minX = (minX / 512).round() * 512.0;
-                  maxX = minX + delta;
-
-                  rangeChangedArgs.visibleMin = minX;
-                  rangeChangedArgs.visibleMax = maxX;
 
                   WidgetsBinding.instance.addPostFrameCallback((_) async {
                     final engine = await audioProcessorEngine.engine();
