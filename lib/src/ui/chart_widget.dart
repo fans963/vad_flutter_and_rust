@@ -55,16 +55,13 @@ class _ChartWidgetState extends State<ChartWidget> {
   @override
   void initState() {
     super.initState();
+    _updateRanges();
     _chartEventSubscription = createChartEventStream().listen(
       (event) {
         switch (event) {
           case ChartEvent_AddChart():
             {
               _chartDataContainer.addSeries(event.chart.key, event.chart);
-              // debugPrint(
-              //   "Received ChartEvent_AddChart: ${event.chart.key}, points: ${event.chart.chart.length}",
-              // );
-              setState(() {});
             }
           case ChartEvent_UpdateAllCharts():
             {
@@ -72,28 +69,45 @@ class _ChartWidgetState extends State<ChartWidget> {
               for (final chart in event.charts) {
                 _chartDataContainer.addSeries(chart.key, chart);
               }
-              // debugPrint(
-              //   "Received ChartEvent_UpdateAllCharts: total charts: ${event.charts.length}",
-              // );
-              setState(() {});
             }
           case ChartEvent_RemoveChart():
             {
               _chartDataContainer.removeSeries(event.key);
-              // debugPrint("Removed chart: ${event.key}");
-              setState(() {});
             }
           case ChartEvent_RemoveAllCharts():
             {
               _chartDataContainer.clearAll();
-              // debugPrint("Removed all charts");
-              setState(() {});
             }
         }
+        setState(() {});
+        _updateRanges();
       },
       onError: (error) => debugPrint('Chart event stream error: $error'),
       cancelOnError: false,
     );
+  }
+
+  Future<void> _updateRanges() async {
+    final engine = await audioProcessorEngine.engine();
+    final maxIndex = await engine.getMaxIndex();
+    final yRange = await engine.getYRange();
+
+    if (mounted) {
+      bool changed = false;
+      if (maxIndex != maxXAxis) {
+        maxXAxis = maxIndex;
+        changed = true;
+      }
+      if (yRange.$1 != minYAxis || yRange.$2 != maxYAxis) {
+        minYAxis = yRange.$1;
+        maxYAxis = yRange.$2;
+        changed = true;
+      }
+
+      if (changed) {
+        setState(() {});
+      }
+    }
   }
 
   void _onSizeChanged(Size size) {
@@ -111,25 +125,6 @@ class _ChartWidgetState extends State<ChartWidget> {
   @override
   Widget build(BuildContext context) {
     final seriesList = _buildChartSeries();
-    audioProcessorEngine.engine().then((engine) async {
-      final maxIndex = await engine.getMaxIndex();
-      if (maxIndex != maxXAxis) {
-        setState(() {
-          maxXAxis = maxIndex;
-        });
-      }
-    });
-
-    audioProcessorEngine.engine().then((engine) async {
-      final yRange = await engine.getYRange();
-      if (yRange.$1 != minYAxis || yRange.$2 != maxYAxis) {
-        setState(() {
-          minYAxis = yRange.$1;
-          maxYAxis = yRange.$2;
-        });
-      }
-    });
-
     return LayoutBuilder(
       builder: (context, constraints) {
         WidgetsBinding.instance.addPostFrameCallback(
@@ -161,22 +156,29 @@ class _ChartWidgetState extends State<ChartWidget> {
                 enablePinching: true,
                 enablePanning: true,
                 enableMouseWheelZooming: true,
-                maximumZoomLevel: 0.0005,
+                maximumZoomLevel: 512.0 / maxXAxis,
               ),
               primaryXAxis: NumericAxis(
-                name: 'primaryXAxis',
                 minimum: 0.0,
                 maximum: maxXAxis,
-              ),
-              primaryYAxis: NumericAxis(
-                name: 'primaryYAxis',
-                minimum: minYAxis - 0.1 * minYAxis.abs(),
-                maximum: maxYAxis + 0.1 * maxYAxis.abs(),
+                interval: 512,
+                enableAutoIntervalOnZooming: false,
+                rangePadding: ChartRangePadding.none,
+                majorGridLines: const MajorGridLines(width: 1),
+                majorTickLines: const MajorTickLines(size: 5),
               ),
               onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
                 if (rangeChangedArgs.axisName == 'primaryXAxis') {
-                  final minX = (rangeChangedArgs.visibleMin as num).toDouble();
-                  final maxX = (rangeChangedArgs.visibleMax as num).toDouble();
+                  double minX = (rangeChangedArgs.visibleMin as num).toDouble();
+                  double maxX = (rangeChangedArgs.visibleMax as num).toDouble();
+
+                  // Snap visible range to 512 multiples
+                  final double delta = maxX - minX;
+                  minX = (minX / 512).round() * 512.0;
+                  maxX = minX + delta;
+
+                  rangeChangedArgs.visibleMin = minX;
+                  rangeChangedArgs.visibleMax = maxX;
 
                   WidgetsBinding.instance.addPostFrameCallback((_) async {
                     final engine = await audioProcessorEngine.engine();
