@@ -1,3 +1,4 @@
 {
   "dart.flutterSdkPath": ".fvm/versions/beta",
+  "cmake.sourceDirectory": "/home/fan/workspace/vad_flutter_and_rust/linux"
 }
