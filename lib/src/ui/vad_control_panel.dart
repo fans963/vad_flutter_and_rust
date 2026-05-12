@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/rust/api/types/vad.dart';
 import 'package:vad/src/signals/chart_series_signal.dart';
 import 'package:vad/src/signals/vad_signal.dart';
@@ -148,8 +149,8 @@ class _VadControlPanelState extends State<VadControlPanel> {
 
   Widget _buildRunButton(BuildContext context) {
     final selected = chartSeriesManager.selectedKeySignal.value;
-    final hasResult = selected != null && vadPointsSignal.value.containsKey(
-      ChartSeriesManager.parseKey(selected).$1,
+    final hasResult = selected != null && chartSeriesManager.getAllSeries().any(
+      (s) => s.$1 == ChartSeriesManager.parseKey(selected).$1 && s.$2 == DataType.vad,
     );
 
     return Column(

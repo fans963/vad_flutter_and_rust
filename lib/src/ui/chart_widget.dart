@@ -6,7 +6,6 @@ import 'package:signals/signals_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:vad/src/signals/chart_control_signal.dart';
 import 'package:vad/src/signals/chart_series_signal.dart';
-import 'package:vad/src/signals/vad_signal.dart';
 import 'package:vad/src/rust/api/events/communicator_events.dart';
 import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/rust/api/types/events.dart';
@@ -79,10 +78,7 @@ class _ChartWidgetState extends State<ChartWidget> {
             }
             _dataVersion.value++;
           case ChartEvent_RemoveChart():
-            _chartDataContainer.removeChartByType(
-              event.key,
-              event.dataType,
-            );
+            _chartDataContainer.removeChartByType(event.key, event.dataType);
             chartSeriesManager.unregisterSeries(event.key, event.dataType);
             _dataVersion.value++;
           case ChartEvent_RemoveAllCharts():
@@ -107,7 +103,6 @@ class _ChartWidgetState extends State<ChartWidget> {
     return Watch((context) {
       _dataVersion.value;
       chartSeriesManager.versionSignal.value;
-      vadVersionSignal.value;
       xViewMinSignal.value;
       xViewMaxSignal.value;
       yViewMinSignal.value;
@@ -122,10 +117,13 @@ class _ChartWidgetState extends State<ChartWidget> {
         child: RepaintBoundary(
           child: SfCartesianChart(
             key: ValueKey('chart_${_dataVersion.value}'),
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerLowest,
             legend: Legend(
               isVisible: true,
               isResponsive: true,
+              toggleSeriesVisibility: false,
               position: LegendPosition.bottom,
             ),
             primaryXAxis: NumericAxis(
@@ -159,7 +157,6 @@ class _ChartWidgetState extends State<ChartWidget> {
 
   List<CartesianSeries> _buildChartSeries() {
     final keys = _chartDataContainer.getKeys();
-    final vadData = vadPointsSignal.value;
 
     final seriesList = <CartesianSeries>[];
 
@@ -194,6 +191,19 @@ class _ChartWidgetState extends State<ChartWidget> {
                 width: lineWidth,
               ),
             );
+          case DataType.vad:
+            seriesList.add(
+              AreaSeries<Point, double>(
+                name: '$key ${communicatorChart.dataType.name}',
+                dataSource: communicatorChart.chart,
+                xValueMapper: (p, _) => p.x,
+                yValueMapper: (p, _) => p.y,
+                color: Colors.green.withOpacity(0.25),
+                borderColor: Colors.green.withOpacity(0.6),
+                borderWidth: 1,
+                animationDuration: 0,
+              ),
+            );
           default:
             seriesList.add(
               FastLineSeries<Point, double>(
@@ -207,22 +217,6 @@ class _ChartWidgetState extends State<ChartWidget> {
               ),
             );
         }
-      }
-
-      final vadPoints = vadData[key];
-      if (vadPoints != null && vadPoints.isNotEmpty) {
-        seriesList.add(
-          AreaSeries<Point, double>(
-            name: '$key VAD',
-            dataSource: vadPoints,
-            xValueMapper: (p, _) => p.x,
-            yValueMapper: (p, _) => p.y,
-            color: Colors.green.withOpacity(0.25),
-            borderColor: Colors.green.withOpacity(0.6),
-            borderWidth: 1,
-            animationDuration: 0,
-          ),
-        );
       }
     }
     return seriesList;

@@ -13,6 +13,7 @@ pub enum DataType {
     Spectrum,
     Energy,
     ZeroCrossingRate,
+    Vad,
 }
 
 #[derive(Clone, Debug)]
@@ -23,21 +24,6 @@ pub struct Chart {
     pub max_y: f32,
     pub visible: Arc<AtomicBool>,
 }
-
-// impl PartialEq for Chart {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.data_type == other.data_type
-//             && self.points == other.points
-//             && self.min_y == other.min_y
-//             && self.max_y == other.max_y
-//             && self
-//                 .visible
-//                 .load(atomic::Ordering::Relaxed)
-//                 == other
-//                     .visible
-//                     .load(atomic::Ordering::Relaxed)
-//     }
-// }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct CommunicatorChart {
@@ -74,18 +60,6 @@ impl Chart {
         }
     }
 }
-
-// impl Default for Chart {
-//     fn default() -> Self {
-//         Self {
-//             data_type: DataType::Audio,
-//             points: Arc::new(vec![]),
-//             min_y: 0.0,
-//             max_y: 0.0,
-//             visible: Arc::new(AtomicBool::new(true)),
-//         }
-//     }
-// }
 
 #[derive(Clone)]
 pub struct ChartWIthKey {

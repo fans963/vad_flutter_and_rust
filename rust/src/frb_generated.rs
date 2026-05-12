@@ -4174,6 +4174,7 @@ impl SseDecode for crate::api::types::chart::DataType {
             1 => crate::api::types::chart::DataType::Spectrum,
             2 => crate::api::types::chart::DataType::Energy,
             3 => crate::api::types::chart::DataType::ZeroCrossingRate,
+            4 => crate::api::types::chart::DataType::Vad,
             _ => unreachable!("Invalid variant for DataType: {}", inner),
         };
     }
@@ -4967,6 +4968,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::types::chart::DataType {
             Self::Spectrum => 1.into_dart(),
             Self::Energy => 2.into_dart(),
             Self::ZeroCrossingRate => 3.into_dart(),
+            Self::Vad => 4.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -5685,6 +5687,7 @@ impl SseEncode for crate::api::types::chart::DataType {
                 crate::api::types::chart::DataType::Spectrum => 1,
                 crate::api::types::chart::DataType::Energy => 2,
                 crate::api::types::chart::DataType::ZeroCrossingRate => 3,
+                crate::api::types::chart::DataType::Vad => 4,
                 _ => {
                     unimplemented!("");
                 }

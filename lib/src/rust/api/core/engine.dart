@@ -10,7 +10,7 @@ import '../types/error.dart';
 import '../types/vad.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `update_all`, `update_max_index`
+// These functions are ignored because they are not marked as `pub`: `recompute_global_range`, `update_all`, `update_max_index`
 
 Future<AudioProcessorEngine> createDefaultEngine({required Config config}) =>
     RustLib.instance.api.crateApiCoreEngineCreateDefaultEngine(config: config);

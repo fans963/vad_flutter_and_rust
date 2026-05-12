@@ -69,7 +69,7 @@ class CommunicatorChart {
           chart == other.chart;
 }
 
-enum DataType { audio, spectrum, energy, zeroCrossingRate }
+enum DataType { audio, spectrum, energy, zeroCrossingRate, vad }
 
 class Point {
   final double x;

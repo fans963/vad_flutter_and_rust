@@ -30,6 +30,12 @@ ctor = "1.0.5"
 thiserror = "2.0.17"
 console_log = { version = "1.0", optional = false }
 console_error_panic_hook = { version = "0.1.7", optional = false }
+burn = { version = "0.21.0", default-features = false, features = ["flex"] }
+burn-flex = "0.21.0"
+burn-store = { version = "0.21.0", features = ["burnpack"] }
+
+[build-dependencies]
+burn-onnx = "0.21.0"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

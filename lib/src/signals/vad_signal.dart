@@ -18,12 +18,6 @@ final vadAlgorithmNameSignal = signal("energy");
 final vadAlgorithmsSignal = signal<List<String>>([]);
 final vadParamsSignal = signal<List<VadParamDef>>([]);
 
-/// VAD confidence chart points, keyed by file path.
-final vadPointsSignal = signal<Map<String, List<Point>>>({});
-
-/// Incremented when VAD results change, used by ChartWidget to trigger rebuild.
-final vadVersionSignal = signal(0);
-
 Future<void> refreshVadState() async {
   final engine = await audioProcessorEngine.engine();
   final names = await engine.listVadAlgorithms();
@@ -42,19 +36,6 @@ Future<void> selectVadAlgorithm(String name) async {
 
 Future<void> runVadOnFile(String filePath) async {
   final engine = await audioProcessorEngine.engine();
-  final result = await engine.computeVad(filePath: filePath);
-
-  final points = <Point>[];
-  for (int i = 0; i < result.confidence.length; i++) {
-    points.add(Point(
-      x: (i * result.frameSize).toDouble(),
-      y: result.confidence[i].toDouble(),
-    ));
-  }
-
-  final updated = Map<String, List<Point>>.from(vadPointsSignal.value);
-  updated[filePath] = points;
-  vadPointsSignal.value = updated;
-  vadVersionSignal.value++;
+  await engine.addChart(filePath: filePath, dataType: DataType.vad);
 }
 

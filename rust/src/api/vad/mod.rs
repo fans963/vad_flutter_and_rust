@@ -1,11 +1,13 @@
 pub mod energy_vad;
 pub mod zcr_vad;
+pub mod silero_vad;
 
 use std::sync::{Mutex, OnceLock};
 
 use crate::api::traits::vad_algorithm::VadAlgorithm;
 use energy_vad::EnergyVad;
 use zcr_vad::ZeroCrossingRateVad;
+use silero_vad::SileroVad;
 
 type VadBox = Box<dyn VadAlgorithm + Send>;
 
@@ -16,7 +18,16 @@ fn vad_lock() -> &'static Mutex<VadBox> {
 }
 
 pub fn list_algorithm_names() -> Vec<String> {
-    vec!["energy".into(), "zcr".into()]
+    vec!["energy".into(), "zcr".into(), "silero".into()]
+}
+
+fn create_vad(name: &str) -> Option<VadBox> {
+    match name {
+        "energy" => Some(Box::new(EnergyVad::default())),
+        "zcr" => Some(Box::new(ZeroCrossingRateVad::default())),
+        "silero" => Some(Box::new(SileroVad::default())),
+        _ => None,
+    }
 }
 
 pub fn current_algorithm_name() -> String {
@@ -39,12 +50,4 @@ pub fn set_parameter(key: &str, value: f32) {
 
 pub fn process(samples: &[f32], sample_rate: u32) -> crate::api::types::vad::VadResult {
     vad_lock().lock().unwrap().process(samples, sample_rate)
-}
-
-fn create_vad(name: &str) -> Option<VadBox> {
-    match name {
-        "energy" => Some(Box::new(EnergyVad::default())),
-        "zcr" => Some(Box::new(ZeroCrossingRateVad::default())),
-        _ => None,
-    }
 }

@@ -66,9 +66,10 @@ class ChartSeriesManager {
     final key = makeKey(filePath, dataType);
     if (_series.containsKey(key)) return _series[key]!.color;
 
-    _series[key] = SeriesMeta(color: _nextDefaultColor());
+    final color = dataType == DataType.vad ? Colors.green : _nextDefaultColor();
+    _series[key] = SeriesMeta(color: color);
     versionSignal.value++;
-    return _series[key]!.color;
+    return color;
   }
 
   /// Remove a series (called when RemoveChart arrives or user deletes).
