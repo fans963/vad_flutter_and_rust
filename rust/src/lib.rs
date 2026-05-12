@@ -28,7 +28,6 @@ fn init_logger() {
     });
 }
 
-#[ctor::ctor]
 fn init() {
     init_logger();
 }
