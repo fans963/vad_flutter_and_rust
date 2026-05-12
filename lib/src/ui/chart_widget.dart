@@ -4,6 +4,8 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
+import 'package:vad/src/signals/chart_control_signal.dart';
+import 'package:vad/src/signals/chart_series_signal.dart';
 import 'package:vad/src/rust/api/events/communicator_events.dart';
 import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/rust/api/types/events.dart';
@@ -27,6 +29,14 @@ class _ChartDataContainer {
     seriesData.remove(key);
   }
 
+  void removeChartByType(String key, DataType dataType) {
+    final list = seriesData[key];
+    if (list != null) {
+      list.removeWhere((c) => c.dataType == dataType);
+      if (list.isEmpty) seriesData.remove(key);
+    }
+  }
+
   void clearAll() {
     seriesData.clear();
   }
@@ -39,15 +49,12 @@ class _ChartDataContainer {
 class _ChartWidgetState extends State<ChartWidget> {
   StreamSubscription<ChartEvent>? _chartEventSubscription;
   final _containerKey = GlobalKey();
-  double? _lastWidth;
-  late final _ChartDataContainer _chartDataContainer = _ChartDataContainer();
-  double minXAxis = 0.0;
-  double maxXAxis = 10000.0;
-  double minYAxis = -0.5;
-  double maxYAxis = 0.5;
+  final _ChartDataContainer _chartDataContainer = _ChartDataContainer();
+  int _dataVersion = 0;
 
   @override
   void dispose() {
+    onViewRangeChanged = null;
     _chartEventSubscription?.cancel();
     super.dispose();
   }
@@ -55,36 +62,53 @@ class _ChartWidgetState extends State<ChartWidget> {
   @override
   void initState() {
     super.initState();
+    onViewRangeChanged = _onViewRangeChanged;
+
     _chartEventSubscription = createChartEventStream().listen(
       (event) {
         switch (event) {
           case ChartEvent_AddChart():
             {
               _chartDataContainer.addSeries(event.chart.key, event.chart);
+              chartSeriesManager.registerSeries(
+                event.chart.key,
+                event.chart.dataType,
+              );
+              _dataVersion++;
             }
           case ChartEvent_UpdateAllCharts():
             {
               _chartDataContainer.clearAll();
               for (final chart in event.charts) {
                 _chartDataContainer.addSeries(chart.key, chart);
+                chartSeriesManager.registerSeries(chart.key, chart.dataType);
               }
+              _dataVersion++;
             }
           case ChartEvent_RemoveChart():
             {
-              _chartDataContainer.removeSeries(event.key);
+              _chartDataContainer.removeChartByType(
+                event.key,
+                event.dataType,
+              );
+              chartSeriesManager.unregisterSeries(event.key, event.dataType);
+              _dataVersion++;
             }
           case ChartEvent_RemoveAllCharts():
             {
               _chartDataContainer.clearAll();
+              _dataVersion++;
             }
           case ChartEvent_UpdateMaxIndex():
             {
-              maxXAxis = event.maxIndex.toDouble();
+              chartMaxIndexSignal.value = event.maxIndex.toDouble();
+              recomputeVisibleRanges();
             }
           case ChartEvent_UpdateYRange():
             {
-              minYAxis = event.minY.toDouble();
-              maxYAxis = event.maxY.toDouble();
+              yAutoMinSignal.value = event.minY.toDouble();
+              yAutoMaxSignal.value = event.maxY.toDouble();
+              recomputeVisibleRanges();
             }
         }
         setState(() {});
@@ -94,111 +118,95 @@ class _ChartWidgetState extends State<ChartWidget> {
     );
   }
 
-  void _onSizeChanged(Size size) {
-    if (size.width != _lastWidth) {
-      _lastWidth = size.width;
-      _updateEnginePoints(size.width);
-    }
-  }
-
-  Future<void> _updateEnginePoints(double width) async {
-    final engine = await audioProcessorEngine.engine();
-    await engine.setDownSamplePointsNum(pointsNum: BigInt.from(width.toInt()));
+  void _onViewRangeChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    chartSeriesManager.versionSignal.value; // track series state changes
     final seriesList = _buildChartSeries();
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => _onSizeChanged(constraints.biggest),
-        );
-        return SizedBox(
-          key: _containerKey,
-          height: 500,
-          child: RepaintBoundary(
-            child: SfCartesianChart(
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerLowest,
-              legend: Legend(
-                isVisible: true,
-                isResponsive: true,
-                position: LegendPosition.bottom,
-              ),
-              zoomPanBehavior: ZoomPanBehavior(
-                zoomMode: ZoomMode.xy,
-                enableDoubleTapZooming: true,
-                enableDirectionalZooming: true,
-                selectionRectColor: Theme.of(
-                  context,
-                ).colorScheme.primary.withOpacity(0.3),
-                selectionRectBorderColor: Theme.of(context).colorScheme.primary,
-                selectionRectBorderWidth: 1,
-                enableSelectionZooming: true,
-                enablePinching: true,
-                enablePanning: true,
-                enableMouseWheelZooming: true,
-                maximumZoomLevel: 512.0 / maxXAxis,
-              ),
-              primaryXAxis: NumericAxis(
-                minimum: 0.0,
-                maximum: maxXAxis,
-                enableAutoIntervalOnZooming: true,
-                rangePadding: ChartRangePadding.none,
-                majorGridLines: const MajorGridLines(width: 0),
-                majorTickLines: const MajorTickLines(size: 0),
-                plotBands: [
-                  PlotBand(
-                    isVisible: true,
-                    start: 0.0,
-                    end: 0.0,
-                    borderColor: Colors.red,
-                    borderWidth: 1,
-                  ),
-                ],
-              ),
-              onActualRangeChanged: (ActualRangeChangedArgs rangeChangedArgs) {
-                if (rangeChangedArgs.axisName == 'primaryXAxis') {
-                  double minX = (rangeChangedArgs.visibleMin as num).toDouble();
-                  double maxX = (rangeChangedArgs.visibleMax as num).toDouble();
-
-                  WidgetsBinding.instance.addPostFrameCallback((_) async {
-                    final engine = await audioProcessorEngine.engine();
-                    await engine.setIndexRange(start: minX, end: maxX);
-                  });
-                }
-              },
-              onLegendTapped: (legendTapArgs) => {
-                audioProcessorEngine.engine().then((engine) async {
-                  String? seriesName = legendTapArgs.series.name;
-                  if (seriesName != null) {
-                    engine.setSelectedAudio(chartName: seriesName);
-                    engine.reserveVisible(chartName: seriesName);
-                  }
-                }),
-              },
-              series: seriesList,
+    final xMin = xViewMinSignal.value;
+    final xMax = xViewMaxSignal.value;
+    final yMin = yViewMinSignal.value;
+    final yMax = yViewMaxSignal.value;
+    return SizedBox(
+      key: _containerKey,
+      height: 500,
+      child: RepaintBoundary(
+        child: SfCartesianChart(
+          key: ValueKey(
+              'chart_${xMin.toInt()}_${xMax.toInt()}_$_dataVersion'
+              '_v${chartSeriesManager.versionSignal.value}',
             ),
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerLowest,
+          legend: Legend(
+            isVisible: true,
+            isResponsive: true,
+            position: LegendPosition.bottom,
           ),
-        );
-      },
+          primaryXAxis: NumericAxis(
+            minimum: xViewMinSignal.value,
+            maximum: xViewMaxSignal.value,
+            rangePadding: ChartRangePadding.none,
+            majorGridLines: const MajorGridLines(width: 0),
+            majorTickLines: const MajorTickLines(size: 0),
+            plotBands: [
+              PlotBand(
+                isVisible: true,
+                start: 0.0,
+                end: 0.0,
+                borderColor: Colors.red,
+                borderWidth: 1,
+              ),
+            ],
+          ),
+          primaryYAxis: NumericAxis(
+            minimum: yViewMinSignal.value,
+            maximum: yViewMaxSignal.value,
+            rangePadding: ChartRangePadding.none,
+            majorGridLines: const MajorGridLines(width: 0),
+          ),
+          onLegendTapped: (legendTapArgs) {
+            final rawName = legendTapArgs.series.name;
+            if (rawName == null) return;
+            // series name format: "$filePath ${dataType.name}"
+            final lastSpace = rawName.lastIndexOf(' ');
+            if (lastSpace == -1) return;
+            final filePath = rawName.substring(0, lastSpace);
+            final dtName = rawName.substring(lastSpace + 1);
+            final dataType =
+                DataType.values.firstWhere((d) => d.name == dtName);
+            chartSeriesManager.select(filePath, dataType);
+          },
+          series: seriesList,
+        ),
+      ),
     );
   }
 
   List<CartesianSeries> _buildChartSeries() {
     final keys = _chartDataContainer.getKeys();
-    final colors = _getChartColors();
 
     final seriesList = <CartesianSeries>[];
-    int seriesIndex = 0;
 
     for (final key in keys) {
       final charts = _chartDataContainer.getCharts(key)!;
 
       for (final communicatorChart in charts) {
-        final color = colors[seriesIndex % colors.length];
+        final color = chartSeriesManager.getColor(
+          key,
+          communicatorChart.dataType,
+        );
+        final selected = chartSeriesManager.isSelected(
+          key,
+          communicatorChart.dataType,
+        );
+        final lineWidth = selected ? 1.5 : 0.4;
+        final opacity = selected ? 1.0 : 0.7;
+
         switch (communicatorChart.dataType) {
           case DataType.zeroCrossingRate || DataType.energy:
             {
@@ -208,8 +216,9 @@ class _ChartWidgetState extends State<ChartWidget> {
                   dataSource: communicatorChart.chart,
                   xValueMapper: (Point point, _) => point.x,
                   yValueMapper: (Point point, _) => point.y,
+                  color: color.withOpacity(opacity),
                   animationDuration: 0,
-                  width: 0.4,
+                  width: lineWidth,
                 ),
               );
             }
@@ -221,29 +230,15 @@ class _ChartWidgetState extends State<ChartWidget> {
                   dataSource: communicatorChart.chart,
                   xValueMapper: (Point point, _) => point.x,
                   yValueMapper: (Point point, _) => point.y,
-                  color: color,
-                  width: 0.4,
+                  color: color.withOpacity(opacity),
+                  width: lineWidth,
                   animationDuration: 0,
                 ),
               );
             }
         }
-        seriesIndex++;
       }
     }
     return seriesList;
-  }
-
-  List<Color> _getChartColors() {
-    return [
-      Colors.blue,
-      Colors.red,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.cyan,
-      Colors.pink,
-      Colors.amber,
-    ];
   }
 }

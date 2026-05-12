@@ -172,20 +172,11 @@ class MyApp extends StatelessWidget {
                     }
                   }
                 },
-                child: Stack(
+                child: Column(
                   children: [
-                    Column(
-                      children: [
-                        if (isDesktop) const TitleBar(),
-                        Expanded(
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(),
-                            child: const ChartWidget(),
-                          ),
-                        ),
-                        const ToolPlate(),
-                      ],
-                    ),
+                    if (isDesktop) const TitleBar(),
+                    const Expanded(child: ChartWidget()),
+                    const ToolPlate(),
                   ],
                 ),
               ),
