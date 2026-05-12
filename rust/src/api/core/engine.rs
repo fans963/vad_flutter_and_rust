@@ -1,12 +1,11 @@
 use std::sync::atomic;
 
 use log::info;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::api::{
     communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
-    sampling::minmax::{self, Minmax},
+    sampling::minmax::Minmax,
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
         audio_decoder::AudioDecoder, audio_storage::AudioStorage,

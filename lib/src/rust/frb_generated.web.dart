@@ -19,7 +19,6 @@ import 'api/traits/audio_storage.dart';
 import 'api/traits/cached_chart_storage.dart';
 import 'api/traits/communicator.dart';
 import 'api/traits/down_sample.dart';
-import 'api/traits/transform.dart';
 import 'api/transform/energy.dart';
 import 'api/transform/fft.dart';
 import 'api/transform/zero_crossing_rate.dart';
@@ -414,9 +413,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FormatGetter dco_decode_TraitDef_FormatGetter(dynamic raw);
-
-  @protected
-  SignalTransform dco_decode_TraitDef_SignalTransform(dynamic raw);
 
   @protected
   AppError dco_decode_app_error(dynamic raw);

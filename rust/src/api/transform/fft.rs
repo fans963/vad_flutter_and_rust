@@ -38,7 +38,7 @@ impl SignalTransform for FftTransform {
         };
 
         let output_len = frame_size / 2;
-        let sample_rate = data.info.sample_rate as f32;
+        let _sample_rate = data.info.sample_rate as f32;
 
         let mut planner = FftPlanner::new();
         let fft = planner.plan_fft_forward(frame_size);

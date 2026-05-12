@@ -2,12 +2,12 @@ use crate::api::{
     events::communicator_events::emit_chart_event,
     traits::communicator::Communicator,
     types::{
-        chart::{Chart, ChartWIthKey, CommunicatorChart, DataType},
+        chart::{Chart, CommunicatorChart, DataType},
         events::ChartEvent,
     },
 };
 
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::Arc;
 
 pub struct StreamCommunicator {}
 

@@ -6,6 +6,16 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "staticlib"]
 
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = [
+    "-O3",
+    "--enable-bulk-memory",
+    "--enable-threads",
+    "--enable-mutable-globals",
+    "--enable-nontrapping-float-to-int",
+    "--enable-simd",
+]
+
 [dependencies]
 flutter_rust_bridge = "=2.12.0"
 num-complex = "0.4.6"

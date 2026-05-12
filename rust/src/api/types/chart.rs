@@ -1,4 +1,4 @@
-use std::sync::atomic::{self, AtomicBool};
+use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 
 #[derive(Clone, Copy, Debug, PartialEq)]

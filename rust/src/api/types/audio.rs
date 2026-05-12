@@ -2,7 +2,7 @@ use std::sync::{Arc, atomic::AtomicBool};
 
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
-use crate::api::{types::chart::{Chart, DataType, Point}, util::get_min_max::{self, get_min_max_par}};
+use crate::api::{types::chart::{Chart, DataType, Point}, util::get_min_max::get_min_max_par};
 
 #[derive(Clone)]
 pub struct AudioData {
