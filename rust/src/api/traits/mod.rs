@@ -4,3 +4,4 @@ pub mod cached_chart_storage;
 pub mod transform;
 pub mod down_sample;
 pub mod communicator;
+pub mod vad_algorithm;

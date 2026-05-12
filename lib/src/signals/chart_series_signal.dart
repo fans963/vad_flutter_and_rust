@@ -133,7 +133,28 @@ class ChartSeriesManager {
     return _series[key];
   }
 
-  // ── Delete (triggers Rust + local cleanup) ──────────────────────────────
+  // ── Visibility ───────────────────────────────────────────────────────
+
+  bool isVisible(String filePath, DataType dataType) {
+    return _series[makeKey(filePath, dataType)]?.isVisible ?? true;
+  }
+
+  void toggleVisibility(String filePath, DataType dataType) {
+    final key = makeKey(filePath, dataType);
+    final meta = _series[key];
+    if (meta != null) {
+      meta.isVisible = !meta.isVisible;
+    } else {
+      _series[key] = SeriesMeta(color: _nextDefaultColor(), isVisible: false);
+    }
+    versionSignal.value++;
+  }
+
+  // ── Query ────────────────────────────────────────────────────────────
+
+  List<(String filePath, DataType dataType)> getAllSeries() {
+    return _series.keys.map((key) => parseKey(key)).toList();
+  }
 
   Future<void> deleteSelected() async {
     final key = selectedKeySignal.value;

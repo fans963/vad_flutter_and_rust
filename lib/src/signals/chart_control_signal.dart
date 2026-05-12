@@ -49,15 +49,6 @@ final yViewMaxSignal = signal(0.5);
 
 const kDownsamplePoints = 2000;
 
-// ─── Callback to notify ChartWidget that visible range changed ──────────
-
-/// Set by ChartWidget.initState, called by recomputeVisibleRanges.
-void Function()? onViewRangeChanged;
-
-// ─── Recompute visible ranges from slider inputs ────────────────────────
-
-/// Call this whenever any slider or data-bound signal changes.
-/// Updates the visible range signals and returns the new (xStart, xEnd).
 (double xStart, double xEnd) recomputeVisibleRanges() {
   final maxIdx = chartMaxIndexSignal.value;
   final xZoom = xZoomSignal.value;
@@ -88,8 +79,6 @@ void Function()? onViewRangeChanged;
   final yHalf = max(yViewableRange / 2, 0.001);
   yViewMinSignal.value = yCenter - yHalf;
   yViewMaxSignal.value = yCenter + yHalf;
-
-  onViewRangeChanged?.call();
 
   return (xStart, xEnd);
 }

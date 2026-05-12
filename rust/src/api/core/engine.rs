@@ -19,7 +19,9 @@ use crate::api::{
         chart::{Chart, ChartWIthKey, DataType},
         config::Config,
         error::AppError,
+        vad::{VadParamDef, VadResult},
     },
+    vad,
 };
 
 pub struct AudioProcessorEngine {
@@ -187,7 +189,10 @@ impl AudioProcessorEngine {
         file_path: String,
         data_type: DataType,
     ) -> Result<(), AppError> {
-        self.cache.remove(file_path, data_type)
+        self.cache.remove(file_path.clone(), data_type)?;
+        self.communicator
+            .remove_chart(file_path, data_type);
+        Ok(())
     }
 
     pub async fn set_selected_audio(&mut self, chart_name: Option<String>) {
@@ -227,6 +232,33 @@ impl AudioProcessorEngine {
         );
         self.update_all();
         Ok(())
+    }
+
+    // ── VAD Engine API ─────────────────────────────────────────────────
+
+    pub async fn list_vad_algorithms(&self) -> Vec<String> {
+        vad::list_algorithm_names()
+    }
+
+    pub async fn get_current_vad_name(&self) -> String {
+        vad::current_algorithm_name()
+    }
+
+    pub async fn set_vad_algorithm(&mut self, name: String) {
+        vad::set_algorithm(&name);
+    }
+
+    pub async fn get_vad_params(&self) -> Vec<VadParamDef> {
+        vad::get_parameters()
+    }
+
+    pub async fn set_vad_param(&mut self, key: String, value: f64) {
+        vad::set_parameter(&key, value as f32);
+    }
+
+    pub async fn compute_vad(&mut self, file_path: String) -> Result<VadResult, AppError> {
+        let stored = self.storage.load(file_path)?;
+        Ok(vad::process(&stored.data.samples, stored.info.sample_rate))
     }
 }
 

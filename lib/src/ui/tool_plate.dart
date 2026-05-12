@@ -9,6 +9,7 @@ import 'package:vad/src/signals/audio_processor_signal.dart';
 import 'package:vad/src/signals/chart_control_signal.dart';
 import 'package:vad/src/signals/chart_series_signal.dart';
 import 'package:vad/src/signals/page_controller_signal.dart';
+import 'package:vad/src/ui/vad_control_panel.dart';
 import 'package:vad/src/util/drag_handler.dart';
 
 class ToolPlate extends StatelessWidget {
@@ -20,6 +21,7 @@ class ToolPlate extends StatelessWidget {
       const HomePanel(),
       const InfoPanel(),
       const ControlPanel(),
+      const VadControlPanel(),
     ];
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -263,6 +265,60 @@ class _ControlPanelState extends State<ControlPanel> {
     }
   }
 
+  Widget _buildSeriesSelector(BuildContext context) {
+    final allSeries = chartSeriesManager.getAllSeries();
+    final selectedKey = chartSeriesManager.selectedKeySignal.value;
+
+    if (allSeries.isEmpty) {
+      return Text('暂无数据，请先加载音频文件',
+          style: Theme.of(context).textTheme.bodySmall);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('选择曲线', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<String>(
+          value: selectedKey,
+          isExpanded: true,
+          items: allSeries.map((s) {
+            final (fp, dt) = s;
+            final key = ChartSeriesManager.makeKey(fp, dt);
+            final fileName = fp.split('/').last;
+            final color = chartSeriesManager.getColor(fp, dt);
+            return DropdownMenuItem(
+              value: key,
+              child: Row(
+                children: [
+                  Container(
+                    width: 12, height: 12,
+                    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('$fileName — ${dt.name}',
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+          onChanged: (key) {
+            if (key == null) return;
+            final (fp, dt) = ChartSeriesManager.parseKey(key);
+            chartSeriesManager.select(fp, dt);
+          },
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            isDense: true,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSelectedSeriesBar(BuildContext context) {
     final selectedKey = chartSeriesManager.selectedKeySignal.value;
     final meta = chartSeriesManager.getSelectedMeta();
@@ -310,6 +366,18 @@ class _ControlPanelState extends State<ControlPanel> {
                 icon: const Icon(Icons.colorize, size: 18),
                 label: const Text('换色'),
               ),
+              // Visibility toggle
+              IconButton(
+                onPressed: () {
+                  final (fp, dt) = ChartSeriesManager.parseKey(selectedKey);
+                  chartSeriesManager.toggleVisibility(fp, dt);
+                },
+                icon: Icon(
+                  meta.isVisible ? Icons.visibility : Icons.visibility_off,
+                  size: 20,
+                ),
+                tooltip: meta.isVisible ? '隐藏' : '显示',
+              ),
               const Spacer(),
               // Delete button
               TextButton.icon(
@@ -333,11 +401,20 @@ class _ControlPanelState extends State<ControlPanel> {
   Widget build(BuildContext context) {
     return Watch((context) {
       final maxIdx = chartMaxIndexSignal.value;
+      chartSeriesManager.versionSignal.value; // react to visibility/color changes
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Series selector ──
+            _buildSeriesSelector(context),
+            const SizedBox(height: 12),
+            _buildSelectedSeriesBar(context),
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 8),
+
             // ── X-axis position slider ──
             Text(
               '时间轴位置',
@@ -441,9 +518,6 @@ class _ControlPanelState extends State<ControlPanel> {
               ],
             ),
             const SizedBox(height: 8),
-
-            // ── Selected series actions ──
-            _buildSelectedSeriesBar(context),
 
             // ── Info bar ──
             Text(

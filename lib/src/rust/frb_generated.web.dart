@@ -19,6 +19,7 @@ import 'api/traits/audio_storage.dart';
 import 'api/traits/cached_chart_storage.dart';
 import 'api/traits/communicator.dart';
 import 'api/traits/down_sample.dart';
+import 'api/traits/vad_algorithm.dart';
 import 'api/transform/energy.dart';
 import 'api/transform/fft.dart';
 import 'api/transform/zero_crossing_rate.dart';
@@ -28,8 +29,10 @@ import 'api/types/config.dart';
 import 'api/types/error.dart';
 import 'api/types/events.dart';
 import 'api/types/file.dart';
+import 'api/types/vad.dart';
 import 'api/util/format_getter.dart';
 import 'api/util/get_min_max.dart';
+import 'api/vad.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -415,6 +418,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FormatGetter dco_decode_TraitDef_FormatGetter(dynamic raw);
 
   @protected
+  VadAlgorithm dco_decode_TraitDef_VadAlgorithm(dynamic raw);
+
+  @protected
   AppError dco_decode_app_error(dynamic raw);
 
   @protected
@@ -476,6 +482,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double dco_decode_f_32(dynamic raw);
 
   @protected
+  double dco_decode_f_64(dynamic raw);
+
+  @protected
   FftTransform dco_decode_fft_transform(dynamic raw);
 
   @protected
@@ -488,16 +497,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
   List<CommunicatorChart> dco_decode_list_communicator_chart(dynamic raw);
 
   @protected
   List<Point> dco_decode_list_point(dynamic raw);
 
   @protected
+  List<double> dco_decode_list_prim_f_32_loose(dynamic raw);
+
+  @protected
+  Float32List dco_decode_list_prim_f_32_strict(dynamic raw);
+
+  @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  List<VadParamDef> dco_decode_list_vad_param_def(dynamic raw);
 
   @protected
   Minmax dco_decode_minmax(dynamic raw);
@@ -531,6 +552,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt dco_decode_usize(dynamic raw);
+
+  @protected
+  VadParamDef dco_decode_vad_param_def(dynamic raw);
+
+  @protected
+  VadResult dco_decode_vad_result(dynamic raw);
 
   @protected
   ZeroCrossingRateCalculator dco_decode_zero_crossing_rate_calculator(
@@ -906,6 +933,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double sse_decode_f_32(SseDeserializer deserializer);
 
   @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
+
+  @protected
   FftTransform sse_decode_fft_transform(SseDeserializer deserializer);
 
   @protected
@@ -918,6 +948,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
   List<CommunicatorChart> sse_decode_list_communicator_chart(
     SseDeserializer deserializer,
   );
@@ -926,10 +959,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Point> sse_decode_list_point(SseDeserializer deserializer);
 
   @protected
+  List<double> sse_decode_list_prim_f_32_loose(SseDeserializer deserializer);
+
+  @protected
+  Float32List sse_decode_list_prim_f_32_strict(SseDeserializer deserializer);
+
+  @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  List<VadParamDef> sse_decode_list_vad_param_def(SseDeserializer deserializer);
 
   @protected
   Minmax sse_decode_minmax(SseDeserializer deserializer);
@@ -967,6 +1009,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
+
+  @protected
+  VadParamDef sse_decode_vad_param_def(SseDeserializer deserializer);
+
+  @protected
+  VadResult sse_decode_vad_result(SseDeserializer deserializer);
 
   @protected
   ZeroCrossingRateCalculator sse_decode_zero_crossing_rate_calculator(
@@ -1414,6 +1462,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_32(double self, SseSerializer serializer);
 
   @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
+
+  @protected
   void sse_encode_fft_transform(FftTransform self, SseSerializer serializer);
 
   @protected
@@ -1427,6 +1478,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_communicator_chart(
     List<CommunicatorChart> self,
     SseSerializer serializer,
@@ -1436,11 +1490,29 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_point(List<Point> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_prim_f_32_loose(
+    List<double> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_prim_f_32_strict(
+    Float32List self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_vad_param_def(
+    List<VadParamDef> self,
     SseSerializer serializer,
   );
 
@@ -1488,6 +1560,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_vad_param_def(VadParamDef self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_vad_result(VadResult self, SseSerializer serializer);
 
   @protected
   void sse_encode_zero_crossing_rate_calculator(

@@ -7,6 +7,7 @@ import '../../frb_generated.dart';
 import '../types/chart.dart';
 import '../types/config.dart';
 import '../types/error.dart';
+import '../types/vad.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `update_all`, `update_max_index`
@@ -23,6 +24,14 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
   });
 
   Future<void> addChart({required String filePath, required DataType dataType});
+
+  Future<VadResult> computeVad({required String filePath});
+
+  Future<String> getCurrentVadName();
+
+  Future<List<VadParamDef>> getVadParams();
+
+  Future<List<String>> listVadAlgorithms();
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<AudioProcessorEngine> newInstance({
@@ -55,6 +64,10 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
   Future<void> setIndexRange({required double start, required double end});
 
   Future<void> setSelectedAudio({String? chartName});
+
+  Future<void> setVadAlgorithm({required String name});
+
+  Future<void> setVadParam({required String key, required double value});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn AudioDecoder + Send + Sync >>>

@@ -9,3 +9,4 @@ pub mod sampling;
 pub mod events;
 pub mod transform;
 pub mod communicator;
+pub mod vad;
