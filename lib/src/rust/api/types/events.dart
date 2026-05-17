@@ -31,4 +31,9 @@ sealed class ChartEvent with _$ChartEvent {
     required double minY,
     required double maxY,
   }) = ChartEvent_UpdateYRange;
+  const factory ChartEvent.updatePlaybackState({
+    required bool isPlaying,
+    required double position,
+    required double duration,
+  }) = ChartEvent_UpdatePlaybackState;
 }

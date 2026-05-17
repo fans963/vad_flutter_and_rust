@@ -6,6 +6,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:vad/src/signals/chart_control_signal.dart';
 import 'package:vad/src/signals/chart_series_signal.dart';
+import 'package:vad/src/signals/audio_player_signal.dart';
 import 'package:vad/src/rust/api/events/communicator_events.dart';
 import 'package:vad/src/rust/api/types/chart.dart';
 import 'package:vad/src/rust/api/types/events.dart';
@@ -91,6 +92,12 @@ class _ChartWidgetState extends State<ChartWidget> {
             yAutoMinSignal.value = event.minY.toDouble();
             yAutoMaxSignal.value = event.maxY.toDouble();
             recomputeVisibleRanges();
+          case ChartEvent_UpdatePlaybackState():
+            updatePlaybackState(
+              event.isPlaying,
+              event.position,
+              event.duration,
+            );
         }
       },
       onError: (error) => debugPrint('Chart event stream error: $error'),

@@ -20,4 +20,9 @@ pub enum ChartEvent {
         min_y:f32,
         max_y:f32,
     },
+    UpdatePlaybackState{
+        is_playing: bool,
+        position: f64,
+        duration: f64,
+    },
 }

@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../player.dart';
 import '../types/chart.dart';
 import '../types/config.dart';
 import '../types/error.dart';
@@ -29,6 +30,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<String> getCurrentVadName();
 
+  Future<PlaybackState> getPlaybackState();
+
   Future<List<VadParamDef>> getVadParams();
 
   Future<List<String>> listVadAlgorithms();
@@ -48,6 +51,13 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
     communicator: communicator,
   );
 
+  Future<void> pauseAudio();
+
+  Future<void> playAudio({
+    required String filePath,
+    required double startFraction,
+  });
+
   Future<void> removeAudio({required String filePath});
 
   Future<void> removeChart({
@@ -56,6 +66,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
   });
 
   Future<void> reserveVisible({required String chartName});
+
+  Future<void> seekAudio({required double fraction});
 
   Future<void> setConfig({required Config config});
 
@@ -68,6 +80,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
   Future<void> setVadAlgorithm({required String name});
 
   Future<void> setVadParam({required String key, required double value});
+
+  Future<void> stopAudio();
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < dyn AudioDecoder + Send + Sync >>>

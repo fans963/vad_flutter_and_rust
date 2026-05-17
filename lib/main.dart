@@ -167,7 +167,6 @@ class MyApp extends StatelessWidget {
                     NavigationDestination(icon: Icon(Icons.home), label: '首页'),
                     NavigationDestination(icon: Icon(Icons.info), label: '信息'),
                     NavigationDestination(icon: Icon(Icons.tune), label: '控制'),
-                    NavigationDestination(icon: Icon(Icons.mic), label: 'VAD'),
                   ],
                   selectedIndex: pageIndexSignal.value,
                   onDestinationSelected: (index) {

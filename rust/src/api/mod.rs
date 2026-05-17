@@ -10,3 +10,4 @@ pub mod events;
 pub mod transform;
 pub mod communicator;
 pub mod vad;
+pub mod player;

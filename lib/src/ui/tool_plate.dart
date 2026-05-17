@@ -6,10 +6,12 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
+import 'package:vad/src/rust/api/types/vad.dart';
+import 'package:vad/src/signals/audio_player_signal.dart';
 import 'package:vad/src/signals/chart_control_signal.dart';
 import 'package:vad/src/signals/chart_series_signal.dart';
 import 'package:vad/src/signals/page_controller_signal.dart';
-import 'package:vad/src/ui/vad_control_panel.dart';
+import 'package:vad/src/signals/vad_signal.dart';
 import 'package:vad/src/util/drag_handler.dart';
 
 class ToolPlate extends StatelessWidget {
@@ -21,7 +23,6 @@ class ToolPlate extends StatelessWidget {
       const HomePanel(),
       const InfoPanel(),
       const ControlPanel(),
-      const VadControlPanel(),
     ];
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -174,6 +175,12 @@ class ControlPanel extends StatefulWidget {
 class _ControlPanelState extends State<ControlPanel> {
   bool _engineConfigured = false;
   Timer? _debounce;
+  bool _userDraggingTimeline = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -312,6 +319,45 @@ class _ControlPanelState extends State<ControlPanel> {
     );
   }
 
+  Future<void> _playSelected() async {
+    final key = chartSeriesManager.selectedKey;
+    if (key == null) return;
+    final (fp, _) = ChartSeriesManager.parseKey(key);
+    await playAudio(fp, startFraction: xPositionSignal.value);
+  }
+
+  Widget _buildAudioBar(BuildContext context) {
+    return Watch((context) {
+      final isPlaying = isPlayingSignal.value;
+      final dur = playbackDurationSignal.value;
+      final hasAudio = dur > Duration.zero;
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+            onPressed: togglePlayPause,
+            tooltip: isPlaying ? '暂停' : '播放',
+          ),
+          IconButton(
+            icon: const Icon(Icons.stop),
+            onPressed: hasAudio ? stopAudio : null,
+            tooltip: '停止',
+          ),
+          const SizedBox(width: 12),
+          Text(
+            '${playbackPositionSignal.value.inMinutes.toString().padLeft(2, '0')}:'
+            '${(playbackPositionSignal.value.inSeconds % 60).toString().padLeft(2, '0')} / '
+            '${dur.inMinutes.toString().padLeft(2, '0')}:'
+            '${(dur.inSeconds % 60).toString().padLeft(2, '0')}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      );
+    });
+  }
+
   Widget _buildSelectedSeriesBar(BuildContext context) {
     final selectedKey = chartSeriesManager.selectedKeySignal.value;
     final meta = chartSeriesManager.getSelectedMeta();
@@ -371,6 +417,12 @@ class _ControlPanelState extends State<ControlPanel> {
                 ),
                 tooltip: meta.isVisible ? '隐藏' : '显示',
               ),
+              // Play button
+              IconButton(
+                onPressed: _playSelected,
+                icon: const Icon(Icons.play_circle, size: 22),
+                tooltip: '播放音频',
+              ),
               const Spacer(),
               // Delete button
               TextButton.icon(
@@ -394,7 +446,14 @@ class _ControlPanelState extends State<ControlPanel> {
   Widget build(BuildContext context) {
     return Watch((context) {
       final maxIdx = chartMaxIndexSignal.value;
-      chartSeriesManager.versionSignal.value; // react to visibility/color changes
+      chartSeriesManager.versionSignal.value;
+
+      // Sync timeline with audio playback
+      if (isPlayingSignal.value && !_userDraggingTimeline) {
+        xPositionSignal.value = playbackFractionSignal.value;
+        recomputeVisibleRanges();
+        _scheduleEngineUpdate();
+      } // react to visibility/color changes
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
         child: Column(
@@ -404,6 +463,8 @@ class _ControlPanelState extends State<ControlPanel> {
             _buildSeriesSelector(context),
             const SizedBox(height: 12),
             _buildSelectedSeriesBar(context),
+            const SizedBox(height: 12),
+            _buildAudioBar(context),
             const SizedBox(height: 12),
             const Divider(),
             const SizedBox(height: 8),
@@ -418,14 +479,27 @@ class _ControlPanelState extends State<ControlPanel> {
                 const Text('0%'),
                 Expanded(
                   child: Slider(
-                    value: xPositionSignal.value,
+                    value: _userDraggingTimeline
+                        ? xPositionSignal.value
+                        : (isPlayingSignal.value
+                            ? playbackFractionSignal.value
+                            : xPositionSignal.value),
                     min: 0.0,
                     max: 1.0,
                     divisions: 200,
+                    onChangeStart: (_) {
+                      _userDraggingTimeline = true;
+                    },
                     onChanged: (v) {
                       xPositionSignal.value = v;
                       recomputeVisibleRanges();
                       _scheduleEngineUpdate();
+                    },
+                    onChangeEnd: (v) {
+                      _userDraggingTimeline = false;
+                      if (isPlayingSignal.value && playbackDurationSignal.value > Duration.zero) {
+                        seekTo(v);
+                      }
                     },
                   ),
                 ),
@@ -519,9 +593,90 @@ class _ControlPanelState extends State<ControlPanel> {
               'Total: ${maxIdx.toStringAsFixed(0)}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
+            const SizedBox(height: 12),
+            _buildVadSection(context),
           ],
         ),
       );
     });
+  }
+
+  Widget _buildVadSection(BuildContext context) {
+    return Watch((context) {
+      final algorithms = vadAlgorithmsSignal.value;
+      final currentAlgo = vadAlgorithmNameSignal.value;
+      final params = vadParamsSignal.value;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(),
+          const SizedBox(height: 4),
+          Text('VAD', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Row(children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: algorithms.contains(currentAlgo) ? currentAlgo : null,
+                isExpanded: true,
+                items: algorithms.map((n) => DropdownMenuItem(value: n, child: Text(n))).toList(),
+                onChanged: (name) {
+                  if (name != null) selectVadAlgorithm(name);
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  isDense: true,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () {
+                final key = chartSeriesManager.selectedKey;
+                if (key != null) {
+                  final (fp, _) = ChartSeriesManager.parseKey(key);
+                  runVadOnFile(fp);
+                }
+              },
+              child: const Text('运行 VAD'),
+            ),
+          ]),
+          if (params.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            ...params.map((p) => _buildMiniParam(context, p)),
+          ],
+        ],
+      );
+    });
+  }
+
+  Widget _buildMiniParam(BuildContext context, VadParamDef def) {
+    final displayValue = def.kind == 'int'
+        ? def.value.toInt().toString()
+        : def.value.toStringAsFixed(3);
+    return Row(children: [
+      SizedBox(width: 60, child: Text(def.label, style: Theme.of(context).textTheme.bodySmall)),
+      Expanded(
+        child: Slider(
+          value: def.value,
+          min: def.min,
+          max: def.max,
+          divisions: def.kind == 'int' ? (def.max - def.min).toInt() : null,
+          onChanged: (v) => _onVadParamChanged(def, def.kind == 'int' ? v.roundToDouble() : v),
+        ),
+      ),
+      SizedBox(width: 36, child: Text(displayValue, style: Theme.of(context).textTheme.bodySmall)),
+    ]);
+  }
+
+  Future<void> _onVadParamChanged(VadParamDef def, double value) async {
+    final updated = List<VadParamDef>.from(vadParamsSignal.value);
+    final idx = updated.indexWhere((p) => p.key == def.key);
+    if (idx >= 0) {
+      updated[idx] = VadParamDef(key: def.key, label: def.label, kind: def.kind, value: value, min: def.min, max: def.max, step: def.step);
+      vadParamsSignal.value = updated;
+    }
+    await setVadParam(def.key, value);
   }
 }

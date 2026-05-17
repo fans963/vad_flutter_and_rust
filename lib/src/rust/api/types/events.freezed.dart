@@ -55,7 +55,7 @@ extension ChartEventPatterns on ChartEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ChartEvent_AddChart value)?  addChart,TResult Function( ChartEvent_RemoveChart value)?  removeChart,TResult Function( ChartEvent_UpdateAllCharts value)?  updateAllCharts,TResult Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,TResult Function( ChartEvent_UpdateMaxIndex value)?  updateMaxIndex,TResult Function( ChartEvent_UpdateYRange value)?  updateYRange,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ChartEvent_AddChart value)?  addChart,TResult Function( ChartEvent_RemoveChart value)?  removeChart,TResult Function( ChartEvent_UpdateAllCharts value)?  updateAllCharts,TResult Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,TResult Function( ChartEvent_UpdateMaxIndex value)?  updateMaxIndex,TResult Function( ChartEvent_UpdateYRange value)?  updateYRange,TResult Function( ChartEvent_UpdatePlaybackState value)?  updatePlaybackState,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
@@ -64,7 +64,8 @@ return removeChart(_that);case ChartEvent_UpdateAllCharts() when updateAllCharts
 return updateAllCharts(_that);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts(_that);case ChartEvent_UpdateMaxIndex() when updateMaxIndex != null:
 return updateMaxIndex(_that);case ChartEvent_UpdateYRange() when updateYRange != null:
-return updateYRange(_that);case _:
+return updateYRange(_that);case ChartEvent_UpdatePlaybackState() when updatePlaybackState != null:
+return updatePlaybackState(_that);case _:
   return orElse();
 
 }
@@ -82,7 +83,7 @@ return updateYRange(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ChartEvent_AddChart value)  addChart,required TResult Function( ChartEvent_RemoveChart value)  removeChart,required TResult Function( ChartEvent_UpdateAllCharts value)  updateAllCharts,required TResult Function( ChartEvent_RemoveAllCharts value)  removeAllCharts,required TResult Function( ChartEvent_UpdateMaxIndex value)  updateMaxIndex,required TResult Function( ChartEvent_UpdateYRange value)  updateYRange,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ChartEvent_AddChart value)  addChart,required TResult Function( ChartEvent_RemoveChart value)  removeChart,required TResult Function( ChartEvent_UpdateAllCharts value)  updateAllCharts,required TResult Function( ChartEvent_RemoveAllCharts value)  removeAllCharts,required TResult Function( ChartEvent_UpdateMaxIndex value)  updateMaxIndex,required TResult Function( ChartEvent_UpdateYRange value)  updateYRange,required TResult Function( ChartEvent_UpdatePlaybackState value)  updatePlaybackState,}){
 final _that = this;
 switch (_that) {
 case ChartEvent_AddChart():
@@ -91,7 +92,8 @@ return removeChart(_that);case ChartEvent_UpdateAllCharts():
 return updateAllCharts(_that);case ChartEvent_RemoveAllCharts():
 return removeAllCharts(_that);case ChartEvent_UpdateMaxIndex():
 return updateMaxIndex(_that);case ChartEvent_UpdateYRange():
-return updateYRange(_that);}
+return updateYRange(_that);case ChartEvent_UpdatePlaybackState():
+return updatePlaybackState(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -105,7 +107,7 @@ return updateYRange(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ChartEvent_AddChart value)?  addChart,TResult? Function( ChartEvent_RemoveChart value)?  removeChart,TResult? Function( ChartEvent_UpdateAllCharts value)?  updateAllCharts,TResult? Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,TResult? Function( ChartEvent_UpdateMaxIndex value)?  updateMaxIndex,TResult? Function( ChartEvent_UpdateYRange value)?  updateYRange,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ChartEvent_AddChart value)?  addChart,TResult? Function( ChartEvent_RemoveChart value)?  removeChart,TResult? Function( ChartEvent_UpdateAllCharts value)?  updateAllCharts,TResult? Function( ChartEvent_RemoveAllCharts value)?  removeAllCharts,TResult? Function( ChartEvent_UpdateMaxIndex value)?  updateMaxIndex,TResult? Function( ChartEvent_UpdateYRange value)?  updateYRange,TResult? Function( ChartEvent_UpdatePlaybackState value)?  updatePlaybackState,}){
 final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
@@ -114,7 +116,8 @@ return removeChart(_that);case ChartEvent_UpdateAllCharts() when updateAllCharts
 return updateAllCharts(_that);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts(_that);case ChartEvent_UpdateMaxIndex() when updateMaxIndex != null:
 return updateMaxIndex(_that);case ChartEvent_UpdateYRange() when updateYRange != null:
-return updateYRange(_that);case _:
+return updateYRange(_that);case ChartEvent_UpdatePlaybackState() when updatePlaybackState != null:
+return updatePlaybackState(_that);case _:
   return null;
 
 }
@@ -131,7 +134,7 @@ return updateYRange(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( CommunicatorChart chart)?  addChart,TResult Function( String key,  DataType dataType)?  removeChart,TResult Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult Function()?  removeAllCharts,TResult Function( double maxIndex)?  updateMaxIndex,TResult Function( double minY,  double maxY)?  updateYRange,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( CommunicatorChart chart)?  addChart,TResult Function( String key,  DataType dataType)?  removeChart,TResult Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult Function()?  removeAllCharts,TResult Function( double maxIndex)?  updateMaxIndex,TResult Function( double minY,  double maxY)?  updateYRange,TResult Function( bool isPlaying,  double position,  double duration)?  updatePlaybackState,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
 return addChart(_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
@@ -139,7 +142,8 @@ return removeChart(_that.key,_that.dataType);case ChartEvent_UpdateAllCharts() w
 return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts();case ChartEvent_UpdateMaxIndex() when updateMaxIndex != null:
 return updateMaxIndex(_that.maxIndex);case ChartEvent_UpdateYRange() when updateYRange != null:
-return updateYRange(_that.minY,_that.maxY);case _:
+return updateYRange(_that.minY,_that.maxY);case ChartEvent_UpdatePlaybackState() when updatePlaybackState != null:
+return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);case _:
   return orElse();
 
 }
@@ -157,7 +161,7 @@ return updateYRange(_that.minY,_that.maxY);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( CommunicatorChart chart)  addChart,required TResult Function( String key,  DataType dataType)  removeChart,required TResult Function( List<CommunicatorChart> charts)  updateAllCharts,required TResult Function()  removeAllCharts,required TResult Function( double maxIndex)  updateMaxIndex,required TResult Function( double minY,  double maxY)  updateYRange,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( CommunicatorChart chart)  addChart,required TResult Function( String key,  DataType dataType)  removeChart,required TResult Function( List<CommunicatorChart> charts)  updateAllCharts,required TResult Function()  removeAllCharts,required TResult Function( double maxIndex)  updateMaxIndex,required TResult Function( double minY,  double maxY)  updateYRange,required TResult Function( bool isPlaying,  double position,  double duration)  updatePlaybackState,}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart():
 return addChart(_that.chart);case ChartEvent_RemoveChart():
@@ -165,7 +169,8 @@ return removeChart(_that.key,_that.dataType);case ChartEvent_UpdateAllCharts():
 return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts():
 return removeAllCharts();case ChartEvent_UpdateMaxIndex():
 return updateMaxIndex(_that.maxIndex);case ChartEvent_UpdateYRange():
-return updateYRange(_that.minY,_that.maxY);}
+return updateYRange(_that.minY,_that.maxY);case ChartEvent_UpdatePlaybackState():
+return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -179,7 +184,7 @@ return updateYRange(_that.minY,_that.maxY);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( CommunicatorChart chart)?  addChart,TResult? Function( String key,  DataType dataType)?  removeChart,TResult? Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult? Function()?  removeAllCharts,TResult? Function( double maxIndex)?  updateMaxIndex,TResult? Function( double minY,  double maxY)?  updateYRange,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( CommunicatorChart chart)?  addChart,TResult? Function( String key,  DataType dataType)?  removeChart,TResult? Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult? Function()?  removeAllCharts,TResult? Function( double maxIndex)?  updateMaxIndex,TResult? Function( double minY,  double maxY)?  updateYRange,TResult? Function( bool isPlaying,  double position,  double duration)?  updatePlaybackState,}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
 return addChart(_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
@@ -187,7 +192,8 @@ return removeChart(_that.key,_that.dataType);case ChartEvent_UpdateAllCharts() w
 return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts() when removeAllCharts != null:
 return removeAllCharts();case ChartEvent_UpdateMaxIndex() when updateMaxIndex != null:
 return updateMaxIndex(_that.maxIndex);case ChartEvent_UpdateYRange() when updateYRange != null:
-return updateYRange(_that.minY,_that.maxY);case _:
+return updateYRange(_that.minY,_that.maxY);case ChartEvent_UpdatePlaybackState() when updatePlaybackState != null:
+return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);case _:
   return null;
 
 }
@@ -560,6 +566,76 @@ class _$ChartEvent_UpdateYRangeCopyWithImpl<$Res>
   return _then(ChartEvent_UpdateYRange(
 minY: null == minY ? _self.minY : minY // ignore: cast_nullable_to_non_nullable
 as double,maxY: null == maxY ? _self.maxY : maxY // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ChartEvent_UpdatePlaybackState extends ChartEvent {
+  const ChartEvent_UpdatePlaybackState({required this.isPlaying, required this.position, required this.duration}): super._();
+  
+
+ final  bool isPlaying;
+ final  double position;
+ final  double duration;
+
+/// Create a copy of ChartEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChartEvent_UpdatePlaybackStateCopyWith<ChartEvent_UpdatePlaybackState> get copyWith => _$ChartEvent_UpdatePlaybackStateCopyWithImpl<ChartEvent_UpdatePlaybackState>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChartEvent_UpdatePlaybackState&&(identical(other.isPlaying, isPlaying) || other.isPlaying == isPlaying)&&(identical(other.position, position) || other.position == position)&&(identical(other.duration, duration) || other.duration == duration));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,isPlaying,position,duration);
+
+@override
+String toString() {
+  return 'ChartEvent.updatePlaybackState(isPlaying: $isPlaying, position: $position, duration: $duration)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChartEvent_UpdatePlaybackStateCopyWith<$Res> implements $ChartEventCopyWith<$Res> {
+  factory $ChartEvent_UpdatePlaybackStateCopyWith(ChartEvent_UpdatePlaybackState value, $Res Function(ChartEvent_UpdatePlaybackState) _then) = _$ChartEvent_UpdatePlaybackStateCopyWithImpl;
+@useResult
+$Res call({
+ bool isPlaying, double position, double duration
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChartEvent_UpdatePlaybackStateCopyWithImpl<$Res>
+    implements $ChartEvent_UpdatePlaybackStateCopyWith<$Res> {
+  _$ChartEvent_UpdatePlaybackStateCopyWithImpl(this._self, this._then);
+
+  final ChartEvent_UpdatePlaybackState _self;
+  final $Res Function(ChartEvent_UpdatePlaybackState) _then;
+
+/// Create a copy of ChartEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? isPlaying = null,Object? position = null,Object? duration = null,}) {
+  return _then(ChartEvent_UpdatePlaybackState(
+isPlaying: null == isPlaying ? _self.isPlaying : isPlaying // ignore: cast_nullable_to_non_nullable
+as bool,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
+as double,duration: null == duration ? _self.duration : duration // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }

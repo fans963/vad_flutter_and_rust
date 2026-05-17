@@ -6,6 +6,7 @@ use log::info;
 use crate::api::{
     communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
+    player::{Player, PlaybackState},
     sampling::minmax::Minmax,
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
@@ -36,6 +37,7 @@ pub struct AudioProcessorEngine {
     selected_audio: Option<String>,
     max_index: f32,
     y_range: (f32, f32),
+    player: Player,
 }
 
 impl AudioProcessorEngine {
@@ -57,6 +59,7 @@ impl AudioProcessorEngine {
             selected_audio: None,
             max_index: 10000.0,
             y_range: (-0.5, 0.5),
+            player: Player::new(),
         }
     }
 
@@ -308,6 +311,34 @@ impl AudioProcessorEngine {
     pub async fn compute_vad(&mut self, file_path: String) -> Result<VadResult, AppError> {
         let stored = self.storage.load(file_path)?;
         Ok(vad::process(&stored.data.samples, stored.info.sample_rate))
+    }
+
+    // ── Audio Playback API ─────────────────────────────────────────────
+
+    pub async fn play_audio(&mut self, file_path: String, start_fraction: f64) {
+        if let Ok(audio) = self.storage.load(file_path) {
+            let total = audio.data.samples.len() as u64;
+            let start = ((total as f64 * start_fraction) as u64).min(total);
+            self.player.load(audio);
+            self.player.play(start);
+        }
+    }
+
+    pub async fn pause_audio(&mut self) { self.player.pause(); }
+    pub async fn stop_audio(&mut self) { self.player.stop(); }
+
+    pub async fn seek_audio(&mut self, fraction: f64) {
+        if let Some(total) = self.player.total_samples() {
+            self.player.seek(((total as f64 * fraction) as u64).min(total));
+        }
+    }
+
+    pub async fn get_playback_state(&self) -> PlaybackState {
+        PlaybackState {
+            is_playing: self.player.is_playing(),
+            position: self.player.position_secs(),
+            duration: self.player.duration_secs(),
+        }
     }
 }
 
