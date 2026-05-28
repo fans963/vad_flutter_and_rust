@@ -33,6 +33,8 @@ jobs:
 
       - name: Run Codegen
         run: flutter_rust_bridge_codegen generate
+        env:
+          RUSTFMT: skip
 
       - name: Build Flutter Web(Rust WASM)
         run: flutter_rust_bridge_codegen build-web --wasm-pack-rustflags "-Ctarget-feature=+atomics,+bulk-memory,+mutable-globals -Clink-arg=--shared-memory -Clink-arg=--max-memory=1073741824 -Clink-arg=--import-memory -Clink-arg=--export=__heap_base -Clink-arg=--export=__wasm_init_tls -Clink-arg=--export=__tls_size -Clink-arg=--export=__tls_align -Clink-arg=--export=__tls_base" --release
