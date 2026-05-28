@@ -35,6 +35,9 @@ burn-flex = "0.21.0"
 burn-store = { version = "0.21.0", features = ["burnpack"] }
 cpal = "0.17.3"
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+cpal = { version = "0.17.3", features = ["wasm-bindgen"] }
+
 [build-dependencies]
 burn-onnx = "0.21.0"
 
