@@ -22,8 +22,8 @@ num-complex = "0.4.6"
 rayon = "1.11.0"
 rustfft = "6.4.1"
 symphonia = { version = "0.6.0", features = ["all"] }
-dashmap = { version = "6.1.0", features = ["rayon"] }
-log = "0.4.29"
+dashmap = { version = "6.2.1", features = ["rayon"] }
+log = "0.4.30"
 android_logger = "0.15.1"
 env_logger = "0.11.10"
 ctor = "1.0.6"

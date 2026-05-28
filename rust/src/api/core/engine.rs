@@ -315,6 +315,7 @@ impl AudioProcessorEngine {
 
     // ── Audio Playback API ─────────────────────────────────────────────
 
+    /// Load audio from storage and start playback from `start_fraction` (0.0–1.0).
     pub async fn play_audio(&mut self, file_path: String, start_fraction: f64) {
         if let Ok(audio) = self.storage.load(file_path) {
             let total = audio.data.samples.len() as u64;
@@ -324,13 +325,29 @@ impl AudioProcessorEngine {
         }
     }
 
+    /// Resume playback from the current position. No-op if nothing is loaded.
+    pub async fn resume_audio(&mut self) {
+        self.player.resume();
+    }
+
     pub async fn pause_audio(&mut self) { self.player.pause(); }
     pub async fn stop_audio(&mut self) { self.player.stop(); }
 
+    /// Seek to a fraction (0.0–1.0) of the loaded audio.
     pub async fn seek_audio(&mut self, fraction: f64) {
         if let Some(total) = self.player.total_samples() {
             self.player.seek(((total as f64 * fraction) as u64).min(total));
         }
+    }
+
+    /// Set playback speed multiplier (1.0 = normal, 2.0 = double speed).
+    pub async fn set_playback_speed(&mut self, multiplier: f32) {
+        self.player.set_speed(multiplier);
+    }
+
+    /// Check if audio is currently loaded in the player.
+    pub async fn is_audio_loaded(&self) -> bool {
+        self.player.is_loaded()
     }
 
     pub async fn get_playback_state(&self) -> PlaybackState {

@@ -34,6 +34,9 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<List<VadParamDef>> getVadParams();
 
+  /// Check if audio is currently loaded in the player.
+  Future<bool> isAudioLoaded();
+
   Future<List<String>> listVadAlgorithms();
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
@@ -53,6 +56,7 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<void> pauseAudio();
 
+  /// Load audio from storage and start playback from `start_fraction` (0.0–1.0).
   Future<void> playAudio({
     required String filePath,
     required double startFraction,
@@ -67,6 +71,10 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<void> reserveVisible({required String chartName});
 
+  /// Resume playback from the current position. No-op if nothing is loaded.
+  Future<void> resumeAudio();
+
+  /// Seek to a fraction (0.0–1.0) of the loaded audio.
   Future<void> seekAudio({required double fraction});
 
   Future<void> setConfig({required Config config});
@@ -74,6 +82,9 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
   Future<void> setDownSamplePointsNum({required BigInt pointsNum});
 
   Future<void> setIndexRange({required double start, required double end});
+
+  /// Set playback speed multiplier (1.0 = normal, 2.0 = double speed).
+  Future<void> setPlaybackSpeed({required double multiplier});
 
   Future<void> setSelectedAudio({String? chartName});
 

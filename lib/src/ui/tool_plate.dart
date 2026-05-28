@@ -175,7 +175,6 @@ class ControlPanel extends StatefulWidget {
 class _ControlPanelState extends State<ControlPanel> {
   bool _engineConfigured = false;
   Timer? _debounce;
-  bool _userDraggingTimeline = false;
 
   @override
   void initState() {
@@ -329,29 +328,86 @@ class _ControlPanelState extends State<ControlPanel> {
   Widget _buildAudioBar(BuildContext context) {
     return Watch((context) {
       final isPlaying = isPlayingSignal.value;
+      final pos = playbackPositionSignal.value;
       final dur = playbackDurationSignal.value;
       final hasAudio = dur > Duration.zero;
+      final fraction = playbackFractionSignal.value;
 
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      String _fmt(Duration d) {
+        final m = d.inMinutes.toString().padLeft(2, '0');
+        final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+        return '$m:$s';
+      }
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
-            icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-            onPressed: togglePlayPause,
-            tooltip: isPlaying ? '暂停' : '播放',
+          // Progress slider
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 3,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+              padding: EdgeInsets.zero,
+            ),
+            child: Slider(
+              value: hasAudio ? fraction.clamp(0.0, 1.0) : 0.0,
+              min: 0.0,
+              max: 1.0,
+              divisions: 1000,
+              onChanged: hasAudio
+                  ? (v) {
+                      // Live preview: update position display while dragging
+                      final totalMs = dur.inMilliseconds;
+                      playbackPositionSignal.value =
+                          Duration(milliseconds: (v * totalMs).round());
+                      playbackFractionSignal.value = v;
+                    }
+                  : null,
+              onChangeEnd: hasAudio
+                  ? (v) => seekTo(v)
+                  : null,
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.stop),
-            onPressed: hasAudio ? stopAudio : null,
-            tooltip: '停止',
-          ),
-          const SizedBox(width: 12),
-          Text(
-            '${playbackPositionSignal.value.inMinutes.toString().padLeft(2, '0')}:'
-            '${(playbackPositionSignal.value.inSeconds % 60).toString().padLeft(2, '0')} / '
-            '${dur.inMinutes.toString().padLeft(2, '0')}:'
-            '${(dur.inSeconds % 60).toString().padLeft(2, '0')}',
-            style: Theme.of(context).textTheme.bodySmall,
+          // Controls row: time | play/stop | speed
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                // Current time / total time
+                Text(
+                  '${_fmt(pos)} / ${_fmt(dur)}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const Spacer(),
+                // Stop button (small, secondary)
+                IconButton(
+                  icon: const Icon(Icons.stop, size: 20),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  onPressed: hasAudio ? stopAudio : null,
+                  tooltip: '停止',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                ),
+                // Play / Pause button (primary, larger)
+                IconButton(
+                  icon: Icon(
+                    isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_filled,
+                    size: 36,
+                  ),
+                  color: Theme.of(context).colorScheme.primary,
+                  onPressed: togglePlayPause,
+                  tooltip: isPlaying ? '暂停' : '播放',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                ),
+                // Speed selector
+                _SpeedSelector(),
+              ],
+            ),
           ),
         ],
       );
@@ -446,14 +502,7 @@ class _ControlPanelState extends State<ControlPanel> {
   Widget build(BuildContext context) {
     return Watch((context) {
       final maxIdx = chartMaxIndexSignal.value;
-      chartSeriesManager.versionSignal.value;
-
-      // Sync timeline with audio playback
-      if (isPlayingSignal.value && !_userDraggingTimeline) {
-        xPositionSignal.value = playbackFractionSignal.value;
-        recomputeVisibleRanges();
-        _scheduleEngineUpdate();
-      } // react to visibility/color changes
+      chartSeriesManager.versionSignal.value; // react to visibility/color changes
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
         child: Column(
@@ -479,27 +528,14 @@ class _ControlPanelState extends State<ControlPanel> {
                 const Text('0%'),
                 Expanded(
                   child: Slider(
-                    value: _userDraggingTimeline
-                        ? xPositionSignal.value
-                        : (isPlayingSignal.value
-                            ? playbackFractionSignal.value
-                            : xPositionSignal.value),
+                    value: xPositionSignal.value,
                     min: 0.0,
                     max: 1.0,
                     divisions: 200,
-                    onChangeStart: (_) {
-                      _userDraggingTimeline = true;
-                    },
                     onChanged: (v) {
                       xPositionSignal.value = v;
                       recomputeVisibleRanges();
                       _scheduleEngineUpdate();
-                    },
-                    onChangeEnd: (v) {
-                      _userDraggingTimeline = false;
-                      if (isPlayingSignal.value && playbackDurationSignal.value > Duration.zero) {
-                        seekTo(v);
-                      }
                     },
                   ),
                 ),
@@ -678,5 +714,53 @@ class _ControlPanelState extends State<ControlPanel> {
       vadParamsSignal.value = updated;
     }
     await setVadParam(def.key, value);
+  }
+}
+
+class _SpeedSelector extends StatelessWidget {
+  static const _speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+  static final _currentSpeed = signal(1.0);
+
+  const _SpeedSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return Watch((context) {
+      final speed = _currentSpeed.value;
+      return PopupMenuButton<double>(
+        tooltip: '播放速度',
+        onSelected: (v) {
+          _currentSpeed.value = v;
+          setPlaybackSpeed(v);
+        },
+        itemBuilder: (_) => _speeds
+            .map((s) => PopupMenuItem(
+                  value: s,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (s == speed)
+                        const Icon(Icons.check, size: 16)
+                      else
+                        const SizedBox(width: 16),
+                      const SizedBox(width: 8),
+                      Text('${s}x'),
+                    ],
+                  ),
+                ))
+            .toList(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Text(
+            '${speed}x',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: speed != 1.0
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
+                ),
+          ),
+        ),
+      );
+    });
   }
 }

@@ -8,33 +8,46 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'types/audio.dart';
 
 // These functions are ignored because they are not marked as `pub`: `fill_buffer`, `start_stream`
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `PlayerCommand`, `SharedState`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SharedState`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Player>>
 abstract class Player implements RustOpaqueInterface {
   Future<double> durationSecs();
 
+  Future<bool> isLoaded();
+
   Future<bool> isPlaying();
 
+  /// Load audio data for playback. Stops any current playback first.
   Future<void> load({required Audio audio});
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<Player> newInstance() =>
       RustLib.instance.api.crateApiPlayerPlayerNew();
 
+  /// Pause playback. Keeps the stream alive (outputs silence).
   Future<void> pause();
 
+  /// Start playback from a specific source sample position.
+  /// Creates a new output stream.
   Future<void> play({required BigInt startSample});
 
   Future<double> positionFraction();
 
   Future<double> positionSecs();
 
+  /// Resume playback from current position without reloading.
+  /// If no stream exists, creates one.
+  Future<void> resume();
+
+  /// Seek to a specific source sample position.
   Future<void> seek({required BigInt sample});
 
+  /// Set playback speed multiplier (1.0 = normal, 2.0 = double speed).
   Future<void> setSpeed({required double multiplier});
 
+  /// Stop playback and reset position to 0.
   Future<void> stop();
 
   Future<BigInt?> totalSamples();
