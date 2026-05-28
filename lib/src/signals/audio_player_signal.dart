@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
 
@@ -9,6 +10,9 @@ final playbackFractionSignal = signal(0.0);
 /// Tracks which audio file is currently loaded in the player.
 /// Null means no audio is loaded.
 final loadedFilePathSignal = signal<String?>(null);
+
+/// Error message from the last playback attempt, if any.
+final playbackErrorSignal = signal<String?>(null);
 
 void updatePlaybackState(bool isPlaying, double position, double duration) {
   isPlayingSignal.value = isPlaying;
@@ -24,7 +28,13 @@ void updatePlaybackState(bool isPlaying, double position, double duration) {
 Future<void> playAudio(String filePath, {double startFraction = 0.0}) async {
   final engine = await audioProcessorEngine.engine();
   loadedFilePathSignal.value = filePath;
-  await engine.playAudio(filePath: filePath, startFraction: startFraction);
+  playbackErrorSignal.value = null;
+  try {
+    await engine.playAudio(filePath: filePath, startFraction: startFraction);
+  } catch (e) {
+    playbackErrorSignal.value = e.toString();
+    debugPrint('playAudio error: $e');
+  }
 }
 
 /// Toggle between play and pause. Resumes from the current position.
@@ -33,7 +43,13 @@ Future<void> togglePlayPause() async {
   if (isPlayingSignal.value) {
     await engine.pauseAudio();
   } else {
-    await engine.resumeAudio();
+    playbackErrorSignal.value = null;
+    try {
+      await engine.resumeAudio();
+    } catch (e) {
+      playbackErrorSignal.value = e.toString();
+      debugPrint('resumeAudio error: $e');
+    }
   }
 }
 

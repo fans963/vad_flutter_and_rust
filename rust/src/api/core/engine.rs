@@ -316,18 +316,19 @@ impl AudioProcessorEngine {
     // ── Audio Playback API ─────────────────────────────────────────────
 
     /// Load audio from storage and start playback from `start_fraction` (0.0–1.0).
-    pub async fn play_audio(&mut self, file_path: String, start_fraction: f64) {
+    pub async fn play_audio(&mut self, file_path: String, start_fraction: f64) -> Result<(), String> {
         if let Ok(audio) = self.storage.load(file_path) {
             let total = audio.data.samples.len() as u64;
             let start = ((total as f64 * start_fraction) as u64).min(total);
             self.player.load(audio);
-            self.player.play(start);
+            self.player.play(start)?;
         }
+        Ok(())
     }
 
     /// Resume playback from the current position. No-op if nothing is loaded.
-    pub async fn resume_audio(&mut self) {
-        self.player.resume();
+    pub async fn resume_audio(&mut self) -> Result<(), String> {
+        self.player.resume()
     }
 
     pub async fn pause_audio(&mut self) { self.player.pause(); }

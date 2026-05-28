@@ -102,29 +102,30 @@ impl Player {
 
     /// Start playback from a specific source sample position.
     /// Creates a new output stream.
-    pub fn play(&mut self, start_sample: u64) {
+    pub fn play(&mut self, start_sample: u64) -> Result<(), String> {
         let state = match &self.state {
             Some(s) => s.clone(),
-            None => return,
+            None => return Ok(()),
         };
         let total = state.samples.len() as u64;
         let start = start_sample.min(total);
         state.position.store(start * POS_FRAC, Ordering::Relaxed);
         state.is_playing.store(true, Ordering::Relaxed);
-        self.start_stream(state);
+        self.start_stream(state)
     }
 
     /// Resume playback from current position without reloading.
     /// If no stream exists, creates one.
-    pub fn resume(&mut self) {
+    pub fn resume(&mut self) -> Result<(), String> {
         let state = match &self.state {
             Some(s) => s.clone(),
-            None => return,
+            None => return Ok(()),
         };
         state.is_playing.store(true, Ordering::Relaxed);
         if self.stream.is_none() {
-            self.start_stream(state);
+            self.start_stream(state)?;
         }
+        Ok(())
     }
 
     /// Pause playback. Keeps the stream alive (outputs silence).
@@ -158,10 +159,10 @@ impl Player {
         }
     }
 
-    fn start_stream(&mut self, state: Arc<SharedState>) {
+    fn start_stream(&mut self, state: Arc<SharedState>) -> Result<(), String> {
         let host = cpal::default_host();
-        let device = host.default_output_device().expect("no output device");
-        let config = device.default_output_config().expect("no default config");
+        let device = host.default_output_device().ok_or("no output device")?;
+        let config = device.default_output_config().map_err(|e| format!("no default config: {e}"))?;
         let channels = state.channels as usize;
 
         let stream_config: cpal::StreamConfig = config.clone().into();
@@ -178,15 +179,16 @@ impl Player {
                     None,
                 )
             }
-            _ => panic!("unsupported sample format"),
+            _ => return Err("unsupported sample format".into()),
         };
 
         match stream {
             Ok(s) => {
                 s.play().ok();
                 self.stream = Some(s);
+                Ok(())
             }
-            Err(e) => log::error!("failed to build audio stream: {e}"),
+            Err(e) => Err(format!("failed to build audio stream: {e}")),
         }
     }
 }

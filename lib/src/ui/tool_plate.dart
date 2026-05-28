@@ -409,6 +409,19 @@ class _ControlPanelState extends State<ControlPanel> {
               ],
             ),
           ),
+          // Error indicator
+          if (playbackErrorSignal.value != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 12, right: 12),
+              child: Text(
+                playbackErrorSignal.value!,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
         ],
       );
     });

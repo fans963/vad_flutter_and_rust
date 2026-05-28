@@ -780,7 +780,7 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_play_audio_impl(
             let api_start_fraction = <f64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, ()>(
+                transform_result_sse::<_, String>(
                     (move || async move {
                         let mut api_that_guard = None;
                         let decode_indices_ =
@@ -799,14 +799,12 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_play_audio_impl(
                             }
                         }
                         let mut api_that_guard = api_that_guard.unwrap();
-                        let output_ok = Result::<_, ()>::Ok({
-                            crate::api::core::engine::AudioProcessorEngine::play_audio(
-                                &mut *api_that_guard,
-                                api_file_path,
-                                api_start_fraction,
-                            )
-                            .await;
-                        })?;
+                        let output_ok = crate::api::core::engine::AudioProcessorEngine::play_audio(
+                            &mut *api_that_guard,
+                            api_file_path,
+                            api_start_fraction,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1027,7 +1025,7 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_resume_audio_impl(
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, ()>(
+                transform_result_sse::<_, String>(
                     (move || async move {
                         let mut api_that_guard = None;
                         let decode_indices_ =
@@ -1046,12 +1044,11 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_resume_audio_impl(
                             }
                         }
                         let mut api_that_guard = api_that_guard.unwrap();
-                        let output_ok = Result::<_, ()>::Ok({
+                        let output_ok =
                             crate::api::core::engine::AudioProcessorEngine::resume_audio(
                                 &mut *api_that_guard,
                             )
-                            .await;
-                        })?;
+                            .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -3597,7 +3594,7 @@ fn wire__crate__api__player__Player_play_impl(
             let api_start_sample = <u64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
-                transform_result_sse::<_, ()>((move || {
+                transform_result_sse::<_, String>((move || {
                     let mut api_that_guard = None;
                     let decode_indices_ =
                         flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
@@ -3612,9 +3609,8 @@ fn wire__crate__api__player__Player_play_impl(
                         }
                     }
                     let mut api_that_guard = api_that_guard.unwrap();
-                    let output_ok = Result::<_, ()>::Ok({
-                        crate::api::player::Player::play(&mut *api_that_guard, api_start_sample);
-                    })?;
+                    let output_ok =
+                        crate::api::player::Player::play(&mut *api_that_guard, api_start_sample)?;
                     Ok(output_ok)
                 })())
             }
@@ -3750,7 +3746,7 @@ fn wire__crate__api__player__Player_resume_impl(
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
-                transform_result_sse::<_, ()>((move || {
+                transform_result_sse::<_, String>((move || {
                     let mut api_that_guard = None;
                     let decode_indices_ =
                         flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
@@ -3765,9 +3761,7 @@ fn wire__crate__api__player__Player_resume_impl(
                         }
                     }
                     let mut api_that_guard = api_that_guard.unwrap();
-                    let output_ok = Result::<_, ()>::Ok({
-                        crate::api::player::Player::resume(&mut *api_that_guard);
-                    })?;
+                    let output_ok = crate::api::player::Player::resume(&mut *api_that_guard)?;
                     Ok(output_ok)
                 })())
             }
