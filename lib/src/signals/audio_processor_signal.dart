@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:signals/signals_flutter.dart';
 import 'package:vad/src/rust/api/core/engine.dart';
 import 'package:vad/src/rust/api/types/config.dart';
+import 'package:vad/src/signals/audio_info_signal.dart';
 
 class AudioProcessorController {
   late final _engineSignal = futureSignal(() async {
@@ -29,6 +30,7 @@ class AudioProcessorController {
         format: actualFormat,
         audioData: fileData,
       );
+      loadAudioInfo(filePath);
     } catch (e, st) {
       _engineSignal.setError(e, st);
       rethrow;

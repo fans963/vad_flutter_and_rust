@@ -32,16 +32,35 @@ abstract class AudioData implements RustOpaqueInterface {
 
 class AudioInfo {
   final int sampleRate;
+  final int channels;
+  final String format;
+  final double durationSecs;
+  final BigInt sampleCount;
 
-  const AudioInfo({required this.sampleRate});
+  const AudioInfo({
+    required this.sampleRate,
+    required this.channels,
+    required this.format,
+    required this.durationSecs,
+    required this.sampleCount,
+  });
 
   @override
-  int get hashCode => sampleRate.hashCode;
+  int get hashCode =>
+      sampleRate.hashCode ^
+      channels.hashCode ^
+      format.hashCode ^
+      durationSecs.hashCode ^
+      sampleCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is AudioInfo &&
           runtimeType == other.runtimeType &&
-          sampleRate == other.sampleRate;
+          sampleRate == other.sampleRate &&
+          channels == other.channels &&
+          format == other.format &&
+          durationSecs == other.durationSecs &&
+          sampleCount == other.sampleCount;
 }

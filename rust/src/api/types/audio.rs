@@ -12,6 +12,10 @@ pub struct AudioData {
 #[derive(Clone)]
 pub struct AudioInfo {
     pub sample_rate: u32,
+    pub channels: u16,
+    pub format: String,
+    pub duration_secs: f64,
+    pub sample_count: usize,
 }
 
 #[derive(Clone)]

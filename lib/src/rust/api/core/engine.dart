@@ -5,6 +5,7 @@
 
 import '../../frb_generated.dart';
 import '../player.dart';
+import '../types/audio.dart';
 import '../types/chart.dart';
 import '../types/config.dart';
 import '../types/error.dart';
@@ -28,7 +29,11 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<VadResult> computeVad({required String filePath});
 
+  Future<AudioInfo> getAudioInfo({required String filePath});
+
   Future<String> getCurrentVadName();
+
+  Future<List<String>> getLoadedFiles();
 
   Future<PlaybackState> getPlaybackState();
 

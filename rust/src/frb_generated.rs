@@ -52,7 +52,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1340586202;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 317485962;
 
 // Section: executor
 
@@ -344,6 +344,67 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_compute_vad_impl(
         },
     )
 }
+fn wire__crate__api__core__engine__AudioProcessorEngine_get_audio_info_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "AudioProcessorEngine_get_audio_info",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>,
+            >>::sse_decode(&mut deserializer);
+            let api_file_path = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, crate::api::types::error::AppError>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok =
+                            crate::api::core::engine::AudioProcessorEngine::get_audio_info(
+                                &*api_that_guard,
+                                api_file_path,
+                            )
+                            .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__core__engine__AudioProcessorEngine_get_current_vad_name_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -392,6 +453,66 @@ fn wire__crate__api__core__engine__AudioProcessorEngine_get_current_vad_name_imp
                         let api_that_guard = api_that_guard.unwrap();
                         let output_ok = Result::<_, ()>::Ok(
                             crate::api::core::engine::AudioProcessorEngine::get_current_vad_name(
+                                &*api_that_guard,
+                            )
+                            .await,
+                        )?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__core__engine__AudioProcessorEngine_get_loaded_files_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "AudioProcessorEngine_get_loaded_files",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AudioProcessorEngine>,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, ()>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok = Result::<_, ()>::Ok(
+                            crate::api::core::engine::AudioProcessorEngine::get_loaded_files(
                                 &*api_that_guard,
                             )
                             .await,
@@ -5001,8 +5122,16 @@ impl SseDecode for crate::api::types::audio::AudioInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_sampleRate = <u32>::sse_decode(deserializer);
+        let mut var_channels = <u16>::sse_decode(deserializer);
+        let mut var_format = <String>::sse_decode(deserializer);
+        let mut var_durationSecs = <f64>::sse_decode(deserializer);
+        let mut var_sampleCount = <usize>::sse_decode(deserializer);
         return crate::api::types::audio::AudioInfo {
             sample_rate: var_sampleRate,
+            channels: var_channels,
+            format: var_format,
+            duration_secs: var_durationSecs,
+            sample_count: var_sampleCount,
         };
     }
 }
@@ -5302,6 +5431,13 @@ impl SseDecode for crate::api::decoder::symphonia_decoder::SymphoniaDecoder {
     }
 }
 
+impl SseDecode for u16 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_u16::<NativeEndian>().unwrap()
+    }
+}
+
 impl SseDecode for u32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5388,75 +5524,77 @@ fn pde_ffi_dispatcher_primary_impl(
                         3 => wire__crate__api__core__engine__AudioProcessorEngine_add_impl(port, ptr, rust_vec_len, data_len),
 4 => wire__crate__api__core__engine__AudioProcessorEngine_add_chart_impl(port, ptr, rust_vec_len, data_len),
 5 => wire__crate__api__core__engine__AudioProcessorEngine_compute_vad_impl(port, ptr, rust_vec_len, data_len),
-6 => wire__crate__api__core__engine__AudioProcessorEngine_get_current_vad_name_impl(port, ptr, rust_vec_len, data_len),
-7 => wire__crate__api__core__engine__AudioProcessorEngine_get_playback_state_impl(port, ptr, rust_vec_len, data_len),
-8 => wire__crate__api__core__engine__AudioProcessorEngine_get_vad_params_impl(port, ptr, rust_vec_len, data_len),
-9 => wire__crate__api__core__engine__AudioProcessorEngine_is_audio_loaded_impl(port, ptr, rust_vec_len, data_len),
-10 => wire__crate__api__core__engine__AudioProcessorEngine_list_vad_algorithms_impl(port, ptr, rust_vec_len, data_len),
-11 => wire__crate__api__core__engine__AudioProcessorEngine_new_impl(port, ptr, rust_vec_len, data_len),
-12 => wire__crate__api__core__engine__AudioProcessorEngine_pause_audio_impl(port, ptr, rust_vec_len, data_len),
-13 => wire__crate__api__core__engine__AudioProcessorEngine_play_audio_impl(port, ptr, rust_vec_len, data_len),
-14 => wire__crate__api__core__engine__AudioProcessorEngine_remove_audio_impl(port, ptr, rust_vec_len, data_len),
-15 => wire__crate__api__core__engine__AudioProcessorEngine_remove_chart_impl(port, ptr, rust_vec_len, data_len),
-16 => wire__crate__api__core__engine__AudioProcessorEngine_resume_audio_impl(port, ptr, rust_vec_len, data_len),
-17 => wire__crate__api__core__engine__AudioProcessorEngine_seek_audio_impl(port, ptr, rust_vec_len, data_len),
-18 => wire__crate__api__core__engine__AudioProcessorEngine_set_config_impl(port, ptr, rust_vec_len, data_len),
-19 => wire__crate__api__core__engine__AudioProcessorEngine_set_down_sample_points_num_impl(port, ptr, rust_vec_len, data_len),
-20 => wire__crate__api__core__engine__AudioProcessorEngine_set_index_range_impl(port, ptr, rust_vec_len, data_len),
-21 => wire__crate__api__core__engine__AudioProcessorEngine_set_playback_speed_impl(port, ptr, rust_vec_len, data_len),
-22 => wire__crate__api__core__engine__AudioProcessorEngine_set_vad_algorithm_impl(port, ptr, rust_vec_len, data_len),
-23 => wire__crate__api__core__engine__AudioProcessorEngine_set_vad_param_impl(port, ptr, rust_vec_len, data_len),
-24 => wire__crate__api__core__engine__AudioProcessorEngine_stop_audio_impl(port, ptr, rust_vec_len, data_len),
-25 => wire__crate__api__types__audio__Audio_audio_to_chart_impl(port, ptr, rust_vec_len, data_len),
-40 => wire__crate__api__types__chart__Chart_get_range_impl(port, ptr, rust_vec_len, data_len),
-45 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_load_impl(port, ptr, rust_vec_len, data_len),
-46 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_new_impl(port, ptr, rust_vec_len, data_len),
-47 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_remove_impl(port, ptr, rust_vec_len, data_len),
-48 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_save_impl(port, ptr, rust_vec_len, data_len),
-49 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_add_impl(port, ptr, rust_vec_len, data_len),
-52 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_get_impl(port, ptr, rust_vec_len, data_len),
-53 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_get_all_cache_impl(port, ptr, rust_vec_len, data_len),
-54 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_new_impl(port, ptr, rust_vec_len, data_len),
-55 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_remove_impl(port, ptr, rust_vec_len, data_len),
-56 => wire__crate__api__player__Player_duration_secs_impl(port, ptr, rust_vec_len, data_len),
-57 => wire__crate__api__player__Player_is_loaded_impl(port, ptr, rust_vec_len, data_len),
-58 => wire__crate__api__player__Player_is_playing_impl(port, ptr, rust_vec_len, data_len),
-59 => wire__crate__api__player__Player_load_impl(port, ptr, rust_vec_len, data_len),
-60 => wire__crate__api__player__Player_new_impl(port, ptr, rust_vec_len, data_len),
-61 => wire__crate__api__player__Player_pause_impl(port, ptr, rust_vec_len, data_len),
-62 => wire__crate__api__player__Player_play_impl(port, ptr, rust_vec_len, data_len),
-63 => wire__crate__api__player__Player_position_fraction_impl(port, ptr, rust_vec_len, data_len),
-64 => wire__crate__api__player__Player_position_secs_impl(port, ptr, rust_vec_len, data_len),
-65 => wire__crate__api__player__Player_resume_impl(port, ptr, rust_vec_len, data_len),
-66 => wire__crate__api__player__Player_seek_impl(port, ptr, rust_vec_len, data_len),
-67 => wire__crate__api__player__Player_set_speed_impl(port, ptr, rust_vec_len, data_len),
-68 => wire__crate__api__player__Player_stop_impl(port, ptr, rust_vec_len, data_len),
-69 => wire__crate__api__player__Player_total_samples_impl(port, ptr, rust_vec_len, data_len),
-89 => wire__crate__api__vad__VadEngine_current_name_impl(port, ptr, rust_vec_len, data_len),
-90 => wire__crate__api__vad__VadEngine_get_parameters_impl(port, ptr, rust_vec_len, data_len),
-91 => wire__crate__api__vad__VadEngine_list_algorithms_impl(port, ptr, rust_vec_len, data_len),
-92 => wire__crate__api__vad__VadEngine_new_impl(port, ptr, rust_vec_len, data_len),
-93 => wire__crate__api__vad__VadEngine_process_impl(port, ptr, rust_vec_len, data_len),
-94 => wire__crate__api__vad__VadEngine_set_algorithm_impl(port, ptr, rust_vec_len, data_len),
-95 => wire__crate__api__vad__VadEngine_set_parameter_impl(port, ptr, rust_vec_len, data_len),
-96 => wire__crate__api__types__config__config_default_impl(port, ptr, rust_vec_len, data_len),
-97 => wire__crate__api__events__communicator_events__create_chart_event_stream_impl(port, ptr, rust_vec_len, data_len),
-98 => wire__crate__api__core__engine__create_default_engine_impl(port, ptr, rust_vec_len, data_len),
-99 => wire__crate__api__events__communicator_events__emit_chart_event_impl(port, ptr, rust_vec_len, data_len),
-100 => wire__crate__api__transform__energy__energy_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
-101 => wire__crate__api__transform__fft__fft_transform_transform_impl(port, ptr, rust_vec_len, data_len),
-102 => wire__crate__api__util__get_min_max__get_min_max_par_impl(port, ptr, rust_vec_len, data_len),
-103 => wire__crate__api__sampling__minmax__minmax_downsample_impl(port, ptr, rust_vec_len, data_len),
-104 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(port, ptr, rust_vec_len, data_len),
-105 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(port, ptr, rust_vec_len, data_len),
-106 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(port, ptr, rust_vec_len, data_len),
-107 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(port, ptr, rust_vec_len, data_len),
-108 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(port, ptr, rust_vec_len, data_len),
-109 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_max_index_impl(port, ptr, rust_vec_len, data_len),
-110 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_y_range_impl(port, ptr, rust_vec_len, data_len),
-111 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(port, ptr, rust_vec_len, data_len),
-112 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(port, ptr, rust_vec_len, data_len),
-113 => wire__crate__api__transform__zero_crossing_rate__zero_crossing_rate_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
+6 => wire__crate__api__core__engine__AudioProcessorEngine_get_audio_info_impl(port, ptr, rust_vec_len, data_len),
+7 => wire__crate__api__core__engine__AudioProcessorEngine_get_current_vad_name_impl(port, ptr, rust_vec_len, data_len),
+8 => wire__crate__api__core__engine__AudioProcessorEngine_get_loaded_files_impl(port, ptr, rust_vec_len, data_len),
+9 => wire__crate__api__core__engine__AudioProcessorEngine_get_playback_state_impl(port, ptr, rust_vec_len, data_len),
+10 => wire__crate__api__core__engine__AudioProcessorEngine_get_vad_params_impl(port, ptr, rust_vec_len, data_len),
+11 => wire__crate__api__core__engine__AudioProcessorEngine_is_audio_loaded_impl(port, ptr, rust_vec_len, data_len),
+12 => wire__crate__api__core__engine__AudioProcessorEngine_list_vad_algorithms_impl(port, ptr, rust_vec_len, data_len),
+13 => wire__crate__api__core__engine__AudioProcessorEngine_new_impl(port, ptr, rust_vec_len, data_len),
+14 => wire__crate__api__core__engine__AudioProcessorEngine_pause_audio_impl(port, ptr, rust_vec_len, data_len),
+15 => wire__crate__api__core__engine__AudioProcessorEngine_play_audio_impl(port, ptr, rust_vec_len, data_len),
+16 => wire__crate__api__core__engine__AudioProcessorEngine_remove_audio_impl(port, ptr, rust_vec_len, data_len),
+17 => wire__crate__api__core__engine__AudioProcessorEngine_remove_chart_impl(port, ptr, rust_vec_len, data_len),
+18 => wire__crate__api__core__engine__AudioProcessorEngine_resume_audio_impl(port, ptr, rust_vec_len, data_len),
+19 => wire__crate__api__core__engine__AudioProcessorEngine_seek_audio_impl(port, ptr, rust_vec_len, data_len),
+20 => wire__crate__api__core__engine__AudioProcessorEngine_set_config_impl(port, ptr, rust_vec_len, data_len),
+21 => wire__crate__api__core__engine__AudioProcessorEngine_set_down_sample_points_num_impl(port, ptr, rust_vec_len, data_len),
+22 => wire__crate__api__core__engine__AudioProcessorEngine_set_index_range_impl(port, ptr, rust_vec_len, data_len),
+23 => wire__crate__api__core__engine__AudioProcessorEngine_set_playback_speed_impl(port, ptr, rust_vec_len, data_len),
+24 => wire__crate__api__core__engine__AudioProcessorEngine_set_vad_algorithm_impl(port, ptr, rust_vec_len, data_len),
+25 => wire__crate__api__core__engine__AudioProcessorEngine_set_vad_param_impl(port, ptr, rust_vec_len, data_len),
+26 => wire__crate__api__core__engine__AudioProcessorEngine_stop_audio_impl(port, ptr, rust_vec_len, data_len),
+27 => wire__crate__api__types__audio__Audio_audio_to_chart_impl(port, ptr, rust_vec_len, data_len),
+42 => wire__crate__api__types__chart__Chart_get_range_impl(port, ptr, rust_vec_len, data_len),
+47 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_load_impl(port, ptr, rust_vec_len, data_len),
+48 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_new_impl(port, ptr, rust_vec_len, data_len),
+49 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_remove_impl(port, ptr, rust_vec_len, data_len),
+50 => wire__crate__api__storage__kv_audio_storage__KvAudioStorage_save_impl(port, ptr, rust_vec_len, data_len),
+51 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_add_impl(port, ptr, rust_vec_len, data_len),
+54 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_get_impl(port, ptr, rust_vec_len, data_len),
+55 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_get_all_cache_impl(port, ptr, rust_vec_len, data_len),
+56 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_new_impl(port, ptr, rust_vec_len, data_len),
+57 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_remove_impl(port, ptr, rust_vec_len, data_len),
+58 => wire__crate__api__player__Player_duration_secs_impl(port, ptr, rust_vec_len, data_len),
+59 => wire__crate__api__player__Player_is_loaded_impl(port, ptr, rust_vec_len, data_len),
+60 => wire__crate__api__player__Player_is_playing_impl(port, ptr, rust_vec_len, data_len),
+61 => wire__crate__api__player__Player_load_impl(port, ptr, rust_vec_len, data_len),
+62 => wire__crate__api__player__Player_new_impl(port, ptr, rust_vec_len, data_len),
+63 => wire__crate__api__player__Player_pause_impl(port, ptr, rust_vec_len, data_len),
+64 => wire__crate__api__player__Player_play_impl(port, ptr, rust_vec_len, data_len),
+65 => wire__crate__api__player__Player_position_fraction_impl(port, ptr, rust_vec_len, data_len),
+66 => wire__crate__api__player__Player_position_secs_impl(port, ptr, rust_vec_len, data_len),
+67 => wire__crate__api__player__Player_resume_impl(port, ptr, rust_vec_len, data_len),
+68 => wire__crate__api__player__Player_seek_impl(port, ptr, rust_vec_len, data_len),
+69 => wire__crate__api__player__Player_set_speed_impl(port, ptr, rust_vec_len, data_len),
+70 => wire__crate__api__player__Player_stop_impl(port, ptr, rust_vec_len, data_len),
+71 => wire__crate__api__player__Player_total_samples_impl(port, ptr, rust_vec_len, data_len),
+91 => wire__crate__api__vad__VadEngine_current_name_impl(port, ptr, rust_vec_len, data_len),
+92 => wire__crate__api__vad__VadEngine_get_parameters_impl(port, ptr, rust_vec_len, data_len),
+93 => wire__crate__api__vad__VadEngine_list_algorithms_impl(port, ptr, rust_vec_len, data_len),
+94 => wire__crate__api__vad__VadEngine_new_impl(port, ptr, rust_vec_len, data_len),
+95 => wire__crate__api__vad__VadEngine_process_impl(port, ptr, rust_vec_len, data_len),
+96 => wire__crate__api__vad__VadEngine_set_algorithm_impl(port, ptr, rust_vec_len, data_len),
+97 => wire__crate__api__vad__VadEngine_set_parameter_impl(port, ptr, rust_vec_len, data_len),
+98 => wire__crate__api__types__config__config_default_impl(port, ptr, rust_vec_len, data_len),
+99 => wire__crate__api__events__communicator_events__create_chart_event_stream_impl(port, ptr, rust_vec_len, data_len),
+100 => wire__crate__api__core__engine__create_default_engine_impl(port, ptr, rust_vec_len, data_len),
+101 => wire__crate__api__events__communicator_events__emit_chart_event_impl(port, ptr, rust_vec_len, data_len),
+102 => wire__crate__api__transform__energy__energy_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
+103 => wire__crate__api__transform__fft__fft_transform_transform_impl(port, ptr, rust_vec_len, data_len),
+104 => wire__crate__api__util__get_min_max__get_min_max_par_impl(port, ptr, rust_vec_len, data_len),
+105 => wire__crate__api__sampling__minmax__minmax_downsample_impl(port, ptr, rust_vec_len, data_len),
+106 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(port, ptr, rust_vec_len, data_len),
+107 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(port, ptr, rust_vec_len, data_len),
+108 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(port, ptr, rust_vec_len, data_len),
+109 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(port, ptr, rust_vec_len, data_len),
+110 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(port, ptr, rust_vec_len, data_len),
+111 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_max_index_impl(port, ptr, rust_vec_len, data_len),
+112 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_y_range_impl(port, ptr, rust_vec_len, data_len),
+113 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(port, ptr, rust_vec_len, data_len),
+114 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(port, ptr, rust_vec_len, data_len),
+115 => wire__crate__api__transform__zero_crossing_rate__zero_crossing_rate_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -5471,26 +5609,26 @@ fn pde_ffi_dispatcher_sync_impl(
     match func_id {
                         1 => wire__crate__api__types__audio__AudioData_auto_accessor_get_samples_impl(ptr, rust_vec_len, data_len),
 2 => wire__crate__api__types__audio__AudioData_auto_accessor_set_samples_impl(ptr, rust_vec_len, data_len),
-26 => wire__crate__api__types__audio__Audio_auto_accessor_get_data_impl(ptr, rust_vec_len, data_len),
-27 => wire__crate__api__types__audio__Audio_auto_accessor_get_info_impl(ptr, rust_vec_len, data_len),
-28 => wire__crate__api__types__audio__Audio_auto_accessor_set_data_impl(ptr, rust_vec_len, data_len),
-29 => wire__crate__api__types__audio__Audio_auto_accessor_set_info_impl(ptr, rust_vec_len, data_len),
-30 => wire__crate__api__types__chart__Chart_auto_accessor_get_data_type_impl(ptr, rust_vec_len, data_len),
-31 => wire__crate__api__types__chart__Chart_auto_accessor_get_max_y_impl(ptr, rust_vec_len, data_len),
-32 => wire__crate__api__types__chart__Chart_auto_accessor_get_min_y_impl(ptr, rust_vec_len, data_len),
-33 => wire__crate__api__types__chart__Chart_auto_accessor_get_points_impl(ptr, rust_vec_len, data_len),
-34 => wire__crate__api__types__chart__Chart_auto_accessor_get_visible_impl(ptr, rust_vec_len, data_len),
-35 => wire__crate__api__types__chart__Chart_auto_accessor_set_data_type_impl(ptr, rust_vec_len, data_len),
-36 => wire__crate__api__types__chart__Chart_auto_accessor_set_max_y_impl(ptr, rust_vec_len, data_len),
-37 => wire__crate__api__types__chart__Chart_auto_accessor_set_min_y_impl(ptr, rust_vec_len, data_len),
-38 => wire__crate__api__types__chart__Chart_auto_accessor_set_points_impl(ptr, rust_vec_len, data_len),
-39 => wire__crate__api__types__chart__Chart_auto_accessor_set_visible_impl(ptr, rust_vec_len, data_len),
-41 => wire__crate__api__types__file__File_auto_accessor_get_bytes_impl(ptr, rust_vec_len, data_len),
-42 => wire__crate__api__types__file__File_auto_accessor_get_file_path_impl(ptr, rust_vec_len, data_len),
-43 => wire__crate__api__types__file__File_auto_accessor_set_bytes_impl(ptr, rust_vec_len, data_len),
-44 => wire__crate__api__types__file__File_auto_accessor_set_file_path_impl(ptr, rust_vec_len, data_len),
-50 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_auto_accessor_get_config_impl(ptr, rust_vec_len, data_len),
-51 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_auto_accessor_set_config_impl(ptr, rust_vec_len, data_len),
+28 => wire__crate__api__types__audio__Audio_auto_accessor_get_data_impl(ptr, rust_vec_len, data_len),
+29 => wire__crate__api__types__audio__Audio_auto_accessor_get_info_impl(ptr, rust_vec_len, data_len),
+30 => wire__crate__api__types__audio__Audio_auto_accessor_set_data_impl(ptr, rust_vec_len, data_len),
+31 => wire__crate__api__types__audio__Audio_auto_accessor_set_info_impl(ptr, rust_vec_len, data_len),
+32 => wire__crate__api__types__chart__Chart_auto_accessor_get_data_type_impl(ptr, rust_vec_len, data_len),
+33 => wire__crate__api__types__chart__Chart_auto_accessor_get_max_y_impl(ptr, rust_vec_len, data_len),
+34 => wire__crate__api__types__chart__Chart_auto_accessor_get_min_y_impl(ptr, rust_vec_len, data_len),
+35 => wire__crate__api__types__chart__Chart_auto_accessor_get_points_impl(ptr, rust_vec_len, data_len),
+36 => wire__crate__api__types__chart__Chart_auto_accessor_get_visible_impl(ptr, rust_vec_len, data_len),
+37 => wire__crate__api__types__chart__Chart_auto_accessor_set_data_type_impl(ptr, rust_vec_len, data_len),
+38 => wire__crate__api__types__chart__Chart_auto_accessor_set_max_y_impl(ptr, rust_vec_len, data_len),
+39 => wire__crate__api__types__chart__Chart_auto_accessor_set_min_y_impl(ptr, rust_vec_len, data_len),
+40 => wire__crate__api__types__chart__Chart_auto_accessor_set_points_impl(ptr, rust_vec_len, data_len),
+41 => wire__crate__api__types__chart__Chart_auto_accessor_set_visible_impl(ptr, rust_vec_len, data_len),
+43 => wire__crate__api__types__file__File_auto_accessor_get_bytes_impl(ptr, rust_vec_len, data_len),
+44 => wire__crate__api__types__file__File_auto_accessor_get_file_path_impl(ptr, rust_vec_len, data_len),
+45 => wire__crate__api__types__file__File_auto_accessor_set_bytes_impl(ptr, rust_vec_len, data_len),
+46 => wire__crate__api__types__file__File_auto_accessor_set_file_path_impl(ptr, rust_vec_len, data_len),
+52 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_auto_accessor_get_config_impl(ptr, rust_vec_len, data_len),
+53 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_auto_accessor_set_config_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -5814,7 +5952,14 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::types::error::AppError>
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::types::audio::AudioInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.sample_rate.into_into_dart().into_dart()].into_dart()
+        [
+            self.sample_rate.into_into_dart().into_dart(),
+            self.channels.into_into_dart().into_dart(),
+            self.format.into_into_dart().into_dart(),
+            self.duration_secs.into_into_dart().into_dart(),
+            self.sample_count.into_into_dart().into_dart(),
+        ]
+        .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
@@ -6553,6 +6698,10 @@ impl SseEncode for crate::api::types::audio::AudioInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u32>::sse_encode(self.sample_rate, serializer);
+        <u16>::sse_encode(self.channels, serializer);
+        <String>::sse_encode(self.format, serializer);
+        <f64>::sse_encode(self.duration_secs, serializer);
+        <usize>::sse_encode(self.sample_count, serializer);
     }
 }
 
@@ -6796,6 +6945,13 @@ impl SseEncode for crate::api::communicator::stream_sink_communicator::StreamCom
 impl SseEncode for crate::api::decoder::symphonia_decoder::SymphoniaDecoder {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+}
+
+impl SseEncode for u16 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_u16::<NativeEndian>(self).unwrap();
+    }
 }
 
 impl SseEncode for u32 {

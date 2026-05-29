@@ -48,6 +48,7 @@ impl AudioDecoder for SymphoniaDecoder {
         };
 
         let sample_rate = audio_params.sample_rate.unwrap();
+        let channels = audio_params.channels.as_ref().map_or(1, |c| c.count() as u16);
         let track_id = track.id;
 
         let mut decoder = symphonia::default::get_codecs()
@@ -91,11 +92,20 @@ impl AudioDecoder for SymphoniaDecoder {
             }
         }
 
+        let sample_count = samples_f32.len();
+        let duration_secs = sample_count as f64 / sample_rate as f64;
+
         Ok(Audio {
             data: AudioData {
                 samples: Arc::new(samples_f32),
             },
-            info: AudioInfo { sample_rate },
+            info: AudioInfo {
+                sample_rate,
+                channels,
+                format,
+                duration_secs,
+                sample_count,
+            },
         })
     }
 }

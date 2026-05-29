@@ -6,6 +6,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vad/src/signals/audio_processor_signal.dart';
+import 'package:vad/src/signals/audio_info_signal.dart';
 import 'package:vad/src/rust/api/types/vad.dart';
 import 'package:vad/src/signals/audio_player_signal.dart';
 import 'package:vad/src/signals/chart_control_signal.dart';
@@ -159,8 +160,115 @@ class InfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('信息', style: Theme.of(context).textTheme.headlineMedium),
+    return Watch((context) {
+      final infoMap = audioInfoMapSignal.value;
+      final colorScheme = Theme.of(context).colorScheme;
+
+      if (infoMap.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.audio_file, size: 48, color: colorScheme.outline),
+              const SizedBox(height: 16),
+              Text('暂无音频文件', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: colorScheme.outline)),
+              const SizedBox(height: 8),
+              Text('拖放或点击 + 添加音频文件', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colorScheme.outlineVariant)),
+            ],
+          ),
+        );
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: infoMap.length,
+        itemBuilder: (context, index) {
+          final entry = infoMap.entries.elementAt(index);
+          final filePath = entry.key;
+          final info = entry.value;
+          final fileName = filePath.split('/').last;
+
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.audiotrack, size: 20, color: colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          fileName,
+                          style: Theme.of(context).textTheme.titleSmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          info.format.toUpperCase(),
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: colorScheme.onPrimaryContainer),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _InfoChip(label: '时长', value: formatDuration(info.durationSecs)),
+                      const SizedBox(width: 8),
+                      _InfoChip(label: '采样率', value: '${info.sampleRate} Hz'),
+                      const SizedBox(width: 8),
+                      _InfoChip(label: '声道', value: info.channels.toString()),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      _InfoChip(label: '采样数', value: formatSampleCount(info.sampleCount)),
+                      const SizedBox(width: 8),
+                      _InfoChip(label: '位深', value: '32-bit float'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    });
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoChip({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
+          const SizedBox(width: 4),
+          Text(value, style: Theme.of(context).textTheme.labelMedium),
+        ],
+      ),
     );
   }
 }

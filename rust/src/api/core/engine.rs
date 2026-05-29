@@ -17,6 +17,7 @@ use crate::api::{
         energy::EnergyCalculator, fft::FftTransform, zero_crossing_rate::ZeroCrossingRateCalculator,
     },
     types::{
+        audio::AudioInfo,
         chart::{Chart, DataType, Point},
         config::Config,
         error::AppError,
@@ -291,6 +292,22 @@ impl AudioProcessorEngine {
             position: self.player.position_secs(),
             duration: self.player.duration_secs(),
         }
+    }
+
+    pub async fn get_audio_info(&self, file_path: String) -> Result<AudioInfo, AppError> {
+        let audio = self.storage.load(file_path)?;
+        Ok(audio.info)
+    }
+
+    pub async fn get_loaded_files(&self) -> Vec<String> {
+        self.cache.get_all_cache()
+            .map(|charts| {
+                let mut keys: Vec<String> = charts.into_iter().map(|(k, _)| k).collect();
+                keys.sort();
+                keys.dedup();
+                keys
+            })
+            .unwrap_or_default()
     }
 }
 
