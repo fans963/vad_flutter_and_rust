@@ -26,7 +26,7 @@ dashmap = { version = "6.2.1", features = ["rayon"] }
 log = "0.4.30"
 android_logger = "0.15.1"
 env_logger = "0.11.10"
-ctor = "1.0.6"
+ctor = "1.0.7"
 thiserror = "2.0.18"
 console_log = { version = "1.0", optional = false }
 console_error_panic_hook = { version = "0.1.7", optional = false }

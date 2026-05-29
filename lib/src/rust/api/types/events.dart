@@ -35,5 +35,6 @@ sealed class ChartEvent with _$ChartEvent {
     required bool isPlaying,
     required double position,
     required double duration,
+    required double chartPosition,
   }) = ChartEvent_UpdatePlaybackState;
 }

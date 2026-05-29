@@ -258,10 +258,12 @@ fn fill_buffer<T: cpal::Sample + From<f32>>(
         let playing = state.is_playing.load(Ordering::Relaxed);
         let position = pos_frames as f64 / input_rate;
         let duration = total_source_frames as f64 / input_rate;
+        let chart_position = pos_frames as f64;
         emit_chart_event(ChartEvent::UpdatePlaybackState {
             is_playing: playing,
             position,
             duration,
+            chart_position,
         });
     }
 }

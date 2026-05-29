@@ -24,5 +24,6 @@ pub enum ChartEvent {
         is_playing: bool,
         position: f64,
         duration: f64,
+        chart_position: f64,
     },
 }

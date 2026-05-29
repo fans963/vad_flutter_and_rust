@@ -4886,6 +4886,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           isPlaying: dco_decode_bool(raw[1]),
           position: dco_decode_f_64(raw[2]),
           duration: dco_decode_f_64(raw[3]),
+          chartPosition: dco_decode_f_64(raw[4]),
         );
       default:
         throw Exception("unreachable");
@@ -5934,10 +5935,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_isPlaying = sse_decode_bool(deserializer);
         var var_position = sse_decode_f_64(deserializer);
         var var_duration = sse_decode_f_64(deserializer);
+        var var_chartPosition = sse_decode_f_64(deserializer);
         return ChartEvent_UpdatePlaybackState(
           isPlaying: var_isPlaying,
           position: var_position,
           duration: var_duration,
+          chartPosition: var_chartPosition,
         );
       default:
         throw UnimplementedError('');
@@ -7063,11 +7066,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         isPlaying: final isPlaying,
         position: final position,
         duration: final duration,
+        chartPosition: final chartPosition,
       ):
         sse_encode_i_32(6, serializer);
         sse_encode_bool(isPlaying, serializer);
         sse_encode_f_64(position, serializer);
         sse_encode_f_64(duration, serializer);
+        sse_encode_f_64(chartPosition, serializer);
     }
   }
 

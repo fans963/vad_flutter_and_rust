@@ -134,7 +134,7 @@ return updatePlaybackState(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( CommunicatorChart chart)?  addChart,TResult Function( String key,  DataType dataType)?  removeChart,TResult Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult Function()?  removeAllCharts,TResult Function( double maxIndex)?  updateMaxIndex,TResult Function( double minY,  double maxY)?  updateYRange,TResult Function( bool isPlaying,  double position,  double duration)?  updatePlaybackState,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( CommunicatorChart chart)?  addChart,TResult Function( String key,  DataType dataType)?  removeChart,TResult Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult Function()?  removeAllCharts,TResult Function( double maxIndex)?  updateMaxIndex,TResult Function( double minY,  double maxY)?  updateYRange,TResult Function( bool isPlaying,  double position,  double duration,  double chartPosition)?  updatePlaybackState,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
 return addChart(_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
@@ -143,7 +143,7 @@ return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts() when remo
 return removeAllCharts();case ChartEvent_UpdateMaxIndex() when updateMaxIndex != null:
 return updateMaxIndex(_that.maxIndex);case ChartEvent_UpdateYRange() when updateYRange != null:
 return updateYRange(_that.minY,_that.maxY);case ChartEvent_UpdatePlaybackState() when updatePlaybackState != null:
-return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);case _:
+return updatePlaybackState(_that.isPlaying,_that.position,_that.duration,_that.chartPosition);case _:
   return orElse();
 
 }
@@ -161,7 +161,7 @@ return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( CommunicatorChart chart)  addChart,required TResult Function( String key,  DataType dataType)  removeChart,required TResult Function( List<CommunicatorChart> charts)  updateAllCharts,required TResult Function()  removeAllCharts,required TResult Function( double maxIndex)  updateMaxIndex,required TResult Function( double minY,  double maxY)  updateYRange,required TResult Function( bool isPlaying,  double position,  double duration)  updatePlaybackState,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( CommunicatorChart chart)  addChart,required TResult Function( String key,  DataType dataType)  removeChart,required TResult Function( List<CommunicatorChart> charts)  updateAllCharts,required TResult Function()  removeAllCharts,required TResult Function( double maxIndex)  updateMaxIndex,required TResult Function( double minY,  double maxY)  updateYRange,required TResult Function( bool isPlaying,  double position,  double duration,  double chartPosition)  updatePlaybackState,}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart():
 return addChart(_that.chart);case ChartEvent_RemoveChart():
@@ -170,7 +170,7 @@ return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts():
 return removeAllCharts();case ChartEvent_UpdateMaxIndex():
 return updateMaxIndex(_that.maxIndex);case ChartEvent_UpdateYRange():
 return updateYRange(_that.minY,_that.maxY);case ChartEvent_UpdatePlaybackState():
-return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);}
+return updatePlaybackState(_that.isPlaying,_that.position,_that.duration,_that.chartPosition);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -184,7 +184,7 @@ return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( CommunicatorChart chart)?  addChart,TResult? Function( String key,  DataType dataType)?  removeChart,TResult? Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult? Function()?  removeAllCharts,TResult? Function( double maxIndex)?  updateMaxIndex,TResult? Function( double minY,  double maxY)?  updateYRange,TResult? Function( bool isPlaying,  double position,  double duration)?  updatePlaybackState,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( CommunicatorChart chart)?  addChart,TResult? Function( String key,  DataType dataType)?  removeChart,TResult? Function( List<CommunicatorChart> charts)?  updateAllCharts,TResult? Function()?  removeAllCharts,TResult? Function( double maxIndex)?  updateMaxIndex,TResult? Function( double minY,  double maxY)?  updateYRange,TResult? Function( bool isPlaying,  double position,  double duration,  double chartPosition)?  updatePlaybackState,}) {final _that = this;
 switch (_that) {
 case ChartEvent_AddChart() when addChart != null:
 return addChart(_that.chart);case ChartEvent_RemoveChart() when removeChart != null:
@@ -193,7 +193,7 @@ return updateAllCharts(_that.charts);case ChartEvent_RemoveAllCharts() when remo
 return removeAllCharts();case ChartEvent_UpdateMaxIndex() when updateMaxIndex != null:
 return updateMaxIndex(_that.maxIndex);case ChartEvent_UpdateYRange() when updateYRange != null:
 return updateYRange(_that.minY,_that.maxY);case ChartEvent_UpdatePlaybackState() when updatePlaybackState != null:
-return updatePlaybackState(_that.isPlaying,_that.position,_that.duration);case _:
+return updatePlaybackState(_that.isPlaying,_that.position,_that.duration,_that.chartPosition);case _:
   return null;
 
 }
@@ -577,12 +577,13 @@ as double,
 
 
 class ChartEvent_UpdatePlaybackState extends ChartEvent {
-  const ChartEvent_UpdatePlaybackState({required this.isPlaying, required this.position, required this.duration}): super._();
+  const ChartEvent_UpdatePlaybackState({required this.isPlaying, required this.position, required this.duration, required this.chartPosition}): super._();
   
 
  final  bool isPlaying;
  final  double position;
  final  double duration;
+ final  double chartPosition;
 
 /// Create a copy of ChartEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -594,16 +595,16 @@ $ChartEvent_UpdatePlaybackStateCopyWith<ChartEvent_UpdatePlaybackState> get copy
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChartEvent_UpdatePlaybackState&&(identical(other.isPlaying, isPlaying) || other.isPlaying == isPlaying)&&(identical(other.position, position) || other.position == position)&&(identical(other.duration, duration) || other.duration == duration));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChartEvent_UpdatePlaybackState&&(identical(other.isPlaying, isPlaying) || other.isPlaying == isPlaying)&&(identical(other.position, position) || other.position == position)&&(identical(other.duration, duration) || other.duration == duration)&&(identical(other.chartPosition, chartPosition) || other.chartPosition == chartPosition));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isPlaying,position,duration);
+int get hashCode => Object.hash(runtimeType,isPlaying,position,duration,chartPosition);
 
 @override
 String toString() {
-  return 'ChartEvent.updatePlaybackState(isPlaying: $isPlaying, position: $position, duration: $duration)';
+  return 'ChartEvent.updatePlaybackState(isPlaying: $isPlaying, position: $position, duration: $duration, chartPosition: $chartPosition)';
 }
 
 
@@ -614,7 +615,7 @@ abstract mixin class $ChartEvent_UpdatePlaybackStateCopyWith<$Res> implements $C
   factory $ChartEvent_UpdatePlaybackStateCopyWith(ChartEvent_UpdatePlaybackState value, $Res Function(ChartEvent_UpdatePlaybackState) _then) = _$ChartEvent_UpdatePlaybackStateCopyWithImpl;
 @useResult
 $Res call({
- bool isPlaying, double position, double duration
+ bool isPlaying, double position, double duration, double chartPosition
 });
 
 
@@ -631,11 +632,12 @@ class _$ChartEvent_UpdatePlaybackStateCopyWithImpl<$Res>
 
 /// Create a copy of ChartEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? isPlaying = null,Object? position = null,Object? duration = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? isPlaying = null,Object? position = null,Object? duration = null,Object? chartPosition = null,}) {
   return _then(ChartEvent_UpdatePlaybackState(
 isPlaying: null == isPlaying ? _self.isPlaying : isPlaying // ignore: cast_nullable_to_non_nullable
 as bool,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
 as double,duration: null == duration ? _self.duration : duration // ignore: cast_nullable_to_non_nullable
+as double,chartPosition: null == chartPosition ? _self.chartPosition : chartPosition // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }

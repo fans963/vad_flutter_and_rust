@@ -5190,10 +5190,12 @@ impl SseDecode for crate::api::types::events::ChartEvent {
                 let mut var_isPlaying = <bool>::sse_decode(deserializer);
                 let mut var_position = <f64>::sse_decode(deserializer);
                 let mut var_duration = <f64>::sse_decode(deserializer);
+                let mut var_chartPosition = <f64>::sse_decode(deserializer);
                 return crate::api::types::events::ChartEvent::UpdatePlaybackState {
                     is_playing: var_isPlaying,
                     position: var_position,
                     duration: var_duration,
+                    chart_position: var_chartPosition,
                 };
             }
             _ => {
@@ -6003,11 +6005,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::types::events::ChartEvent {
                 is_playing,
                 position,
                 duration,
+                chart_position,
             } => [
                 6.into_dart(),
                 is_playing.into_into_dart().into_dart(),
                 position.into_into_dart().into_dart(),
                 duration.into_into_dart().into_dart(),
+                chart_position.into_into_dart().into_dart(),
             ]
             .into_dart(),
             _ => {
@@ -6745,11 +6749,13 @@ impl SseEncode for crate::api::types::events::ChartEvent {
                 is_playing,
                 position,
                 duration,
+                chart_position,
             } => {
                 <i32>::sse_encode(6, serializer);
                 <bool>::sse_encode(is_playing, serializer);
                 <f64>::sse_encode(position, serializer);
                 <f64>::sse_encode(duration, serializer);
+                <f64>::sse_encode(chart_position, serializer);
             }
             _ => {
                 unimplemented!("");

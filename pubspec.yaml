@@ -24,7 +24,7 @@ dependencies:
   flutter_colorpicker: ^1.1.0
   freezed_annotation: ^3.1.0
   show_fps: ^1.1.0
-  signals: ^7.0.0
+  signals: ^7.1.0
   super_drag_and_drop: ^0.9.1
   syncfusion_flutter_core: ^33.2.8
 

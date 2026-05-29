@@ -97,6 +97,7 @@ class _ChartWidgetState extends State<ChartWidget> {
               event.isPlaying,
               event.position,
               event.duration,
+              event.chartPosition,
             );
         }
       },
@@ -114,10 +115,12 @@ class _ChartWidgetState extends State<ChartWidget> {
       xViewMaxSignal.value;
       yViewMinSignal.value;
       yViewMaxSignal.value;
+      playbackChartPositionSignal.value;
 
       final seriesList = _buildChartSeries();
       final xMin = xViewMinSignal.value;
       final xMax = xViewMaxSignal.value;
+      final playhead = playbackChartPositionSignal.value;
 
       return SizedBox(
         height: 500,
@@ -142,10 +145,10 @@ class _ChartWidgetState extends State<ChartWidget> {
               plotBands: [
                 PlotBand(
                   isVisible: true,
-                  start: 0.0,
-                  end: 0.0,
+                  start: playhead,
+                  end: playhead,
                   borderColor: Colors.red,
-                  borderWidth: 1,
+                  borderWidth: 1.5,
                 ),
               ],
             ),
