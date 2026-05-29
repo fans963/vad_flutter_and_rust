@@ -14,7 +14,7 @@ abstract class Communicator {
 
   Future<void> removeChart({required String key, required DataType dataType});
 
-  Future<void> updateAllCharts({required List<ChartWIthKey> charts});
+  Future<void> updateAllCharts({required List<(String, Chart)> charts});
 
   Future<void> updateMaxIndex({required double maxIndex});
 

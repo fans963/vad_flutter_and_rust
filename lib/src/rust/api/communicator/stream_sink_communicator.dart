@@ -38,9 +38,9 @@ class StreamCommunicator {
         dataType: dataType,
       );
 
-  Future<void> updateAllCharts({required List<ChartWIthKey> charts}) => RustLib
-      .instance
-      .api
+  Future<void> updateAllCharts({
+    required List<(String, Chart)> charts,
+  }) => RustLib.instance.api
       .crateApiCommunicatorStreamSinkCommunicatorStreamCommunicatorUpdateAllCharts(
         that: this,
         charts: charts,

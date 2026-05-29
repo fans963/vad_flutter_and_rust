@@ -3,7 +3,6 @@ pub mod traits;
 pub mod decoder;
 pub mod storage;
 pub mod util;
-pub mod cache;
 pub mod core;
 pub mod sampling;
 pub mod events;

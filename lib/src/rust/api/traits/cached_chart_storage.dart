@@ -13,7 +13,7 @@ abstract class CachedChartStorage {
 
   Future<Chart> get_({required String key, required DataType dataType});
 
-  Future<List<ChartWIthKey>> getAllCache();
+  Future<List<(String, Chart)>> getAllCache();
 
   Future<void> remove({required String key, required DataType dataType});
 }

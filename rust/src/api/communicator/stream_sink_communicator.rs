@@ -19,22 +19,28 @@ impl StreamCommunicator {
 
 impl Communicator for StreamCommunicator {
     fn add_chart(&self, key: String, chart: Chart) {
+        let points = Arc::try_unwrap(chart.points)
+            .unwrap_or_else(|arc| (*arc).clone());
         emit_chart_event(ChartEvent::AddChart {
             chart: CommunicatorChart {
                 key,
                 data_type: chart.data_type,
-                chart: Arc::try_unwrap(chart.points).unwrap_or_else(|v| (*v).clone()),
+                chart: points,
             },
         });
     }
 
-    fn update_all_charts(&self, charts: Vec<crate::api::types::chart::ChartWIthKey>) {
+    fn update_all_charts(&self, charts: Vec<(String, Chart)>) {
         let communicator_charts: Vec<CommunicatorChart> = charts
             .into_iter()
-            .map(|c| CommunicatorChart {
-                key: c.key,
-                data_type: c.chart.data_type,
-                chart: Arc::try_unwrap(c.chart.points).unwrap_or_else(|v| (*v).clone()),
+            .map(|(key, chart)| {
+                let points = Arc::try_unwrap(chart.points)
+                    .unwrap_or_else(|arc| (*arc).clone());
+                CommunicatorChart {
+                    key,
+                    data_type: chart.data_type,
+                    chart: points,
+                }
             })
             .collect();
         emit_chart_event(ChartEvent::UpdateAllCharts {

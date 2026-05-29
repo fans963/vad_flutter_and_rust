@@ -1,4 +1,4 @@
-use std::sync::{Arc, atomic::AtomicBool};
+use std::sync::Arc;
 
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
@@ -21,7 +21,7 @@ pub struct Audio {
 }
 
 impl Audio {
-    pub async fn audio_to_chart(&self) -> Chart {
+    pub fn audio_to_chart(&self) -> Chart {
         let points: Vec<Point> = self
             .data
             .samples
@@ -32,13 +32,13 @@ impl Audio {
                 y: sample,
             })
             .collect();
-        let (min_y, max_y) =  get_min_max_par(&points).await;
+        let (min_y, max_y) = get_min_max_par(&points);
         Chart {
             data_type: DataType::Audio,
             points: Arc::new(points),
             min_y,
             max_y,
-            visible: Arc::new(AtomicBool::new(true)),
+            visible: true,
         }
     }
 }

@@ -7,7 +7,7 @@ import '../../frb_generated.dart';
 import '../../lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Chart>>
 abstract class Chart implements RustOpaqueInterface {
@@ -19,7 +19,7 @@ abstract class Chart implements RustOpaqueInterface {
 
   ArcVecPoint get points;
 
-  ArcAtomicBool get visible;
+  bool get visible;
 
   set dataType(DataType dataType);
 
@@ -29,20 +29,9 @@ abstract class Chart implements RustOpaqueInterface {
 
   set points(ArcVecPoint points);
 
-  set visible(ArcAtomicBool visible);
+  set visible(bool visible);
 
   Future<Chart> getRange({required double startX, required double endX});
-}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ChartWIthKey>>
-abstract class ChartWIthKey implements RustOpaqueInterface {
-  Chart get chart;
-
-  String get key;
-
-  set chart(Chart chart);
-
-  set key(String key);
 }
 
 class CommunicatorChart {

@@ -7,27 +7,26 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'types/vad.dart';
 
-// These functions are ignored because they are not marked as `pub`: `create_vad`, `vad_lock`
+// These functions are ignored because they are not marked as `pub`: `create`
 
-Future<List<String>> listAlgorithmNames() =>
-    RustLib.instance.api.crateApiVadListAlgorithmNames();
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<VadEngine>>
+abstract class VadEngine implements RustOpaqueInterface {
+  Future<String> currentName();
 
-Future<String> currentAlgorithmName() =>
-    RustLib.instance.api.crateApiVadCurrentAlgorithmName();
+  Future<List<VadParamDef>> getParameters();
 
-Future<void> setAlgorithm({required String name}) =>
-    RustLib.instance.api.crateApiVadSetAlgorithm(name: name);
+  Future<List<String>> listAlgorithms();
 
-Future<List<VadParamDef>> getParameters() =>
-    RustLib.instance.api.crateApiVadGetParameters();
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<VadEngine> newInstance({required String name}) =>
+      RustLib.instance.api.crateApiVadVadEngineNew(name: name);
 
-Future<void> setParameter({required String key, required double value}) =>
-    RustLib.instance.api.crateApiVadSetParameter(key: key, value: value);
+  Future<VadResult> process({
+    required List<double> samples,
+    required int sampleRate,
+  });
 
-Future<VadResult> process({
-  required List<double> samples,
-  required int sampleRate,
-}) => RustLib.instance.api.crateApiVadProcess(
-  samples: samples,
-  sampleRate: sampleRate,
-);
+  Future<void> setAlgorithm({required String name});
+
+  Future<void> setParameter({required String key, required double value});
+}

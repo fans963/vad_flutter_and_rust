@@ -1,4 +1,3 @@
-use std::sync::atomic;
 use std::sync::Arc;
 
 use log::info;
@@ -7,23 +6,23 @@ use crate::api::{
     communicator,
     decoder::symphonia_decoder::SymphoniaDecoder,
     player::{Player, PlaybackState},
-    sampling::minmax::Minmax,
+    sampling::minmax::minmax_downsample,
     storage::{kv_audio_storage::KvAudioStorage, kv_cached_chart_storage::KvCachedChartStorage},
     traits::{
         audio_decoder::AudioDecoder, audio_storage::AudioStorage,
         cached_chart_storage::CachedChartStorage, communicator::Communicator,
-        down_sample::DownSample, transform::SignalTransform,
+        transform::SignalTransform,
     },
     transform::{
         energy::EnergyCalculator, fft::FftTransform, zero_crossing_rate::ZeroCrossingRateCalculator,
     },
     types::{
-        chart::{Chart, ChartWIthKey, DataType, Point},
+        chart::{Chart, DataType, Point},
         config::Config,
         error::AppError,
         vad::{VadParamDef, VadResult},
     },
-    vad,
+    vad::VadEngine,
 };
 
 pub struct AudioProcessorEngine {
@@ -34,10 +33,10 @@ pub struct AudioProcessorEngine {
     communicator: Box<dyn Communicator + Send + Sync>,
     down_sample_points_num: usize,
     index_range: (f32, f32),
-    selected_audio: Option<String>,
     max_index: f32,
     y_range: (f32, f32),
     player: Player,
+    vad: VadEngine,
 }
 
 impl AudioProcessorEngine {
@@ -56,50 +55,59 @@ impl AudioProcessorEngine {
             communicator,
             down_sample_points_num: 500,
             index_range: (0.0, 0.0),
-            selected_audio: None,
             max_index: 10000.0,
             y_range: (-0.5, 0.5),
             player: Player::new(),
+            vad: VadEngine::new("energy"),
         }
     }
 
-    fn update_all(&mut self) {
-        let all_charts = self.cache.get_all_cache();
-        if let Ok(charts) = all_charts {
+    fn recompute_ranges(&mut self) {
+        if let Ok(charts) = self.cache.get_all_cache() {
             let mut y_min = f32::MAX;
             let mut y_max = f32::MIN;
             let mut max_idx = 0.0f32;
 
-            let visible_charts: Vec<ChartWIthKey> = charts
-                .iter()
-                .filter(|c| c.chart.visible.load(atomic::Ordering::Relaxed))
-                .map(|c| {
-                    y_min = y_min.min(c.chart.min_y);
-                    y_max = y_max.max(c.chart.max_y);
-                    if let Some(last) = c.chart.points.last() {
-                        max_idx = max_idx.max(last.x);
-                    }
-
-                    let visible_chart = c.chart.get_range(self.index_range.0, self.index_range.1);
-                    let downsampled_chart =
-                        Minmax {}.down_sample(visible_chart, self.down_sample_points_num);
-                    ChartWIthKey {
-                        key: c.key.clone(),
-                        chart: downsampled_chart,
-                    }
-                })
-                .collect();
+            for (_, c) in &charts {
+                if !c.visible {
+                    continue;
+                }
+                y_min = y_min.min(c.min_y);
+                y_max = y_max.max(c.max_y);
+                if let Some(last) = c.points.last() {
+                    max_idx = max_idx.max(last.x);
+                }
+            }
 
             if y_min <= y_max {
                 self.y_range = (y_min, y_max);
+                self.max_index = (max_idx / self.config.frame_size as f32).ceil()
+                    * self.config.frame_size as f32;
             }
-            self.max_index = max_idx;
+        }
+    }
+
+    fn update_all(&mut self) {
+        self.recompute_ranges();
+        self.communicator.update_max_index(self.max_index);
+        self.communicator
+            .update_y_range(self.y_range.0, self.y_range.1);
+
+        let all_charts = self.cache.get_all_cache();
+        if let Ok(charts) = all_charts {
+            let visible_charts: Vec<_> = charts
+                .iter()
+                .filter(|(_, c)| c.visible)
+                .map(|(key, c)| {
+                    let visible_chart = c.get_range(self.index_range.0, self.index_range.1);
+                    let downsampled = minmax_downsample(visible_chart, self.down_sample_points_num);
+                    (key.clone(), downsampled)
+                })
+                .collect();
 
             if !visible_charts.is_empty() {
                 self.communicator.update_all_charts(visible_charts);
             }
-            self.communicator.update_max_index(self.max_index);
-            self.communicator.update_y_range(self.y_range.0, self.y_range.1);
         }
     }
 
@@ -130,22 +138,16 @@ impl AudioProcessorEngine {
         self.storage
             .save(file_path.clone(), decoded_audio.clone())?;
 
-        let audio_chart = decoded_audio.audio_to_chart().await;
-        self.y_range = (
-            self.y_range.0.min(audio_chart.min_y),
-            self.y_range.1.max(audio_chart.max_y),
-        );
-        self.update_max_index(&audio_chart);
-        self.communicator
-            .update_max_index(self.max_index);
+        let audio_chart = decoded_audio.audio_to_chart();
+        self.cache.add(file_path.clone(), audio_chart.clone())?;
+
+        self.recompute_ranges();
+        self.communicator.update_max_index(self.max_index);
         self.communicator
             .update_y_range(self.y_range.0, self.y_range.1);
 
-        self.cache.add(file_path.clone(), audio_chart.clone())?;
-
         let visible_chart = audio_chart.get_range(self.index_range.0, self.index_range.1);
-
-        let downsampled_chart = Minmax {}.down_sample(visible_chart, self.down_sample_points_num);
+        let downsampled_chart = minmax_downsample(visible_chart, self.down_sample_points_num);
         self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
     }
@@ -164,7 +166,7 @@ impl AudioProcessorEngine {
         } else {
             let stored_audio = self.storage.load(file_path.clone())?;
             let chart = match data_type {
-                DataType::Audio => stored_audio.audio_to_chart().await,
+                DataType::Audio => stored_audio.audio_to_chart(),
                 DataType::Spectrum => {
                     (FftTransform {})
                         .transform(stored_audio, self.config.clone())
@@ -181,17 +183,17 @@ impl AudioProcessorEngine {
                         .await?
                 }
                 DataType::Vad => {
-                    let result = vad::process(&stored_audio.data.samples, stored_audio.info.sample_rate);
+                    let result = self.vad.process(&stored_audio.data.samples, stored_audio.info.sample_rate);
                     let points: Vec<Point> = result.confidence.iter().enumerate()
                         .map(|(i, &c)| Point { x: (i * result.frame_size as usize) as f32, y: c })
                         .collect();
-                    let (min_y, max_y) = crate::api::util::get_min_max::get_min_max_par(&points).await;
+                    let (min_y, max_y) = crate::api::util::get_min_max::get_min_max_par(&points);
                     Chart {
                         data_type: DataType::Vad,
                         points: Arc::new(points),
                         min_y,
                         max_y,
-                        visible: Arc::new(std::sync::atomic::AtomicBool::new(true)),
+                        visible: true,
                     }
                 }
             };
@@ -199,123 +201,59 @@ impl AudioProcessorEngine {
             info!("{:?} data length: {}", data_type, chart.points.len());
             chart
         };
-        self.update_max_index(&target_chart);
-        self.communicator
-            .update_max_index(self.max_index);
+
+        self.recompute_ranges();
+        self.communicator.update_max_index(self.max_index);
         self.communicator
             .update_y_range(self.y_range.0, self.y_range.1);
+
         let visible_chart = target_chart.get_range(self.index_range.0, self.index_range.1);
 
-        let downsampled_chart = Minmax {}.down_sample(visible_chart, self.down_sample_points_num);
+        let downsampled_chart = minmax_downsample(visible_chart, self.down_sample_points_num);
         self.communicator.add_chart(file_path, downsampled_chart);
         Ok(())
     }
 
     pub async fn remove_chart(
-        &self,
+        &mut self,
         file_path: String,
         data_type: DataType,
     ) -> Result<(), AppError> {
         self.cache.remove(file_path.clone(), data_type)?;
         self.communicator
             .remove_chart(file_path, data_type);
-        self.recompute_global_range();
+        self.recompute_ranges();
+        self.communicator.update_max_index(self.max_index);
+        self.communicator
+            .update_y_range(self.y_range.0, self.y_range.1);
         Ok(())
     }
-
-    fn recompute_global_range(&self) {
-        if let Ok(charts) = self.cache.get_all_cache() {
-            let mut y_min = f32::MAX;
-            let mut y_max = f32::MIN;
-            let mut max_idx = 0.0f32;
-
-            for c in &charts {
-                if !c.chart.visible.load(atomic::Ordering::Relaxed) {
-                    continue;
-                }
-                y_min = y_min.min(c.chart.min_y);
-                y_max = y_max.max(c.chart.max_y);
-                if let Some(last) = c.chart.points.last() {
-                    max_idx = max_idx.max(last.x);
-                }
-            }
-
-            if y_min <= y_max {
-                self.communicator.update_y_range(y_min, y_max);
-                self.communicator.update_max_index(max_idx);
-            }
-        }
-    }
-
-    pub async fn set_selected_audio(&mut self, chart_name: Option<String>) {
-        self.selected_audio = chart_name;
-    }
-
-    fn update_max_index(&mut self, chart: &Chart) {
-        chart.points.last().map(|p| {
-            if p.x > self.max_index {
-                self.max_index =
-                    (p.x / self.config.frame_size as f32).ceil() * self.config.frame_size as f32;
-            }
-        });
-    }
-
-    pub async fn reserve_visible(&mut self, chart_name: String) -> Result<(), AppError> {
-        let (file_path, data_part) = chart_name.rsplit_once(' ').unwrap_or(("", &chart_name));
-
-        let data_type = match data_part {
-            "audio" => DataType::Audio,
-            "spectrum" => DataType::Spectrum,
-            "energy" => DataType::Energy,
-            "zeroCrossingRate" => DataType::ZeroCrossingRate,
-            _ => return Err(AppError::InvalidChartName(chart_name)),
-        };
-
-        let chart = self.cache.get(file_path.to_string(), data_type)?;
-        chart.visible.store(
-            !chart.visible.load(atomic::Ordering::Relaxed),
-            atomic::Ordering::Relaxed,
-        );
-        info!(
-            "Set visible: {}, {}, {}",
-            file_path,
-            data_part,
-            chart.visible.load(atomic::Ordering::Relaxed)
-        );
-        self.update_all();
-        Ok(())
-    }
-
-    // ── VAD Engine API ─────────────────────────────────────────────────
 
     pub async fn list_vad_algorithms(&self) -> Vec<String> {
-        vad::list_algorithm_names()
+        self.vad.list_algorithms()
     }
 
     pub async fn get_current_vad_name(&self) -> String {
-        vad::current_algorithm_name()
+        self.vad.current_name()
     }
 
     pub async fn set_vad_algorithm(&mut self, name: String) {
-        vad::set_algorithm(&name);
+        self.vad.set_algorithm(&name);
     }
 
     pub async fn get_vad_params(&self) -> Vec<VadParamDef> {
-        vad::get_parameters()
+        self.vad.get_parameters()
     }
 
     pub async fn set_vad_param(&mut self, key: String, value: f64) {
-        vad::set_parameter(&key, value as f32);
+        self.vad.set_parameter(&key, value as f32);
     }
 
     pub async fn compute_vad(&mut self, file_path: String) -> Result<VadResult, AppError> {
         let stored = self.storage.load(file_path)?;
-        Ok(vad::process(&stored.data.samples, stored.info.sample_rate))
+        Ok(self.vad.process(&stored.data.samples, stored.info.sample_rate))
     }
 
-    // ── Audio Playback API ─────────────────────────────────────────────
-
-    /// Load audio from storage and start playback from `start_fraction` (0.0–1.0).
     pub async fn play_audio(&mut self, file_path: String, start_fraction: f64) -> Result<(), String> {
         if let Ok(audio) = self.storage.load(file_path) {
             let total = audio.data.samples.len() as u64;
@@ -326,7 +264,6 @@ impl AudioProcessorEngine {
         Ok(())
     }
 
-    /// Resume playback from the current position. No-op if nothing is loaded.
     pub async fn resume_audio(&mut self) -> Result<(), String> {
         self.player.resume()
     }
@@ -334,19 +271,16 @@ impl AudioProcessorEngine {
     pub async fn pause_audio(&mut self) { self.player.pause(); }
     pub async fn stop_audio(&mut self) { self.player.stop(); }
 
-    /// Seek to a fraction (0.0–1.0) of the loaded audio.
     pub async fn seek_audio(&mut self, fraction: f64) {
         if let Some(total) = self.player.total_samples() {
             self.player.seek(((total as f64 * fraction) as u64).min(total));
         }
     }
 
-    /// Set playback speed multiplier (1.0 = normal, 2.0 = double speed).
     pub async fn set_playback_speed(&mut self, multiplier: f32) {
         self.player.set_speed(multiplier);
     }
 
-    /// Check if audio is currently loaded in the player.
     pub async fn is_audio_loaded(&self) -> bool {
         self.player.is_loaded()
     }

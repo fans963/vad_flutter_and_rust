@@ -1,4 +1,3 @@
-use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -22,7 +21,7 @@ pub struct Chart {
     pub points: Arc<Vec<Point>>,
     pub min_y: f32,
     pub max_y: f32,
-    pub visible: Arc<AtomicBool>,
+    pub visible: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -56,13 +55,7 @@ impl Chart {
             points: Arc::new(self.points[start..end].to_vec()),
             min_y: self.min_y,
             max_y: self.max_y,
-            visible: Arc::clone(&self.visible),
+            visible: self.visible,
         }
     }
-}
-
-#[derive(Clone)]
-pub struct ChartWIthKey {
-    pub key: String,
-    pub chart: Chart,
 }

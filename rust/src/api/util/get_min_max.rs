@@ -2,7 +2,7 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::api::types::chart::Point;
 
-pub async fn get_min_max_par(points: &Vec<Point>) -> (f32, f32) {
+pub fn get_min_max_par(points: &[Point]) -> (f32, f32) {
     points
         .par_iter()
         .fold(

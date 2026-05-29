@@ -1,4 +1,4 @@
-use std::sync::{Arc, atomic::AtomicBool};
+use std::sync::Arc;
 
 use rayon::{
     iter::{IndexedParallelIterator, ParallelIterator},
@@ -41,13 +41,13 @@ impl SignalTransform for ZeroCrossingRateCalculator {
             })
             .collect::<Vec<Point>>();
 
-        let (min_y, max_y) = get_min_max_par(&points).await;
+        let (min_y, max_y) = get_min_max_par(&points);
         Ok(Chart {
             data_type: DataType::ZeroCrossingRate,
             points: Arc::new(points),
             min_y,
             max_y,
-            visible: Arc::new(AtomicBool::new(true)),
+            visible: true,
         })
     }
 }

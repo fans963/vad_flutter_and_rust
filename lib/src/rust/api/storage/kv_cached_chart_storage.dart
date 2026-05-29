@@ -24,7 +24,7 @@ abstract class KvCachedChartStorage
   Future<Chart> get_({required String key, required DataType dataType});
 
   @override
-  Future<List<ChartWIthKey>> getAllCache();
+  Future<List<(String, Chart)>> getAllCache();
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<KvCachedChartStorage> newInstance() => RustLib.instance.api

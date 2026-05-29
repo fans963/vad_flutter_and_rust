@@ -1,7 +1,7 @@
 use num_complex::Complex;
 use rayon::prelude::*;
 use rustfft::FftPlanner;
-use std::sync::{atomic::AtomicBool, Arc};
+use std::sync::Arc;
 
 use crate::api::{
     traits::transform::SignalTransform,
@@ -27,7 +27,7 @@ impl SignalTransform for FftTransform {
                 points: Arc::new(vec![]),
                 min_y: 0.0,
                 max_y: 0.0,
-                visible: Arc::new(AtomicBool::new(true)),
+                visible: true,
             });
         }
 
@@ -72,13 +72,13 @@ impl SignalTransform for FftTransform {
             })
             .collect();
 
-        let (min_y, max_y) = get_min_max_par(&points).await;
+        let (min_y, max_y) = get_min_max_par(&points);
         Ok(Chart {
             data_type: DataType::Spectrum,
             points: Arc::new(points),
             min_y,
             max_y,
-            visible: Arc::new(AtomicBool::new(true)),
+            visible: true,
         })
     }
 }

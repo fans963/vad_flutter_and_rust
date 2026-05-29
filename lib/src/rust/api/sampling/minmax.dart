@@ -7,23 +7,10 @@ import '../../frb_generated.dart';
 import '../types/chart.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class Minmax {
-  const Minmax();
-
-  Future<Chart> downSample({
-    required Chart chart,
-    required BigInt targetPointsNum,
-  }) => RustLib.instance.api.crateApiSamplingMinmaxMinmaxDownSample(
-    that: this,
-    chart: chart,
-    targetPointsNum: targetPointsNum,
-  );
-
-  @override
-  int get hashCode => 0;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Minmax && runtimeType == other.runtimeType;
-}
+Future<Chart> minmaxDownsample({
+  required Chart chart,
+  required BigInt targetPointsNum,
+}) => RustLib.instance.api.crateApiSamplingMinmaxMinmaxDownsample(
+  chart: chart,
+  targetPointsNum: targetPointsNum,
+);

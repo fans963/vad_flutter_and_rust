@@ -11,7 +11,7 @@ import '../types/error.dart';
 import '../types/vad.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `recompute_global_range`, `update_all`, `update_max_index`
+// These functions are ignored because they are not marked as `pub`: `recompute_ranges`, `update_all`
 
 Future<AudioProcessorEngine> createDefaultEngine({required Config config}) =>
     RustLib.instance.api.crateApiCoreEngineCreateDefaultEngine(config: config);
@@ -34,7 +34,6 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<List<VadParamDef>> getVadParams();
 
-  /// Check if audio is currently loaded in the player.
   Future<bool> isAudioLoaded();
 
   Future<List<String>> listVadAlgorithms();
@@ -56,7 +55,6 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<void> pauseAudio();
 
-  /// Load audio from storage and start playback from `start_fraction` (0.0–1.0).
   Future<void> playAudio({
     required String filePath,
     required double startFraction,
@@ -69,12 +67,8 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
     required DataType dataType,
   });
 
-  Future<void> reserveVisible({required String chartName});
-
-  /// Resume playback from the current position. No-op if nothing is loaded.
   Future<void> resumeAudio();
 
-  /// Seek to a fraction (0.0–1.0) of the loaded audio.
   Future<void> seekAudio({required double fraction});
 
   Future<void> setConfig({required Config config});
@@ -83,10 +77,7 @@ abstract class AudioProcessorEngine implements RustOpaqueInterface {
 
   Future<void> setIndexRange({required double start, required double end});
 
-  /// Set playback speed multiplier (1.0 = normal, 2.0 = double speed).
   Future<void> setPlaybackSpeed({required double multiplier});
-
-  Future<void> setSelectedAudio({String? chartName});
 
   Future<void> setVadAlgorithm({required String name});
 

@@ -2,52 +2,55 @@ pub mod energy_vad;
 pub mod zcr_vad;
 pub mod silero_vad;
 
-use std::sync::{Mutex, OnceLock};
-
 use crate::api::traits::vad_algorithm::VadAlgorithm;
+use crate::api::types::vad::{VadParamDef, VadResult};
 use energy_vad::EnergyVad;
 use zcr_vad::ZeroCrossingRateVad;
 use silero_vad::SileroVad;
 
 type VadBox = Box<dyn VadAlgorithm + Send>;
 
-static VAD_INSTANCE: OnceLock<Mutex<VadBox>> = OnceLock::new();
-
-fn vad_lock() -> &'static Mutex<VadBox> {
-    VAD_INSTANCE.get_or_init(|| Mutex::new(Box::new(EnergyVad::default())))
+pub struct VadEngine {
+    inner: VadBox,
 }
 
-pub fn list_algorithm_names() -> Vec<String> {
-    vec!["energy".into(), "zcr".into(), "silero".into()]
-}
-
-fn create_vad(name: &str) -> Option<VadBox> {
-    match name {
-        "energy" => Some(Box::new(EnergyVad::default())),
-        "zcr" => Some(Box::new(ZeroCrossingRateVad::default())),
-        "silero" => Some(Box::new(SileroVad::default())),
-        _ => None,
+impl VadEngine {
+    pub fn new(name: &str) -> Self {
+        Self {
+            inner: Self::create(name),
+        }
     }
-}
 
-pub fn current_algorithm_name() -> String {
-    vad_lock().lock().unwrap().name().to_string()
-}
-
-pub fn set_algorithm(name: &str) {
-    if let Some(algo) = create_vad(name) {
-        *vad_lock().lock().unwrap() = algo;
+    fn create(name: &str) -> VadBox {
+        match name {
+            "energy" => Box::new(EnergyVad::default()),
+            "zcr" => Box::new(ZeroCrossingRateVad::default()),
+            "silero" => Box::new(SileroVad::default()),
+            _ => Box::new(EnergyVad::default()),
+        }
     }
-}
 
-pub fn get_parameters() -> Vec<crate::api::types::vad::VadParamDef> {
-    vad_lock().lock().unwrap().get_parameters()
-}
+    pub fn list_algorithms(&self) -> Vec<String> {
+        vec!["energy".into(), "zcr".into(), "silero".into()]
+    }
 
-pub fn set_parameter(key: &str, value: f32) {
-    vad_lock().lock().unwrap().update_parameter(key, value);
-}
+    pub fn current_name(&self) -> String {
+        self.inner.name().to_string()
+    }
 
-pub fn process(samples: &[f32], sample_rate: u32) -> crate::api::types::vad::VadResult {
-    vad_lock().lock().unwrap().process(samples, sample_rate)
+    pub fn set_algorithm(&mut self, name: &str) {
+        self.inner = Self::create(name);
+    }
+
+    pub fn get_parameters(&self) -> Vec<VadParamDef> {
+        self.inner.get_parameters()
+    }
+
+    pub fn set_parameter(&mut self, key: &str, value: f32) {
+        self.inner.update_parameter(key, value);
+    }
+
+    pub fn process(&self, samples: &[f32], sample_rate: u32) -> VadResult {
+        self.inner.process(samples, sample_rate)
+    }
 }
