@@ -82,8 +82,17 @@ impl AudioDecoder for SymphoniaDecoder {
                     let mut planar: Vec<Vec<f32>> = Vec::new();
                     decoded_buffer.copy_to_vecs_planar(&mut planar);
 
-                    for plane in planar {
-                        samples_f32.extend_from_slice(&plane);
+                    if planar.len() == 1 {
+                        samples_f32.extend_from_slice(&planar[0]);
+                    } else if planar.len() >= 2 {
+                        let left = &planar[0];
+                        let right = &planar[1];
+                        let len = left.len().min(right.len());
+                        samples_f32.reserve(len * 2);
+                        for i in 0..len {
+                            samples_f32.push(left[i]);
+                            samples_f32.push(right[i]);
+                        }
                     }
                 }
                 Err(e) => {

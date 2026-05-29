@@ -67,11 +67,12 @@ impl Player {
             Some(s) => s,
             None => return 0.0,
         };
-        state.samples.len() as f64 / state.sample_rate as f64
+        let total_frames = state.samples.len() as f64 / state.channels as f64;
+        total_frames / state.sample_rate as f64
     }
 
     pub fn total_samples(&self) -> Option<u64> {
-        self.state.as_ref().map(|s| s.samples.len() as u64)
+        self.state.as_ref().map(|s| s.samples.len() as u64 / s.channels as u64)
     }
 
     pub fn position_secs(&self) -> f64 {
@@ -80,15 +81,15 @@ impl Player {
             None => return 0.0,
         };
         let pos_fp = state.position.load(Ordering::Relaxed);
-        let pos = (pos_fp / POS_FRAC) as f64;
-        pos / state.sample_rate as f64
+        let pos_frames = (pos_fp / POS_FRAC) as f64;
+        pos_frames / state.sample_rate as f64
     }
 
     /// Load audio data for playback. Stops any current playback first.
     pub fn load(&mut self, audio: Audio) {
         self.stop();
         let sample_rate = audio.info.sample_rate;
-        let channels = 1u16;
+        let channels = audio.info.channels;
         let samples = audio.data.samples;
         self.state = Some(Arc::new(SharedState {
             samples,
@@ -163,17 +164,17 @@ impl Player {
         let host = cpal::default_host();
         let device = host.default_output_device().ok_or("no output device")?;
         let config = device.default_output_config().map_err(|e| format!("no default config: {e}"))?;
-        let channels = state.channels as usize;
 
         let stream_config: cpal::StreamConfig = config.clone().into();
         let stream_rate = stream_config.sample_rate;
+        let output_channels = stream_config.channels as usize;
 
         let stream = match config.sample_format() {
             cpal::SampleFormat::F32 => {
                 device.build_output_stream(
                     &stream_config,
                     move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
-                        fill_buffer::<f32>(&state, data, channels, stream_rate);
+                        fill_buffer::<f32>(&state, data, output_channels, stream_rate);
                     },
                     |err| log::error!("audio stream error: {err}"),
                     None,
@@ -196,33 +197,41 @@ impl Player {
 fn fill_buffer<T: cpal::Sample + From<f32>>(
     state: &SharedState,
     data: &mut [T],
-    channels: usize,
+    output_channels: usize,
     output_rate: u32,
 ) {
     let samples = &state.samples;
     let speed = state.speed.load(Ordering::Relaxed) as f64 / 1000.0;
     let input_rate = state.sample_rate as f64;
-    let output_rate = output_rate as f64;
+    let input_channels = state.channels as usize;
+    let output_rate_f = output_rate as f64;
 
-    // Source samples to advance per output frame (fixed-point).
-    let advance_fp = (input_rate / output_rate * speed * POS_FRAC as f64) as u64;
+    let advance_fp = (input_rate / output_rate_f * speed * POS_FRAC as f64) as u64;
 
     let mut src_pos_fp = state.position.load(Ordering::Relaxed);
     let playing = state.is_playing.load(Ordering::Relaxed);
-    let total = samples.len() as u64;
-    let total_fp = total * POS_FRAC;
+    let total_source_samples = samples.len() as u64;
+    let total_source_frames = total_source_samples / input_channels as u64;
+    let total_source_fp = total_source_frames * POS_FRAC;
 
     let mut reached_end = false;
-    let frames_out = data.len() / channels;
+    let frames_out = data.len() / output_channels;
 
-    for frame in data.chunks_mut(channels) {
-        let sample = if playing && src_pos_fp < total_fp {
-            let src_idx = (src_pos_fp / POS_FRAC) as usize;
-            let val = samples.get(src_idx).copied().unwrap_or(0.0);
+    for frame in data.chunks_mut(output_channels) {
+        let sample = if playing && src_pos_fp < total_source_fp {
+            let src_frame = (src_pos_fp / POS_FRAC) as usize;
+            let src_idx = src_frame * input_channels;
+            let val = if input_channels == 1 {
+                samples.get(src_idx).copied().unwrap_or(0.0)
+            } else {
+                let l = samples.get(src_idx).copied().unwrap_or(0.0);
+                let r = samples.get(src_idx + 1).copied().unwrap_or(0.0);
+                (l + r) / 2.0
+            };
             src_pos_fp += advance_fp;
             val
         } else {
-            if playing && src_pos_fp >= total_fp {
+            if playing && src_pos_fp >= total_source_fp {
                 reached_end = true;
             }
             0.0
@@ -235,21 +244,20 @@ fn fill_buffer<T: cpal::Sample + From<f32>>(
     state.position.store(src_pos_fp, Ordering::Relaxed);
 
     if reached_end {
-        state.position.store(total_fp, Ordering::Relaxed);
+        state.position.store(total_source_fp, Ordering::Relaxed);
         state.is_playing.store(false, Ordering::Relaxed);
     }
 
-    // Emit playback state based on position change (~100ms of source audio).
-    let pos_samples = (src_pos_fp / POS_FRAC).min(total);
+    let pos_frames = (src_pos_fp / POS_FRAC).min(total_source_frames);
     let emit_interval = (input_rate * 0.1) as u64;
-    let frames_out = frames_out as u64;
-    let prev_pos = pos_samples.saturating_sub(
-        ((advance_fp * frames_out) / POS_FRAC).max(1),
+    let frames_out_u64 = frames_out as u64;
+    let prev_pos = pos_frames.saturating_sub(
+        ((advance_fp * frames_out_u64) / POS_FRAC).max(1),
     );
-    if emit_interval > 0 && (pos_samples / emit_interval) != (prev_pos / emit_interval) {
+    if emit_interval > 0 && (pos_frames / emit_interval) != (prev_pos / emit_interval) {
         let playing = state.is_playing.load(Ordering::Relaxed);
-        let position = pos_samples as f64 / input_rate;
-        let duration = total as f64 / input_rate;
+        let position = pos_frames as f64 / input_rate;
+        let duration = total_source_frames as f64 / input_rate;
         emit_chart_event(ChartEvent::UpdatePlaybackState {
             is_playing: playing,
             position,
