@@ -52,7 +52,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 317485962;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -864107241;
 
 // Section: executor
 
@@ -3075,6 +3075,31 @@ fn wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_remo
         },
     )
 }
+fn wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_remove_by_data_type_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "KvCachedChartStorage_remove_by_data_type", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<KvCachedChartStorage>>>::sse_decode(&mut deserializer);
+let api_data_type = <crate::api::types::chart::DataType>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, crate::api::types::error::AppError>((move ||  {
+                        let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = crate::api::storage::kv_cached_chart_storage::KvCachedChartStorage::remove_by_data_type(&*api_that_guard, api_data_type)?;   Ok(output_ok)
+                    })())
+                } })
+}
 fn wire__crate__api__player__Player_duration_secs_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -5558,45 +5583,46 @@ fn pde_ffi_dispatcher_primary_impl(
 55 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_get_all_cache_impl(port, ptr, rust_vec_len, data_len),
 56 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_new_impl(port, ptr, rust_vec_len, data_len),
 57 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_remove_impl(port, ptr, rust_vec_len, data_len),
-58 => wire__crate__api__player__Player_duration_secs_impl(port, ptr, rust_vec_len, data_len),
-59 => wire__crate__api__player__Player_is_loaded_impl(port, ptr, rust_vec_len, data_len),
-60 => wire__crate__api__player__Player_is_playing_impl(port, ptr, rust_vec_len, data_len),
-61 => wire__crate__api__player__Player_load_impl(port, ptr, rust_vec_len, data_len),
-62 => wire__crate__api__player__Player_new_impl(port, ptr, rust_vec_len, data_len),
-63 => wire__crate__api__player__Player_pause_impl(port, ptr, rust_vec_len, data_len),
-64 => wire__crate__api__player__Player_play_impl(port, ptr, rust_vec_len, data_len),
-65 => wire__crate__api__player__Player_position_fraction_impl(port, ptr, rust_vec_len, data_len),
-66 => wire__crate__api__player__Player_position_secs_impl(port, ptr, rust_vec_len, data_len),
-67 => wire__crate__api__player__Player_resume_impl(port, ptr, rust_vec_len, data_len),
-68 => wire__crate__api__player__Player_seek_impl(port, ptr, rust_vec_len, data_len),
-69 => wire__crate__api__player__Player_set_speed_impl(port, ptr, rust_vec_len, data_len),
-70 => wire__crate__api__player__Player_stop_impl(port, ptr, rust_vec_len, data_len),
-71 => wire__crate__api__player__Player_total_samples_impl(port, ptr, rust_vec_len, data_len),
-91 => wire__crate__api__vad__VadEngine_current_name_impl(port, ptr, rust_vec_len, data_len),
-92 => wire__crate__api__vad__VadEngine_get_parameters_impl(port, ptr, rust_vec_len, data_len),
-93 => wire__crate__api__vad__VadEngine_list_algorithms_impl(port, ptr, rust_vec_len, data_len),
-94 => wire__crate__api__vad__VadEngine_new_impl(port, ptr, rust_vec_len, data_len),
-95 => wire__crate__api__vad__VadEngine_process_impl(port, ptr, rust_vec_len, data_len),
-96 => wire__crate__api__vad__VadEngine_set_algorithm_impl(port, ptr, rust_vec_len, data_len),
-97 => wire__crate__api__vad__VadEngine_set_parameter_impl(port, ptr, rust_vec_len, data_len),
-98 => wire__crate__api__types__config__config_default_impl(port, ptr, rust_vec_len, data_len),
-99 => wire__crate__api__events__communicator_events__create_chart_event_stream_impl(port, ptr, rust_vec_len, data_len),
-100 => wire__crate__api__core__engine__create_default_engine_impl(port, ptr, rust_vec_len, data_len),
-101 => wire__crate__api__events__communicator_events__emit_chart_event_impl(port, ptr, rust_vec_len, data_len),
-102 => wire__crate__api__transform__energy__energy_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
-103 => wire__crate__api__transform__fft__fft_transform_transform_impl(port, ptr, rust_vec_len, data_len),
-104 => wire__crate__api__util__get_min_max__get_min_max_par_impl(port, ptr, rust_vec_len, data_len),
-105 => wire__crate__api__sampling__minmax__minmax_downsample_impl(port, ptr, rust_vec_len, data_len),
-106 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(port, ptr, rust_vec_len, data_len),
-107 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(port, ptr, rust_vec_len, data_len),
-108 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(port, ptr, rust_vec_len, data_len),
-109 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(port, ptr, rust_vec_len, data_len),
-110 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(port, ptr, rust_vec_len, data_len),
-111 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_max_index_impl(port, ptr, rust_vec_len, data_len),
-112 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_y_range_impl(port, ptr, rust_vec_len, data_len),
-113 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(port, ptr, rust_vec_len, data_len),
-114 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(port, ptr, rust_vec_len, data_len),
-115 => wire__crate__api__transform__zero_crossing_rate__zero_crossing_rate_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
+58 => wire__crate__api__storage__kv_cached_chart_storage__KvCachedChartStorage_remove_by_data_type_impl(port, ptr, rust_vec_len, data_len),
+59 => wire__crate__api__player__Player_duration_secs_impl(port, ptr, rust_vec_len, data_len),
+60 => wire__crate__api__player__Player_is_loaded_impl(port, ptr, rust_vec_len, data_len),
+61 => wire__crate__api__player__Player_is_playing_impl(port, ptr, rust_vec_len, data_len),
+62 => wire__crate__api__player__Player_load_impl(port, ptr, rust_vec_len, data_len),
+63 => wire__crate__api__player__Player_new_impl(port, ptr, rust_vec_len, data_len),
+64 => wire__crate__api__player__Player_pause_impl(port, ptr, rust_vec_len, data_len),
+65 => wire__crate__api__player__Player_play_impl(port, ptr, rust_vec_len, data_len),
+66 => wire__crate__api__player__Player_position_fraction_impl(port, ptr, rust_vec_len, data_len),
+67 => wire__crate__api__player__Player_position_secs_impl(port, ptr, rust_vec_len, data_len),
+68 => wire__crate__api__player__Player_resume_impl(port, ptr, rust_vec_len, data_len),
+69 => wire__crate__api__player__Player_seek_impl(port, ptr, rust_vec_len, data_len),
+70 => wire__crate__api__player__Player_set_speed_impl(port, ptr, rust_vec_len, data_len),
+71 => wire__crate__api__player__Player_stop_impl(port, ptr, rust_vec_len, data_len),
+72 => wire__crate__api__player__Player_total_samples_impl(port, ptr, rust_vec_len, data_len),
+93 => wire__crate__api__vad__VadEngine_current_name_impl(port, ptr, rust_vec_len, data_len),
+94 => wire__crate__api__vad__VadEngine_get_parameters_impl(port, ptr, rust_vec_len, data_len),
+95 => wire__crate__api__vad__VadEngine_list_algorithms_impl(port, ptr, rust_vec_len, data_len),
+96 => wire__crate__api__vad__VadEngine_new_impl(port, ptr, rust_vec_len, data_len),
+97 => wire__crate__api__vad__VadEngine_process_impl(port, ptr, rust_vec_len, data_len),
+98 => wire__crate__api__vad__VadEngine_set_algorithm_impl(port, ptr, rust_vec_len, data_len),
+99 => wire__crate__api__vad__VadEngine_set_parameter_impl(port, ptr, rust_vec_len, data_len),
+100 => wire__crate__api__types__config__config_default_impl(port, ptr, rust_vec_len, data_len),
+101 => wire__crate__api__events__communicator_events__create_chart_event_stream_impl(port, ptr, rust_vec_len, data_len),
+102 => wire__crate__api__core__engine__create_default_engine_impl(port, ptr, rust_vec_len, data_len),
+103 => wire__crate__api__events__communicator_events__emit_chart_event_impl(port, ptr, rust_vec_len, data_len),
+104 => wire__crate__api__transform__energy__energy_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
+105 => wire__crate__api__transform__fft__fft_transform_transform_impl(port, ptr, rust_vec_len, data_len),
+106 => wire__crate__api__util__get_min_max__get_min_max_par_impl(port, ptr, rust_vec_len, data_len),
+107 => wire__crate__api__sampling__minmax__minmax_downsample_impl(port, ptr, rust_vec_len, data_len),
+108 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_add_chart_impl(port, ptr, rust_vec_len, data_len),
+109 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_new_impl(port, ptr, rust_vec_len, data_len),
+110 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_all_charts_impl(port, ptr, rust_vec_len, data_len),
+111 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_remove_chart_impl(port, ptr, rust_vec_len, data_len),
+112 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_all_charts_impl(port, ptr, rust_vec_len, data_len),
+113 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_max_index_impl(port, ptr, rust_vec_len, data_len),
+114 => wire__crate__api__communicator__stream_sink_communicator__stream_communicator_update_y_range_impl(port, ptr, rust_vec_len, data_len),
+115 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_decode_impl(port, ptr, rust_vec_len, data_len),
+116 => wire__crate__api__decoder__symphonia_decoder__symphonia_decoder_new_impl(port, ptr, rust_vec_len, data_len),
+117 => wire__crate__api__transform__zero_crossing_rate__zero_crossing_rate_calculator_transform_impl(port, ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }

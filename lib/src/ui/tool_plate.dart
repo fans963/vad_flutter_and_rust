@@ -283,15 +283,21 @@ class ControlPanel extends StatefulWidget {
 class _ControlPanelState extends State<ControlPanel> {
   bool _engineConfigured = false;
   Timer? _debounce;
+  final _vadDropdownKey = GlobalKey();
+  late final _xZoomController = TextEditingController();
+  late final _yZoomController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    refreshVadState();
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
+    _xZoomController.dispose();
+    _yZoomController.dispose();
     super.dispose();
   }
 
@@ -624,9 +630,10 @@ class _ControlPanelState extends State<ControlPanel> {
     return Watch((context) {
       final maxIdx = chartMaxIndexSignal.value;
       chartSeriesManager.versionSignal.value; // react to visibility/color changes
-      return Padding(
+      return SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Series selector ──
@@ -637,111 +644,97 @@ class _ControlPanelState extends State<ControlPanel> {
             _buildAudioBar(context),
             const SizedBox(height: 12),
             const Divider(),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
-            // ── X-axis position slider ──
-            Text(
-              '时间轴位置',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            // ── Axis controls: X and Y side by side ──
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('0%'),
+                // X-axis column
                 Expanded(
-                  child: Slider(
-                    value: xPositionSignal.value,
-                    min: 0.0,
-                    max: 1.0,
-                    divisions: 200,
-                    onChanged: (v) {
-                      xPositionSignal.value = v;
-                      recomputeVisibleRanges();
-                      _scheduleEngineUpdate();
-                    },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('X 轴', style: Theme.of(context).textTheme.titleMedium),
+                      _buildCompactSlider(
+                        context,
+                        label: '位置',
+                        value: xPositionSignal.value,
+                        min: 0.0,
+                        max: 1.0,
+                        divisions: 200,
+                        display: '${(xPositionSignal.value * 100).toStringAsFixed(0)}%',
+                        onChanged: (v) {
+                          xPositionSignal.value = v;
+                          recomputeVisibleRanges();
+                          _scheduleEngineUpdate();
+                        },
+                      ),
+                      _buildCompactSlider(
+                        context,
+                        label: '缩放',
+                        value: xZoomSignal.value.clamp(xZoomMinSignal.value, 1.0),
+                        min: xZoomMinSignal.value,
+                        max: 1.0,
+                        display: '${(xZoomSignal.value * 100).toStringAsFixed(0)}%',
+                        textController: _xZoomController,
+                        suffix: '%',
+                        textScale: 100.0,
+                        onChanged: (v) {
+                          xZoomSignal.value = v;
+                          _xZoomController.text = (v * 100).toStringAsFixed(0);
+                          recomputeVisibleRanges();
+                          _scheduleEngineUpdate();
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                const Text('100%'),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            // ── X-axis zoom slider ──
-            Text(
-              '缩放 (X)',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Row(
-              children: [
-                Text('${(xZoomSignal.value * 100).toStringAsFixed(0)}%'),
+                const SizedBox(width: 16),
+                // Y-axis column
                 Expanded(
-                  child: Slider(
-                    value: xZoomSignal.value,
-                    min: 0.05,
-                    max: 1.0,
-                    divisions: 95,
-                    onChanged: (v) {
-                      xZoomSignal.value = v;
-                      recomputeVisibleRanges();
-                      _scheduleEngineUpdate();
-                    },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Y 轴', style: Theme.of(context).textTheme.titleMedium),
+                      _buildCompactSlider(
+                        context,
+                        label: '缩放',
+                        value: yZoomSignal.value.clamp(yZoomMinSignal.value, yZoomMaxSignal.value),
+                        min: yZoomMinSignal.value,
+                        max: yZoomMaxSignal.value,
+                        display: '${yZoomSignal.value.toStringAsFixed(1)}x',
+                        textController: _yZoomController,
+                        suffix: 'x',
+                        onChanged: (v) {
+                          yZoomSignal.value = v;
+                          _yZoomController.text = v.toStringAsFixed(1);
+                          recomputeVisibleRanges();
+                          _scheduleEngineUpdate();
+                        },
+                      ),
+                      _buildCompactSlider(
+                        context,
+                        label: '位置',
+                        value: yPositionSignal.value,
+                        min: 0.0,
+                        max: 1.0,
+                        divisions: 100,
+                        display: '${(yPositionSignal.value * 100).toStringAsFixed(0)}%',
+                        onChanged: (v) {
+                          yPositionSignal.value = v;
+                          recomputeVisibleRanges();
+                          _scheduleEngineUpdate();
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                const Text('100%'),
               ],
             ),
-            const SizedBox(height: 8),
-
-            // ── Y-axis zoom slider ──
-            Text(
-              '缩放 (Y)',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Row(
-              children: [
-                Text('${yZoomSignal.value.toStringAsFixed(1)}x'),
-                Expanded(
-                  child: Slider(
-                    value: yZoomSignal.value,
-                    min: 0.1,
-                    max: 5.0,
-                    divisions: 49,
-                    onChanged: (v) {
-                      yZoomSignal.value = v;
-                      recomputeVisibleRanges();
-                      _scheduleEngineUpdate();
-                    },
-                  ),
-                ),
-                const Text('5.0x'),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            // ── Y-axis position slider ──
-            Text(
-              '位置 (Y)',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Row(
-              children: [
-                const Text('↓'),
-                Expanded(
-                  child: Slider(
-                    value: yPositionSignal.value,
-                    min: 0.0,
-                    max: 1.0,
-                    divisions: 100,
-                    onChanged: (v) {
-                      yPositionSignal.value = v;
-                      recomputeVisibleRanges();
-                      _scheduleEngineUpdate();
-                    },
-                  ),
-                ),
-                const Text('↑'),
-              ],
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
             // ── Info bar ──
             Text(
@@ -750,12 +743,63 @@ class _ControlPanelState extends State<ControlPanel> {
               'Total: ${maxIdx.toStringAsFixed(0)}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             _buildVadSection(context),
           ],
         ),
       );
     });
+  }
+
+  Widget _buildCompactSlider(
+    BuildContext context, {
+    required String label,
+    required double value,
+    required double min,
+    required double max,
+    int? divisions,
+    required String display,
+    required ValueChanged<double> onChanged,
+    TextEditingController? textController,
+    String? suffix,
+    double textScale = 1.0,
+  }) {
+    return Row(
+      children: [
+        SizedBox(width: 36, child: Text(label, style: Theme.of(context).textTheme.bodyMedium)),
+        Expanded(
+          child: Slider(
+            value: value,
+            min: min,
+            max: max,
+            divisions: divisions,
+            onChanged: onChanged,
+          ),
+        ),
+        SizedBox(
+          width: 64,
+          child: TextField(
+            controller: textController,
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              border: const OutlineInputBorder(),
+              suffixText: suffix,
+              suffixStyle: Theme.of(context).textTheme.bodySmall,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onSubmitted: (text) {
+              final parsed = double.tryParse(text);
+              if (parsed != null) {
+                onChanged((parsed / textScale).clamp(min, max));
+              }
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildVadSection(BuildContext context) {
@@ -773,17 +817,45 @@ class _ControlPanelState extends State<ControlPanel> {
           const SizedBox(height: 4),
           Row(children: [
             Expanded(
-              child: DropdownButtonFormField<String>(
-                value: algorithms.contains(currentAlgo) ? currentAlgo : null,
-                isExpanded: true,
-                items: algorithms.map((n) => DropdownMenuItem(value: n, child: Text(n))).toList(),
-                onChanged: (name) {
-                  if (name != null) selectVadAlgorithm(name);
+              child: GestureDetector(
+                key: _vadDropdownKey,
+                onTap: () async {
+                  final box = _vadDropdownKey.currentContext?.findRenderObject() as RenderBox?;
+                  if (box == null) return;
+                  final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+                  if (overlay == null) return;
+                  final selected = await showMenu<String>(
+                    context: context,
+                    position: RelativeRect.fromRect(
+                      box.localToGlobal(Offset.zero) & box.size,
+                      Offset.zero & overlay.size,
+                    ),
+                    items: algorithms
+                        .map((n) => PopupMenuItem(
+                              value: n,
+                              child: Row(children: [
+                                if (n == currentAlgo)
+                                  const Icon(Icons.check, size: 16)
+                                else
+                                  const SizedBox(width: 16),
+                                const SizedBox(width: 8),
+                                Text(n),
+                              ]),
+                            ))
+                        .toList(),
+                  );
+                  if (selected != null) selectVadAlgorithm(selected);
                 },
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  isDense: true,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).colorScheme.outline),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(children: [
+                    Expanded(child: Text(currentAlgo, style: Theme.of(context).textTheme.bodyMedium)),
+                    const Icon(Icons.arrow_drop_down, size: 20),
+                  ]),
                 ),
               ),
             ),

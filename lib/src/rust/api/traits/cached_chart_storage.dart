@@ -16,4 +16,7 @@ abstract class CachedChartStorage {
   Future<List<(String, Chart)>> getAllCache();
 
   Future<void> remove({required String key, required DataType dataType});
+
+  /// Remove all cached charts of the given data_type across all keys.
+  Future<void> removeByDataType({required DataType dataType});
 }

@@ -84,4 +84,14 @@ impl CachedChartStorage for KvCachedChartStorage {
             )))
         }
     }
+
+    fn remove_by_data_type(
+        &self,
+        data_type: crate::api::types::chart::DataType,
+    ) -> Result<(), AppError> {
+        for mut entry in self.dashmap.iter_mut() {
+            entry.value_mut().retain(|c| c.data_type != data_type);
+        }
+        Ok(())
+    }
 }

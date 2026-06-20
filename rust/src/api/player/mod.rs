@@ -172,7 +172,7 @@ impl Player {
         let stream = match config.sample_format() {
             cpal::SampleFormat::F32 => {
                 device.build_output_stream(
-                    &stream_config,
+                    stream_config,
                     move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
                         fill_buffer::<f32>(&state, data, output_channels, stream_rate);
                     },

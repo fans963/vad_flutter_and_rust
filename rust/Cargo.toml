@@ -20,10 +20,9 @@ wasm-opt = [
 flutter_rust_bridge = "=2.12.0"
 num-complex = "0.4.6"
 rayon = "1.11.0"
-rustfft = "6.4.1"
 symphonia = { version = "0.6.0", features = ["all"] }
 dashmap = { version = "6.2.1", features = ["rayon"] }
-log = "0.4.30"
+log = "0.4.32"
 android_logger = "0.15.1"
 env_logger = "0.11.10"
 ctor = "1.0.7"
@@ -33,10 +32,12 @@ console_error_panic_hook = { version = "0.1.7", optional = false }
 burn = { version = "0.21.0", default-features = false, features = ["flex"] }
 burn-flex = "0.21.0"
 burn-store = { version = "0.21.0", features = ["burnpack"] }
-cpal = "0.17.3"
+cpal = "0.18.1"
+rustfft = "6.4.1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-cpal = { version = "0.17.3", features = ["wasm-bindgen"] }
+cpal = { version = "0.18.1", features = ["wasm-bindgen"] }
+rustfft = { version = "6.4.1", features = ["wasm_simd"] }
 
 [build-dependencies]
 burn-onnx = "0.21.0"

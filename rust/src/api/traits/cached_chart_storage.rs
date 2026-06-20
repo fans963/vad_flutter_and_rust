@@ -8,4 +8,6 @@ pub trait CachedChartStorage {
     fn get(&self, key: String, data_type: DataType) -> Result<Chart, AppError>;
     fn get_all_cache(&self) -> Result<Vec<(String, Chart)>, AppError>;
     fn remove(&self, key: String, data_type: DataType) -> Result<(), AppError>;
+    /// Remove all cached charts of the given data_type across all keys.
+    fn remove_by_data_type(&self, data_type: DataType) -> Result<(), AppError>;
 }

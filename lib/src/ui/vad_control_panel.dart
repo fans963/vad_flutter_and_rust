@@ -13,14 +13,15 @@ class VadControlPanel extends StatefulWidget {
 }
 
 class _VadControlPanelState extends State<VadControlPanel> {
+  final _vadDropdownKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
     refreshVadState();
   }
 
-  Future<void> _onAlgorithmChanged(String? name) async {
-    if (name == null) return;
+  Future<void> _onAlgorithmChanged(String name) async {
     await selectVadAlgorithm(name);
   }
 
@@ -70,15 +71,45 @@ class _VadControlPanelState extends State<VadControlPanel> {
           // Algorithm selector
           Text('VAD 算法', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
-          DropdownButtonFormField<String>(
-            value: algorithms.contains(currentAlgo) ? currentAlgo : null,
-            items: algorithms
-                .map((n) => DropdownMenuItem(value: n, child: Text(n)))
-                .toList(),
-            onChanged: _onAlgorithmChanged,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          GestureDetector(
+            key: _vadDropdownKey,
+            onTap: () async {
+              final box = _vadDropdownKey.currentContext?.findRenderObject() as RenderBox?;
+              if (box == null) return;
+              final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+              if (overlay == null) return;
+              final selected = await showMenu<String>(
+                context: context,
+                position: RelativeRect.fromRect(
+                  box.localToGlobal(Offset.zero) & box.size,
+                  Offset.zero & overlay.size,
+                ),
+                items: algorithms
+                    .map((n) => PopupMenuItem(
+                          value: n,
+                          child: Row(children: [
+                            if (n == currentAlgo)
+                              const Icon(Icons.check, size: 16)
+                            else
+                              const SizedBox(width: 16),
+                            const SizedBox(width: 8),
+                            Text(n),
+                          ]),
+                        ))
+                    .toList(),
+              );
+              if (selected != null) _onAlgorithmChanged(selected);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(children: [
+                Expanded(child: Text(currentAlgo, style: Theme.of(context).textTheme.bodyMedium)),
+                const Icon(Icons.arrow_drop_down, size: 20),
+              ]),
             ),
           ),
           const SizedBox(height: 16),

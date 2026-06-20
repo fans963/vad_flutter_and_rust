@@ -32,4 +32,7 @@ abstract class KvCachedChartStorage
 
   @override
   Future<void> remove({required String key, required DataType dataType});
+
+  @override
+  Future<void> removeByDataType({required DataType dataType});
 }

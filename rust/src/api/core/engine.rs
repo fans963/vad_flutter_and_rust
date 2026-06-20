@@ -240,6 +240,9 @@ impl AudioProcessorEngine {
 
     pub async fn set_vad_algorithm(&mut self, name: String) {
         self.vad.set_algorithm(&name);
+        // Clear cached VAD charts so they get recomputed with the new algorithm
+        let _ = self.cache.remove_by_data_type(DataType::Vad);
+        self.update_all();
     }
 
     pub async fn get_vad_params(&self) -> Vec<VadParamDef> {

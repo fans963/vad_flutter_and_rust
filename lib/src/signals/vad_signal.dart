@@ -36,6 +36,7 @@ Future<void> selectVadAlgorithm(String name) async {
 
 Future<void> runVadOnFile(String filePath) async {
   final engine = await audioProcessorEngine.engine();
+  await engine.removeChart(filePath: filePath, dataType: DataType.vad);
   await engine.addChart(filePath: filePath, dataType: DataType.vad);
 }
 

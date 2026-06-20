@@ -45,19 +45,38 @@ final yViewMinSignal = signal(-0.5);
 /// Visible Y-axis maximum.
 final yViewMaxSignal = signal(0.5);
 
+// ─── Auto-computed zoom limits ──────────────────────────────────────────
+
+/// Minimum X zoom fraction (zoomed in to ~100 points of detail).
+final xZoomMinSignal = signal(0.01);
+
+/// Y zoom range: allow zooming out to 0.1x and in to 10x by default.
+final yZoomMaxSignal = signal(10.0);
+final yZoomMinSignal = signal(0.1);
+
 // ─── Fixed downsampling target (data resolution, independent of window) ─
 
 const kDownsamplePoints = 2000;
+const kMinVisiblePoints = 100;
 
 (double xStart, double xEnd) recomputeVisibleRanges() {
   final maxIdx = chartMaxIndexSignal.value;
   final xZoom = xZoomSignal.value;
   final xPos = xPositionSignal.value;
 
+  // ── Auto-compute zoom limits from data range ──────────────────────
+  if (maxIdx > 0) {
+    xZoomMinSignal.value = (kMinVisiblePoints / maxIdx).clamp(0.001, 1.0);
+  }
+
+  final yRange = yAutoMaxSignal.value - yAutoMinSignal.value;
+  if (yRange > 0) {
+    // Allow zooming out to show 10x the range, zooming in to show 1/100th
+    yZoomMinSignal.value = 0.1;
+    yZoomMaxSignal.value = max(10.0, (1.0 / yRange) * 50);
+  }
+
   // ── X-axis ──────────────────────────────────────────────────────────
-  // viewableRange = portion of total data visible
-  // When xZoom = 1.0 (full view): viewableRange = maxIdx, offset = 0 → always [0, maxIdx]
-  // When xZoom < 1.0: position slider shifts the window
   final xViewableRange = maxIdx * xZoom;
   final xOffset = (xPos - 0.5) * (maxIdx - xViewableRange);
   final xCenter = maxIdx * 0.5 + xOffset;
@@ -68,12 +87,9 @@ const kDownsamplePoints = 2000;
   xViewMaxSignal.value = xEnd;
 
   // ── Y-axis ──────────────────────────────────────────────────────────
-  // Same logic: when yZoom = 1.0 (auto), position has no effect
-  // When yZoom > 1.0 (zoomed in), position shifts the window up/down
-  final yAutoRange = yAutoMaxSignal.value - yAutoMinSignal.value;
-  final yViewableRange = yAutoRange / yZoomSignal.value;
+  final yViewableRange = yRange / yZoomSignal.value;
   final yMid = (yAutoMaxSignal.value + yAutoMinSignal.value) / 2;
-  final yOffset = (yPositionSignal.value - 0.5) * (yAutoRange - yViewableRange);
+  final yOffset = (yPositionSignal.value - 0.5) * (yRange - yViewableRange);
   final yCenter = yMid + yOffset;
 
   final yHalf = max(yViewableRange / 2, 0.001);
